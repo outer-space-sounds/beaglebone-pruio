@@ -29,9 +29,9 @@ void callback_pin1(unsigned int value, unsigned int raw_value){
    printf("Pin 1 value: %u \n", value);
 }
 
-void callback_pin2(unsigned int value, unsigned int raw_value){
-   printf("Pin 2 value: %u \n", value);
-}
+/* void callback_pin2(unsigned int value, unsigned int raw_value){ */
+/*    printf("Pin 2 value: %u \n", value); */
+/* } */
 
 unsigned int finished = 0;
 void signal_handler(int signal){
@@ -42,15 +42,21 @@ int main(int argc, const char *argv[]){
    // Listen to SIGINT signals (program termination)
    signal(SIGINT, signal_handler);
 
-   bbb_pruio_init_adc();
+   bbb_pruio_start_adc();
 
    bbb_pruio_init_adc_pin(1, 0, callback_pin1);
-   bbb_pruio_init_adc_pin(2, 8, callback_pin2);
+   bbb_pruio_init_adc_pin(2, 0, callback_pin1);
+   bbb_pruio_init_adc_pin(3, 0, callback_pin1);
+   bbb_pruio_init_adc_pin(4, 0, callback_pin1);
+   bbb_pruio_init_adc_pin(5, 0, callback_pin1);
+   bbb_pruio_init_adc_pin(6, 0, callback_pin1);
+   bbb_pruio_init_adc_pin(7, 0, callback_pin1);
+   bbb_pruio_init_adc_pin(8, 0, callback_pin1);
 
    while(!finished){
       sleep(1); 
    }
 
-   bbb_pruio_close_adc();
+   /* bbb_pruio_stop_adc(); */
    return 0;
 }

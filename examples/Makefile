@@ -1,5 +1,5 @@
-CFLAGS = -Wall -g -O2 -mtune=cortex-a8 -march=armv7-a -I../src
-LDFLAGS = -L../src -lbbb_pruio -lpthread
+CFLAGS = -Wall -g -O2 -mtune=cortex-a8 -march=armv7-a -I../include
+LDFLAGS = -L../lib -lbbb_pruio
 
 all: example
 
@@ -8,6 +8,14 @@ example: example.o
 
 example.o: example.c
 	gcc $(CFLAGS) -c -o example.o example.c
+
+library:
+	cd .. && make 
+# cd .. && make clean && make
+
+.PHONY:run
+run:
+	LD_LIBRARY_PATH=../lib ./example
 
 .PHONY:clean
 clean:

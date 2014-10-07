@@ -1,5 +1,14 @@
-**/*.un~ 
-*.swp
 examples/example
 *.o
+*.obj
 *.a
+*.elf
+*.map
+
+# Vim
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
