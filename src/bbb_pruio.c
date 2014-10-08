@@ -31,7 +31,7 @@ static int load_device_tree_overlay(){
    }
    char line[256];
    while(fgets(line, 256, f) != NULL){
-      if(strstr(line, "LIB-BBB-PRUIO-DTO") != NULL){
+      if(strstr(line, "PRUIO-DTO") != NULL){
          device_tree_overlay_loaded = 1; 
       }
    }
@@ -42,7 +42,7 @@ static int load_device_tree_overlay(){
       if(f==NULL){
          return(1);
       }
-      fprintf(f, "LIB-BBB-PRUIO-DTO");
+      fprintf(f, "PRUIO-DTO");
       fclose(f);
       usleep(100000);
    }

@@ -8,15 +8,29 @@
 // Addresses
 //
 
-#define SYSCFG 0x26004
+// PRU Module Registers
+#define PRU_ICSS_CFG 0x26000
+#define SYSCFG 0x04
 
+// Control Module Registers
 #define CONTROL_MODULE 0x44e10000
 #define CONF_P9_11 0x870
 #define CONF_P9_12 0x878
 #define CONF_P9_13 0x874
+#define CONF_P9_27 0x9a4
+#define CONF_P9_30 0x998
+#define CONF_P9_42A 0x964
 
+// Clock Module registers
+#define CM_PER 0x44e00000
+#define CM_PER_GPIO3_CLKCTRL 0xb4
+#define CM_WKUP 0x44e00400
+#define CM_WKUP_GPIO0_CLKCTRL 0x08
+
+// GPIO Module registers
 #define GPIO0 0x44e07000
 #define GPIO1 0x4804c000
+#define GPIO3 0x481ae000
 #define GPIO_CTRL 0x130
 #define GPIO_OE 0x134
 #define GPIO_DATAOUT 0x13c
@@ -59,54 +73,54 @@ int main(int argc, const char *argv[]){
 
 inline void set_mux_control(unsigned int ctl){
    // 3 bits for mux control: 
-   // [P9_11 GPIO0[30], P9_12 GPIO1[28], P9_13 GPIO0[31]]
+   // [P9_27 GPIO3[19], P9_30 GPIO3[16], P9_42A GPIO0[7]]
    switch(ctl){
       case 0:
-         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<30);
-         HWREG(GPIO1 + GPIO_DATAOUT) &= ~(1<<28);
-         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<31);
+         HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<19);
+         HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<16);
+         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<7);
          break;
 
       case 1:
-         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<30);
-         HWREG(GPIO1 + GPIO_DATAOUT) &= ~(1<<28);
-         HWREG(GPIO0 + GPIO_DATAOUT) |= ((unsigned int)1)<<31; // Explicit cast to get rig of compiler warning
+         HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<19);
+         HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<16);
+         HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<7);
          break;
 
       case 2:
-         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<30);
-         HWREG(GPIO1 + GPIO_DATAOUT) |= 1<<28;
-         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<31);
+         HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<19);
+         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<16);
+         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<7);
          break;
 
       case 3:
-         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<30);
-         HWREG(GPIO1 + GPIO_DATAOUT) |= 1<<28;
-         HWREG(GPIO0 + GPIO_DATAOUT) |= ((unsigned int)1)<<31;
+         HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<19);
+         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<16);
+         HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<7);
          break;
 
       case 4:
-         HWREG(GPIO0 + GPIO_DATAOUT) |= 1<<30;
-         HWREG(GPIO1 + GPIO_DATAOUT) &= ~(1<<28);
-         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<31);
+         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<19);
+         HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<16);
+         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<7);
          break;
 
       case 5:
-         HWREG(GPIO0 + GPIO_DATAOUT) |= 1<<30;
-         HWREG(GPIO1 + GPIO_DATAOUT) &= ~(1<<28);
-         HWREG(GPIO0 + GPIO_DATAOUT) |= ((unsigned int)1)<<31;
+         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<19);
+         HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<16);
+         HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<7);
          break;
 
       case 6:
-         HWREG(GPIO0 + GPIO_DATAOUT) |= 1<<30;
-         HWREG(GPIO1 + GPIO_DATAOUT) |= 1<<28;
-         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<31);
+         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<19);
+         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<16);
+         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<7);
          break;
 
       default: //7
-         HWREG(GPIO0 + GPIO_DATAOUT) |= 1<<30;
-         HWREG(GPIO1 + GPIO_DATAOUT) |= 1<<28;
-         HWREG(GPIO0 + GPIO_DATAOUT) |= ((unsigned int)1)<<31;
+         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<19);
+         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<16);
+         HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<7);
          break;
    }
 
@@ -119,30 +133,36 @@ inline void set_mux_control(unsigned int ctl){
 void init_ocp(){
    // Enable OCP so we can access the whole memory map for the
    // device from the PRU. Clear bit 4 of SYSCFG register
-   HWREG(SYSCFG) &= ~(1 << 4);
+   HWREG(PRU_ICSS_CFG + SYSCFG) &= ~(1 << 4);
 }
 
 void init_gpio(){
-   // Enable GPIO Module. GPIO_CTRL Register
-   /* HWREG(GPIO0 + GPIO_CTRL) = 0x00; */
-   /* HWREG(GPIO1 + GPIO_CTRL) )= 0x00; */
-
-   // Enable clock used for GPIO0 debounce. CM_WKUP_GPIO0_CLKCTRL Register
-   /* HWREG(0x44e00408) |= 1<<2; */
-   /* HWREG(0x44e00408) |= 1<<18; */
-
-   // P9_11 pin as an output, GPIO0[30], no pull.
    // See BeagleboneBlackP9HeaderTable.pdf from derekmolloy.ie
-   HWREG(CONTROL_MODULE + CONF_P9_11) = 0x0F;
-   HWREG(GPIO0 + GPIO_OE) &= ~(1<<30);
+   // Way easier to read than TI's manual
 
-   // P9_12 pin as output, GPIO1[28], no pull.
-   HWREG(CONTROL_MODULE + CONF_P9_12) = 0x0F;
-   HWREG(GPIO1 + GPIO_OE) &= ~(1<<28);
+   // Enable GPIO Module.
+   HWREG(GPIO0 + GPIO_CTRL) = 0x00;
 
-   // P9_13 pin as output, GPIO0[31], no pull.
-   HWREG(CONTROL_MODULE + CONF_P9_13) = 0x0F;
-   HWREG(GPIO0 + GPIO_OE) &= ~(1<<31);
+   // Enable GPI3 Module.
+   HWREG(GPIO3 + GPIO_CTRL) = 0x00;
+
+   // Enable clock for GPIO0 module. 
+   HWREG(CM_WKUP + CM_WKUP_GPIO0_CLKCTRL) = (0x02) | (1<<18);
+
+   // Enable clock for GPIO3 module. 
+   HWREG(CM_PER + CM_PER_GPIO3_CLKCTRL) = (0x02) | (1<<18);
+   
+   // P9_27 pin as an output, GPIO3[19], no pull.
+   HWREG(CONTROL_MODULE + CONF_P9_27) = 0x0F;
+   HWREG(GPIO3 + GPIO_OE) &= ~(1<<19);
+
+   // P9_30 pin as output, GPIO3[16], no pull.
+   HWREG(CONTROL_MODULE + CONF_P9_30) = 0x0F;
+   HWREG(GPIO3 + GPIO_OE) &= ~(1<<16);
+
+   // P9_42A pin as output, GPIO0[7], no pull.
+   HWREG(CONTROL_MODULE + CONF_P9_42A) = 0x0F;
+   HWREG(GPIO0 + GPIO_OE) &= ~(1<<7);
 }
 
 void init_adc(){
