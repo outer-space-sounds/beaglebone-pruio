@@ -12,6 +12,19 @@
 #define PRU_ICSS_CFG 0x26000
 #define SYSCFG 0x04
 
+// IEP Module Registers
+#define IEP 0x2e000
+#define IEP_TMR_GLB_CFG 0x00
+#define IEP_TMR_GLB_STS 0x04
+#define IEP_TMR_COMPEN 0x08
+#define IEP_TMR_CNT 0x0C
+#define IEP_TMR_CMP_CFG 0x40
+#define IEP_TMR_CMP_STS 0x44
+#define IEP_TMR_CMP0 0x48
+#define IEP_TMR_CMP1 0x4C
+
+
+
 // Control Module Registers
 #define CONTROL_MODULE 0x44e10000
 #define CONF_P9_11 0x870
@@ -37,13 +50,16 @@
 #define GPIO_CLEARDATAOUT 0x190
 #define GPIO_SETDATAOUT 0x194
 
-/////////////////////////////////////////////////////////////////////
-// GLOBALS
-//
 void init_ocp();
 void init_adc();
 void init_gpio();
+void init_iep_timer();
 inline void set_mux_control(unsigned int ctl);
+inline void wait_for_timer();
+
+/////////////////////////////////////////////////////////////////////
+// GLOBALS
+//
 
 /* volatile unsigned int* shared_ram; */
 volatile register unsigned int __R31;
@@ -55,6 +71,7 @@ int main(int argc, const char *argv[]){
    init_ocp();
    init_gpio();
    init_adc();
+   init_iep_timer();
 
    unsigned int i;
    unsigned int mux_control = 7;
@@ -62,7 +79,12 @@ int main(int argc, const char *argv[]){
       mux_control>6 ? mux_control=0 : mux_control++;
       set_mux_control(mux_control);
 
-      for(i=0; i<5000; i++); // Approx. 125uS = 1ms/8
+      /* for(i=0; i<5000; i++); // Approx. 125uS = 1ms/8 */
+      /* for(i=0; i<3200; i++); // Approx. 80uS = 0.64ms/8 */
+
+      // just to see if timer is stable. Loop more than 3160 times and time will change
+      for(i=0; i<3160; i++); 
+      wait_for_timer();
    }
 
    /* __R31 = 35; */
@@ -127,6 +149,53 @@ inline void set_mux_control(unsigned int ctl){
 }
 
 /////////////////////////////////////////////////////////////////////
+// INIT TIMER
+//
+void init_iep_timer(){
+   // We'll count 80uSec, clock is 200MHz
+   // use increment value of 5, compare value is then 80.000
+
+   // 1. Initialize timer to known state
+   // 1.1 Disable timer counter
+   HWREG(IEP + IEP_TMR_GLB_CFG) &= ~(1); 
+   // 1.2 Reset counter (write 1 to clear)
+   HWREG(IEP + IEP_TMR_CNT) = 0xffffffff; 
+   // 1.3 Clear overflow status
+   HWREG(IEP + IEP_TMR_GLB_STS) = 0; 
+   // 1.4Clear compare status (write 1 to clear)
+   HWREG(IEP + IEP_TMR_CMP_STS) = 0xf; 
+
+
+   // 2. Set compare values 
+   HWREG(IEP + IEP_TMR_CMP0) = 80000; 
+   // 2.1 Compare register 1 to XXXX
+   /* HWREG(IEP + IEP_TMR_CMP0) = XXXX;  */
+
+   // 3. Enable compare event for compare 0 
+   // and reset counter when compare 0 event happens
+   HWREG(IEP + IEP_TMR_CMP_CFG) = (1 << 1) | 1; 
+   
+   // 4. Set increment value (5)
+   HWREG(IEP + IEP_TMR_GLB_CFG) |= 5<<4; 
+
+   // 5. Set compensation value (not needed now)
+   HWREG(IEP + IEP_TMR_COMPEN) = 0; 
+   
+   // 6. Enable counter
+   HWREG(IEP + IEP_TMR_GLB_CFG) |= 1; 
+}
+
+inline void wait_for_timer(){
+   // Wait for compare 0 status to go high
+   while((HWREG(IEP+IEP_TMR_CMP_STS) & 1) == 0){
+      // nothing 
+   }
+
+   // Clear compare 0 status (write 1)
+   HWREG(IEP+IEP_TMR_CMP_STS) |= 1;
+}
+
+/////////////////////////////////////////////////////////////////////
 // INIT ADC
 //
 
@@ -135,7 +204,7 @@ void init_ocp(){
    // device from the PRU. Clear bit 4 of SYSCFG register
    HWREG(PRU_ICSS_CFG + SYSCFG) &= ~(1 << 4);
 }
-
+ 
 void init_gpio(){
    // See BeagleboneBlackP9HeaderTable.pdf from derekmolloy.ie
    // Way easier to read than TI's manual
