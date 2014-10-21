@@ -1,99 +1,18 @@
+#include "registers.h"
+
 /////////////////////////////////////////////////////////////////////
 // UTIL
 //
 #define HWREG(x) (*((volatile unsigned int *)(x)))
 /* #define min(a,b) (a<b ? a : b) */
 
+
 /////////////////////////////////////////////////////////////////////
-// Addresses
+// DECLARATIONS
 //
 
-// PRU Module Registers
-#define PRU_ICSS_CFG 0x26000
-#define PRU_ICSS_CFG_SYSCFG 0x04
-
-// IEP Module Registers
-#define IEP 0x2e000
-#define IEP_TMR_GLB_CFG 0x00
-#define IEP_TMR_GLB_STS 0x04
-#define IEP_TMR_COMPEN 0x08
-#define IEP_TMR_CNT 0x0C
-#define IEP_TMR_CMP_CFG 0x40
-#define IEP_TMR_CMP_STS 0x44
-#define IEP_TMR_CMP0 0x48
-#define IEP_TMR_CMP1 0x4C
-
-// Control Module Registers
-#define CONTROL_MODULE 0x44e10000
-#define CONF_P9_11 0x870
-#define CONF_P9_12 0x878
-#define CONF_P9_13 0x874
-#define CONF_P9_27 0x9a4
-#define CONF_P9_30 0x998
-#define CONF_P9_42A 0x964
-
-// Clock Module registers
-#define CM_PER 0x44e00000
-#define CM_PER_GPIO3_CLKCTRL 0xb4
-#define CM_WKUP 0x44e00400
-#define CM_WKUP_GPIO0_CLKCTRL 0x08
-#define CM_WKUP_ADC_TSK_CLKCTL 0xbc
-
-// GPIO Module registers
-#define GPIO0 0x44e07000
-#define GPIO1 0x4804c000
-#define GPIO3 0x481ae000
-#define GPIO_CTRL 0x130
-#define GPIO_OE 0x134
-#define GPIO_DATAOUT 0x13c
-#define GPIO_CLEARDATAOUT 0x190
-#define GPIO_SETDATAOUT 0x194
-
-// ADC Registers
-#define ADC_TSC 0x44e0d000
-#define ADC_TSC_IRQSTATUS 0x28
-#define ADC_TSC_IRQENABLE_SET 0x2c
-#define ADC_TSC_CTRL 0x40
-#define ADC_TSC_ADCRANGE 0x48
-#define ADC_TSC_CLKDIV 0x4c
-#define ADC_TSC_STEPENABLE 0x54
-#define ADC_TSC_STEPCONFIG1 0x64
-#define ADC_TSC_STEPDELAY1 0x68
-#define ADC_TSC_STEPCONFIG2 0x6c
-#define ADC_TSC_STEPDELAY2 0x70
-#define ADC_TSC_STEPCONFIG3 0x74
-#define ADC_TSC_STEPDELAY3 0x78
-#define ADC_TSC_STEPCONFIG4 0x7c
-#define ADC_TSC_STEPDELAY4 0x80
-#define ADC_TSC_STEPCONFIG5 0x84
-#define ADC_TSC_STEPDELAY5 0x88
-#define ADC_TSC_STEPCONFIG6 0x8c
-#define ADC_TSC_STEPDELAY6 0x90
-#define ADC_TSC_STEPCONFIG7 0x94
-#define ADC_TSC_STEPDELAY7 0x98
-#define ADC_TSC_STEPCONFIG8 0x9c
-#define ADC_TSC_STEPDELAY8 0xa0
-#define ADC_TSC_STEPCONFIG9 0xa4
-#define ADC_TSC_STEPDELAY9 0xa8
-#define ADC_TSC_STEPCONFIG10 0xac
-#define ADC_TSC_STEPDELAY10 0xb0
-#define ADC_TSC_STEPCONFIG11 0xb4
-#define ADC_TSC_STEPDELAY11 0xb8
-#define ADC_TSC_STEPCONFIG12 0xbc
-#define ADC_TSC_STEPDELAY12 0xc0
-#define ADC_TSC_STEPCONFIG13 0xc4
-#define ADC_TSC_STEPDELAY13 0xc8
-#define ADC_TSC_STEPCONFIG14 0xcc
-#define ADC_TSC_STEPDELAY14 0xd0
-#define ADC_TSC_STEPCONFIG15 0xd4
-#define ADC_TSC_STEPDELAY15 0xd8
-#define ADC_TSC_STEPCONFIG16 0xdc
-#define ADC_TSC_STEPDELAY16 0xe0
-#define ADC_TSC_FIFO0COUNT 0xe0
-#define ADC_TSC_FIFO1COUNT 0xf0
-#define ADC_TSC_FIFO0DATA 0x100
-#define ADC_TSC_FIFO1DATA 0x200
-
+volatile unsigned int* shared_ram;
+volatile register unsigned int __R31;
 
 void init_ocp();
 void init_adc();
@@ -105,22 +24,155 @@ inline void wait_for_short_timer();
 inline void wait_for_adc();
 inline void adc_start_sampling();
 inline void process_values();
+void init_buffer();
+inline void buffer_write(unsigned int message);
+
+typedef enum channel_mode{
+   CHANNEL_MODE_OFF = 0,
+   CHANNEL_MODE_RAW,
+   CHANNEL_MODE_STEPPED
+} channel_mode;
+
+typedef struct channel{
+   channel_mode mode; 
+   unsigned int value; 
+   unsigned int steps;
+   unsigned int lower_bound;
+   unsigned int upper_bound;
+} channel;
+
 
 /////////////////////////////////////////////////////////////////////
-// ANALYZE VALUES AND SEND TO ARM PROCESSOR
+// ANALYZE VALUES 
 //
 
+unsigned int mux_control;
+channel channels[14];
+/* unsigned int need_interrupt; */
+unsigned int interrupt_counter=0;
+unsigned int interrupt_counter2=0;
+
+inline void process_value(unsigned int channel_number, unsigned int value){
+   if(channels[channel_number].mode == CHANNEL_MODE_OFF){
+      return;
+   }
+
+   unsigned int truncated_value, message;
+   if(channels[channel_number].mode == CHANNEL_MODE_RAW){
+      truncated_value = value >> 5;
+      if(channels[channel_number].value != truncated_value){
+         channels[channel_number].value = truncated_value;
+         /* need_interrupt = 1; */
+         message = (channel_number << 16) | (truncated_value);
+         buffer_write(message);
+
+         /* int i; */
+         /* for(i=0; i<10000; i++); */
+      }
+   }
+}
+
 inline void process_values(){
+   // Read available samples from fifo0 in blocks of seven
+   unsigned int data, i, step_id, value, channel_number;
+   /* need_interrupt = 0; */
+   unsigned int count = HWREG(ADC_TSC + ADC_TSC_FIFO0COUNT);
+   while(count > 6){
+      for(i=0; i<7; i++){
+         data = HWREG(ADC_TSC + ADC_TSC_FIFO0DATA);
+         step_id = (data & (0xf0000)) >> 16;
+         value = (data & 0xfff);
+         if(step_id==5){ // The channel with the mux, channel 6 on adc.
+            if(mux_control == 0)
+               channel_number = 13;
+            else
+               channel_number = 6+mux_control-1;
+         }
+         else if(step_id==6){ // Last step is actually channel 5
+            channel_number = 5;
+         }
+         else{ // Other channels
+            channel_number = step_id;
+         }
+         process_value(channel_number, value);
+      }
+      count = HWREG(ADC_TSC + ADC_TSC_FIFO0COUNT);
+   }
+
+   interrupt_counter++;
+   if(interrupt_counter>12){
+      interrupt_counter = 0;
+
+      /* interrupt_counter2++; */
+      /* if(interrupt_counter2 < 10000){ */
+         __R31 = 35; 
+      /* } */
+      /* else if(interrupt_counter2 >= 100000){ */
+      /*    interrupt_counter2=0; */
+      /* } */
+   }
+}
+
+void init_values(){
+   channel new_channel;
+   new_channel.mode = CHANNEL_MODE_RAW;
+   new_channel.value = 0;
+   new_channel.steps = 0;
+   new_channel.upper_bound = 0;
+   new_channel.lower_bound = 0;
+
    int i;
-   for(i=0; i<1200; i++); 
+   for(i=0; i<14; i++){
+      channels[i] = new_channel; 
+   }
 }
 
 /////////////////////////////////////////////////////////////////////
 // MAIN
 //
 
-volatile unsigned int* shared_ram;
-volatile register unsigned int __R31;
+int main(int argc, const char *argv[]){
+   init_values();
+   init_ocp();
+   init_buffer();
+   init_gpio();
+   init_adc();
+   init_iep_timer();
+
+   unsigned int i;
+   mux_control = 7;
+
+   // TODO: exit condition
+   while(1){
+      mux_control>6 ? mux_control=0 : mux_control++;
+      set_mux_control(mux_control);
+
+      adc_start_sampling();
+      process_values();
+
+      // Debug:
+      HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<30);
+      for(i=0; i<20; i++); 
+      HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<30);
+
+      // Debug:
+      /* wait_for_short_timer(); */
+      /* HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<30); */
+      /* for(i=0; i<20; i++);  */
+      /* HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<30); */
+
+      // Debug:
+      wait_for_adc();
+      HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<30);
+      for(i=0; i<20; i++); 
+      HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<30);
+
+      wait_for_timer(); // Timer resets itself after this
+   }
+
+   __halt();
+   return 0;
+}
 
 void init_ocp(){
    // Enable OCP so we can access the whole memory map for the
@@ -131,51 +183,50 @@ void init_ocp(){
    shared_ram = (volatile unsigned int *)0x10000;
 }
 
-int main(int argc, const char *argv[]){
-   init_ocp();
-   init_gpio();
-   init_adc();
-   init_iep_timer();
+/////////////////////////////////////////////////////////////////////
+// RING BUFFER
+//
 
-   unsigned int i;
-   unsigned int mux_control = 7;
+// Communication with ARM processor is througn a ring buffer in the
+// PRU shared memory area.
+// shared_ram[0] to shared_ram[1023] is the buffer data.
+// shared_ram[1024] is the start (read) pointer.
+// shared_ram[1025] is the end (write) pointer.
+// shared_ram[1026] is the number of overflows.
+//
+// Messages are 32 bit unsigned ints. The 16 MSbits are the channel 
+// number and the 16 LSbits are the value.
+// 
+// Read these:
+// * http://en.wikipedia.org/wiki/Circular_buffer#Use_a_Fill_Count
+// * https://groups.google.com/forum/#!category-topic/beagleboard/F9JI8_vQ-mE
 
-   while(1){
-      mux_control>6 ? mux_control=0 : mux_control++;
-      set_mux_control(mux_control);
+unsigned int buffer_size;
+volatile unsigned int *buffer_start;
+volatile unsigned int *buffer_end;
 
-      adc_start_sampling();
-
-      // Debug:
-      HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<30);
-      for(i=0; i<20; i++); 
-      HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<30);
-
-      process_values();
-
-      // Debug:
-      HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<30);
-      for(i=0; i<20; i++); 
-      HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<30);
-
-      // Sample 1 to 7, it ends after 45uSec mark.
-      wait_for_adc();
-
-      // Debug:
-      /* wait_for_short_timer(); */
-      HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<30);
-      for(i=0; i<20; i++); 
-      HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<30);
-
-      wait_for_timer(); // Timer resets itself after this
-   }
-
-   /* __R31 = 35; */
-   /* __halt(); */
-
-   return 0;
+void init_buffer(){
+   // data in shared_ram[0] to shared_ram[127]
+   buffer_size = 1024; 
+   buffer_start = &(shared_ram[1024]);
+   buffer_end = &(shared_ram[1025]);
+   *buffer_start = 0;
+   *buffer_end = 0;
+   shared_ram[1026] = 0;
 }
 
+inline void buffer_write(unsigned int message){
+   // Note that if buffer is full, messages will be dropped
+   unsigned int is_full = (*buffer_end == (*buffer_start^buffer_size)); // ^ is orex
+   if(!is_full){
+      shared_ram[*buffer_end & (buffer_size-1)] = message;
+      // Increment buffer end, wrap around size
+      *buffer_end = (*buffer_end+1) & (2*buffer_size - 1);
+   }
+   else{
+      shared_ram[1026] ++; 
+   }
+}
 
 /////////////////////////////////////////////////////////////////////
 // TIMER
@@ -344,6 +395,7 @@ inline void wait_for_adc(){
 inline void adc_start_sampling(){
    // Enable steps 1 to 7
    HWREG(ADC_TSC + ADC_TSC_STEPENABLE) = 0xfe;
+   /* HWREG(ADC_TSC + ADC_TSC_STEPENABLE) = 0b111110; // 1 to 5 */
 }
 
 void init_adc(){
@@ -377,7 +429,7 @@ void init_adc(){
 
    // Set config and delays for step 1: 
    // Sw mode, one shot mode, fifo0, channel 0.
-   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG1) = 0 | (0x0<<26) | (0x00<<19) | (0x00<<15) | (average<<2) | (0x00);
+   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG1) = 0 | (0<<26) | (0<<19) | (0<<15) | (average<<2) | (0);
    HWREG(ADC_TSC + ADC_TSC_STEPDELAY1)  = 0 | (sample_delay - 1)<<24 | open_delay;
 
    // Set config and delays for step 2: 
