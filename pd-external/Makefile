@@ -5,7 +5,9 @@ LIBRARY_NAME = bbb_gpio
 # variable, help files will be included automatically, and for GUI
 # objects, the matching .tcl file too
 # SOURCES = bbb_input.c bbb_output.c
-SOURCES = bbb_input.c
+SOURCES = bbb_input.c bbb_input~.c
+
+
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically

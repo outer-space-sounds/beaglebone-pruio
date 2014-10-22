@@ -83,13 +83,11 @@ static void clock_tick(t_input *x){
    /* x->previous_time = x->time; */
    /* x->time = clock_getlogicaltime(); */
 
-   error("%f", (float)(x->time - x->previous_time));
-
-   /* x->counter ++; */
-   /* if(x->counter > 100){ */
-   /*    post("time: %llu", x->time - x->previous_time); */
-   /*    x->counter = 0; */
-   /* } */
+   x->counter ++;
+   if(x->counter > 1000){
+      post("time: %lu", x->time - x->previous_time);
+      x->counter = 0;
+   }
 
 }
 
