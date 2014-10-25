@@ -37,7 +37,6 @@ int main(int argc, const char *argv[]){
    unsigned int data_counter = 0;
 
    unsigned int message;
-   int overruns_pru = 0;
    while(!finished && data_counter<10000){
       while(bbb_pruio_messages_are_available()){
          bbb_pruio_read_message(&message);
@@ -56,7 +55,7 @@ int main(int argc, const char *argv[]){
          overruns += (data[i] - data[i-1] - 1);
       }
    }
-   printf("\noverruns: %i %u\n", overruns, shared_ram[1026]);
+   printf("\nOverruns: %i\n", overruns);
 
    bbb_pruio_stop_adc();
 

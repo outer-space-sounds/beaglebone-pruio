@@ -110,7 +110,7 @@ static int init_pru_system(){
    // Get pointer to shared ram
    void* p;
    if(prussdrv_map_prumem(PRUSS0_SHARED_DATARAM, &p)) return 1;
-   shared_ram = (volatile unsigned int*)p;
+   bbb_pruio_shared_ram = (volatile unsigned int*)p;
 
    return 0;
 }
@@ -222,47 +222,12 @@ static int start_pru0_program(){
 /* } */
 
 
-/////////////////////////////////////////////////////////////////////
-// Ring buffer.
+/////////////////////////////////////////////////////////////////////////////
+// Ring buffer (see header file for more)
 //
-
-// Communication with PRU  is througn a ring buffer in the
-// PRU shared memory area.
-// shared_ram[0] to shared_ram[1023] is the buffer data.
-// shared_ram[1024] is the start (read) pointer.
-// shared_ram[1025] is the end (write) pointer.
-//
-// Messages are 32 bit unsigned ints. The 16 MSbits are the channel 
-// number and the 16 LSbits are the value.
-// 
-// Read these:
-// * http://en.wikipedia.org/wiki/Circular_buffer#Use_a_Fill_Count
-// * https://groups.google.com/forum/#!category-topic/beagleboard/F9JI8_vQ-mE
-
-static unsigned int buffer_size;
-static volatile unsigned int *buffer_start;
-static volatile unsigned int *buffer_end;
 
 static void buffer_init(){
-   buffer_size = 1024;
-   buffer_start = &(shared_ram[1024]); // value inited to 0 in pru
-   buffer_end = &(shared_ram[1025]); // value inited to 0 in pru
+   bbb_pruio_buffer_size = 1024;
+   bbb_pruio_buffer_start = &(bbb_pruio_shared_ram[1024]); // value inited to 0 in pru
+   bbb_pruio_buffer_end = &(bbb_pruio_shared_ram[1025]); // value inited to 0 in pru
 }
-
-int bbb_pruio_messages_are_available(){
-   return (*buffer_start != *buffer_end);
-}
-
-void bbb_pruio_read_message(unsigned int* message){
-   *message = shared_ram[*buffer_start & (buffer_size-1)];
-
-   // Don't write buffer start before reading message (mem barrier)
-   // http://stackoverflow.com/questions/982129/what-does-sync-synchronize-do
-   // https://en.wikipedia.org/wiki/Memory_ordering#Compiler_memory_barrier
-   __sync_synchronize();
-
-   // Increment buffer start, wrap around 2*size
-   *buffer_start = (*buffer_start+1) & (2*buffer_size - 1);
-}
-
-
