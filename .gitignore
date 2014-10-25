@@ -1,4 +1,4 @@
-examples/example
+example/example
 *.o
 *.obj
 *.a

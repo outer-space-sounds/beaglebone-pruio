@@ -22,7 +22,7 @@
 #include "m_pd.h"
 
 /* #include <sys/time.h> */
-#include <time.h>
+/* #include <time.h> */
 
 /* #include <string.h> */
 /* #include <pthread.h> */
@@ -42,6 +42,7 @@ typedef struct input {
 
    unsigned long time;
    unsigned long previous_time;
+   unsigned long average_time;
    unsigned int counter;
 
    t_clock *clock;
@@ -69,12 +70,14 @@ t_class *bbb_input_class;
 /* struct timeval t; */
 
 static void clock_tick(t_input *x){
-   clock_delay(x->clock, 1.0); // 1 millisecond
+   clock_delay(x->clock, 1); // 1 millisecond
 
-   struct timespec t;
-   x->previous_time = x->time;
-   clock_gettime(CLOCK_MONOTONIC,&t);
-   x->time = 1000000000*t.tv_sec + t.tv_nsec;
+
+   /* struct timespec t; */
+   /* clock_gettime(CLOCK_MONOTONIC,&t); */
+   /* x->previous_time = x->time; */
+   /* x->time = 1000000000*t.tv_sec + t.tv_nsec; */
+   /* x->average_time += x->average_time; */
 
    /* gettimeofday(&t,NULL); */
    /* x->previous_time = x->time; */
@@ -83,11 +86,11 @@ static void clock_tick(t_input *x){
    /* x->previous_time = x->time; */
    /* x->time = clock_getlogicaltime(); */
 
-   x->counter ++;
-   if(x->counter > 1000){
-      post("time: %lu", x->time - x->previous_time);
-      x->counter = 0;
-   }
+   /* x->counter ++; */
+   /* if(x->counter > 1000){ */
+   /*    post("time: %lu", x->time - x->previous_time); */
+   /*    x->counter = 0; */
+   /* } */
 
 }
 

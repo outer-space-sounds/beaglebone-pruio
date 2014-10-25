@@ -20,18 +20,7 @@
 #include <stdio.h>
 #include <signal.h>
 #include <unistd.h>
-
 #include <bbb_pruio.h>
-
-// Attention: callback functions are invoked
-// from another thread, use appropriate locks.
-void callback_pin1(unsigned int value, unsigned int raw_value){
-   printf("Pin 1 value: %u \n", value);
-}
-
-/* void callback_pin2(unsigned int value, unsigned int raw_value){ */
-/*    printf("Pin 2 value: %u \n", value); */
-/* } */
 
 unsigned int finished = 0;
 void signal_handler(int signal){
@@ -44,19 +33,32 @@ int main(int argc, const char *argv[]){
 
    bbb_pruio_start_adc();
 
-   bbb_pruio_init_adc_pin(1, 0, callback_pin1);
-   bbb_pruio_init_adc_pin(2, 0, callback_pin1);
-   bbb_pruio_init_adc_pin(3, 0, callback_pin1);
-   bbb_pruio_init_adc_pin(4, 0, callback_pin1);
-   bbb_pruio_init_adc_pin(5, 0, callback_pin1);
-   bbb_pruio_init_adc_pin(6, 0, callback_pin1);
-   bbb_pruio_init_adc_pin(7, 0, callback_pin1);
-   bbb_pruio_init_adc_pin(8, 0, callback_pin1);
+   unsigned int data[100000];
+   unsigned int data_counter = 0;
 
-   while(!finished){
-      sleep(1); 
+   unsigned int message;
+   int overruns_pru = 0;
+   while(!finished && data_counter<10000){
+      while(bbb_pruio_messages_are_available()){
+         bbb_pruio_read_message(&message);
+         data[data_counter] = message;
+         data_counter++;
+      }
+      usleep(13000); 
    }
 
-   /* bbb_pruio_stop_adc(); */
+
+   int i, overruns = 0;
+   for(i=0; i<10000; i++){
+      if(i>0 && (data[i]-1 != data[i-1])){
+         printf("\n%u: %u %u", i, data[i], data[i-1]);   
+         printf(" <-- !!!!");
+         overruns += (data[i] - data[i-1] - 1);
+      }
+   }
+   printf("\noverruns: %i %u\n", overruns, shared_ram[1026]);
+
+   bbb_pruio_stop_adc();
+
    return 0;
 }

@@ -1,12 +1,17 @@
 
-# PREFIX=/usr/local
-PREFIX=/root/libbbb_pruio/repo
-
 ################################################################################
 # Constants
 #
 
-PRU_COMPILER_DIR=vendors/pru_2.0.0B2
+# PREFIX=/usr/local
+PREFIX=/root/libbbb_pruio/repo/library
+
+# Make makefile silent, you can do `VERBOSE=1 make whatever` to get messages
+ifndef VERBOSE
+.SILENT:
+endif
+
+PRU_COMPILER_DIR=../vendors/pru_2.0.0B2
 PRU_C_FLAGS=--silicon_version=2 --hardware_mac=on -i$(PRU_COMPILER_DIR)/include \
 				-i$(PRU_COMPILER_DIR)/lib 
 PRU_LD_FLAGS=-llibc.a
@@ -26,7 +31,7 @@ all: lib/libbbb_pruio.a
 
 # 0. Compile and install device tree overlay
 device-tree-overlay/LIB-BBB-PRUIO-DTO-00A0.dtb:
-	cd device-tree-overlay && make && make install
+	cd ../device-tree-overlay && make && make install
 
 # 1. Compile pru0_main.c into pru0_main.obj
 src/pru0_main.obj: src/pru0_main.c
@@ -59,18 +64,20 @@ lib/libbbb_pruio.a: src/bbb_pruio.o device-tree-overlay/LIB-BBB-PRUIO-DTO-00A0.d
 	cp src/bbb_pruio.h include/
 	gcc $(HOST_LD_FLAGS) -o lib/libbbb_pruio.so src/bbb_pruio.o $(HOST_LIBS)
 
+
+
 #####################################################################
-# Util
+# Utility commands
 #
 
 .PHONY: clean
 clean:
-	-rm src/*.obj
-	-rm src/*.map
-	-rm src/*.elf
-	-rm src/*.o
-	-rm lib/*
-	-rm include/*
+	-rm src/*.obj 2> /dev/null
+	-rm src/*.map 2> /dev/null
+	-rm src/*.elf 2> /dev/null
+	-rm src/*.o 2> /dev/null
+	-rm lib/* 2> /dev/null
+	-rm include/* 2> /dev/null
 
 .PHONY: install
 install:
@@ -80,6 +87,5 @@ install:
 
 .PHONY: uninstall
 uninstall:
-	rm $(PREFIX)/lib/libbbb_pruio*
-	rm $(PREFIX)/include/bbb_pruio.h
-	cd make uninstall
+	-rm $(PREFIX)/lib/libbbb_pruio*
+	-rm $(PREFIX)/include/bbb_pruio.h
