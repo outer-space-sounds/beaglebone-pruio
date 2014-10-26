@@ -3,8 +3,9 @@
 # Constants
 #
 
+PREFIX=/usr
 # PREFIX=/usr/local
-PREFIX=/root/libbbb_pruio/repo/library
+# PREFIX=/root/libbbb_pruio/repo/library
 
 # Make makefile silent, you can do `VERBOSE=1 make whatever` to get messages
 ifndef VERBOSE
@@ -81,9 +82,9 @@ clean:
 
 .PHONY: install
 install:
-	cp lib/* $(PREFIX)/lib
-	cp include/* $(PREFIX)/include
-	cd device-tree-overlay && make && make install
+	cp -f lib/* $(PREFIX)/lib
+	cp -f include/* $(PREFIX)/include
+	cd ../device-tree-overlay && make && make install
 
 .PHONY: uninstall
 uninstall:

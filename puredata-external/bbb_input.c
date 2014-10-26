@@ -1,7 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // 
-//  Pd-BeagleBoneBlack-Io  
-//
+//  Lib BBB Pruio
 //  Copyright (C) 2014 Rafael Vega <rvega@elsoftwarehamuerto.org>
 //
 //  This program is free software: you can redistribute it and/or modify it 
@@ -20,6 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "m_pd.h"
+#include <bbb_pruio.h>
 
 /* #include <sys/time.h> */
 /* #include <time.h> */
@@ -70,7 +70,32 @@ t_class *bbb_input_class;
 /* struct timeval t; */
 
 static void clock_tick(t_input *x){
-   clock_delay(x->clock, 1); // 1 millisecond
+   clock_delay(x->clock, 0.666); // 0.666 milliseconds
+
+   // Read messages from PRU.
+   unsigned int message;
+   float channel_number, value;
+   t_atom list[2];
+   while(bbb_pruio_messages_are_available()){
+      bbb_pruio_read_message(&message);
+
+      // 16 MSB are the channel number, 16 LSB are the value;
+      channel_number = message >> 16;
+      value = message & 0xffff;
+      /* post("%f %f", channel_number, value); */
+
+      SETFLOAT(&list[0], channel_number);
+      SETFLOAT(&list[1], value);
+      outlet_list(x->outlet_left, gensym("list"), 2, list);
+   }
+
+
+
+
+
+
+
+
 
 
    /* struct timespec t; */
@@ -106,13 +131,17 @@ static void *bbb_input_new(void) {
    x->time = 0;
    /* x->previous_time = 0; */
 
-   clock_delay(x->clock, 1.0);
+   // Use a pd clock to tick every 0.666 millisecond
+   clock_delay(x->clock, 0.666);
+
+   bbb_pruio_start_adc();
 
    return (void *)x;
 }
 
 static void bbb_input_free(t_input *x) { 
    clock_free(x->clock);
+   bbb_pruio_stop_adc();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -120,7 +149,7 @@ static void bbb_input_free(t_input *x) {
 // 
 
 void bbb_input_setup(void) {
-   bbb_input_class = class_new(gensym("input"), (t_newmethod)bbb_input_new, (t_method)bbb_input_free, sizeof(t_input), CLASS_DEFAULT, (t_atomtype)0);
+   bbb_input_class = class_new(gensym("bbb_input"), (t_newmethod)bbb_input_new, (t_method)bbb_input_free, sizeof(t_input), CLASS_DEFAULT, (t_atomtype)0);
    /* class_addmethod(bbb_input_class, (t_method)bbb_input_digital, gensym("digital"), A_GIMME, 0); */
    /* class_addmethod(bbb_input_class, (t_method)bbb_input_analog, gensym("analog"), A_GIMME, 0); */
 }

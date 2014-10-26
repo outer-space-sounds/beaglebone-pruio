@@ -27,15 +27,16 @@ inline void process_values();
 void init_buffer();
 inline void buffer_write(unsigned int *message);
 
-typedef enum channel_mode{
-   CHANNEL_MODE_OFF = 0,
-   CHANNEL_MODE_RAW,
-   CHANNEL_MODE_STEPPED
-} channel_mode;
+/* typedef enum channel_mode{ */
+/*    CHANNEL_MODE_OFF = 0, */
+/*    CHANNEL_MODE_RAW, */
+/*    CHANNEL_MODE_STEPPED */
+/* } channel_mode; */
 
 typedef struct channel{
-   channel_mode mode; 
+   /* channel_mode mode;  */
    unsigned int value; 
+   unsigned int past_values[8]; 
    unsigned int steps;
    unsigned int lower_bound;
    unsigned int upper_bound;
@@ -48,90 +49,99 @@ typedef struct channel{
 
 unsigned int mux_control;
 channel channels[14];
-unsigned int average_counter;
+
+/* unsigned int average_counter; */
 /* unsigned int need_interrupt; */
 /* unsigned int interrupt_counter=0; */
 /* unsigned int interrupt_counter2=0; */
 
 inline void process_value(unsigned int channel_number, unsigned int value){
+
+   // Channel is OFF
    /* if(channels[channel_number].mode == CHANNEL_MODE_OFF){ */
    /*    return; */
    /* } */
 
-   /* unsigned int truncated_value, message; */
+   // Channel is in RAW mode. Send new value if it's different to the old one.
    /* if(channels[channel_number].mode == CHANNEL_MODE_RAW){ */
-   /*    truncated_value = value >> 5; */
-   /*    if(channels[channel_number].value != truncated_value){ */
-   /*       channels[channel_number].value = truncated_value; */
-   /*       message = (channel_number << 16) | (truncated_value); */
-   /*       buffer_write(&message); */
+      unsigned int i, average;
+      unsigned int message;
 
-   /*       #<{(| int i; |)}># */
-   /*       #<{(| for(i=0; i<10000; i++); |)}># */
-   /*    } */
+      value = value >> 5;
+
+      // Channels 0 to 5 are sampled 8 times faster than channels 6 to 13.
+      // Calculate 8 times average. mux_control counter is re-used to count 
+      // the 8 samples.
+      if(channel_number < 6){
+         channels[channel_number].past_values[mux_control] = value;
+         if(mux_control==7){
+            average = 0;
+            for(i=0; i<7; i++) {
+               average += channels[channel_number].past_values[i];
+            }
+            average = average >> 3;  // Integer division by 8.
+
+            // Send the value to ARM
+            if(channels[channel_number].value != average){
+               channels[channel_number].value = average;
+               message = (channel_number << 16) + (average);
+               buffer_write(&message);
+            }
+         }
+      }
+      else{ // channels 6 to 13
+         // Send the value to ARM
+         if(channels[channel_number].value != value){
+            channels[channel_number].value = value;
+            message = (channel_number << 16) + (value);
+            buffer_write(&message);
+         }
+      }
    /* } */
 }
 
+// Read available samples from fifo0 in blocks of seven, figure out
+// which channel they belong to (using step id and mux control) and
+// send them to process_value (singular) function.
 inline void process_values(){
-   int i;
-   for(i=0; i<7; i++) {
-      if(average_counter>=100000) return;
-
-      buffer_write(&average_counter);
-      average_counter++;   
+   unsigned int data, i, step_id, value, channel_number;
+   unsigned int count = HWREG(ADC_TSC + ADC_TSC_FIFO0COUNT);
+   while(count > 6){
+      for(i=0; i<7; i++){
+         data = HWREG(ADC_TSC + ADC_TSC_FIFO0DATA);
+         step_id = (data & (0x000f0000)) >> 16;
+         value = (data & 0xfff);
+         if(step_id==5){ // The channel with the mux, channel 6 on adc.
+            if(mux_control == 0)
+               channel_number = 13;
+            else
+               channel_number = 6+mux_control-1;
+         }
+         else if(step_id==6){ // Last step is actually channel 5
+            channel_number = 5;
+         }
+         else{ // Other channels
+            channel_number = step_id;
+         }
+         process_value(channel_number, value);
+      }
+      count = HWREG(ADC_TSC + ADC_TSC_FIFO0COUNT);
    }
-
-
-   /* // Read available samples from fifo0 in blocks of seven */
-   /* unsigned int data, i, step_id, value, channel_number; */
-   /* #<{(| need_interrupt = 0; |)}># */
-   /* unsigned int count = HWREG(ADC_TSC + ADC_TSC_FIFO0COUNT); */
-   /* while(count > 6){ */
-   /*    for(i=0; i<7; i++){ */
-   /*       data = HWREG(ADC_TSC + ADC_TSC_FIFO0DATA); */
-   /*       step_id = (data & (0xf0000)) >> 16; */
-   /*       value = (data & 0xfff); */
-   /*       if(step_id==5){ // The channel with the mux, channel 6 on adc. */
-   /*          if(mux_control == 0) */
-   /*             channel_number = 13; */
-   /*          else */
-   /*             channel_number = 6+mux_control-1; */
-   /*       } */
-   /*       else if(step_id==6){ // Last step is actually channel 5 */
-   /*          channel_number = 5; */
-   /*       } */
-   /*       else{ // Other channels */
-   /*          channel_number = step_id; */
-   /*       } */
-   /*       process_value(channel_number, value); */
-   /*    } */
-   /*    count = HWREG(ADC_TSC + ADC_TSC_FIFO0COUNT); */
-   /* } */
-
-   /* interrupt_counter++; */
-   /* if(interrupt_counter>12){ */
-      /* interrupt_counter = 0; */
-
-      /* interrupt_counter2++; */
-      /* if(interrupt_counter2 < 10000){ */
-         /* __R31 = 35;  */
-      /* } */
-      /* else if(interrupt_counter2 >= 100000){ */
-      /*    interrupt_counter2=0; */
-      /* } */
-   /* } */
 }
 
 void init_values(){
-   average_counter = 0;
-   
+   int i;
+
    channel new_channel;
-   new_channel.mode = CHANNEL_MODE_RAW;
+   /* new_channel.mode = CHANNEL_MODE_RAW; */
    new_channel.value = 0;
    new_channel.steps = 0;
    new_channel.upper_bound = 0;
    new_channel.lower_bound = 0;
-   int i;
+   for(i=0; i<8; i++) {
+      new_channel.past_values[i] = 0;
+   }
+
    for(i=0; i<14; i++){
       channels[i] = new_channel; 
    }
@@ -154,6 +164,7 @@ int main(int argc, const char *argv[]){
 
    // TODO: exit condition
    while(1){
+      mux_control>6 ? mux_control=0 : mux_control++;
       set_mux_control(mux_control);
 
       adc_start_sampling();
@@ -201,7 +212,6 @@ void init_ocp(){
 // shared_ram[0] to shared_ram[1023] is the buffer data.
 // shared_ram[1024] is the start (read) pointer.
 // shared_ram[1025] is the end (write) pointer.
-// shared_ram[1026] is the number of overflows.
 //
 // Messages are 32 bit unsigned ints. The 16 MSbits are the channel 
 // number and the 16 LSbits are the value.
@@ -221,7 +231,6 @@ void init_buffer(){
    buffer_end = &(shared_ram[1025]);
    *buffer_start = 0;
    *buffer_end = 0;
-   shared_ram[1026] = 0;
 }
 
 inline void buffer_write(unsigned int *message){
@@ -231,9 +240,6 @@ inline void buffer_write(unsigned int *message){
       shared_ram[*buffer_end & (buffer_size-1)] = *message;
       // Increment buffer end, wrap around 2*size
       *buffer_end = (*buffer_end+1) & (2*buffer_size - 1);
-   }
-   else if(average_counter<10000){
-      shared_ram[1026] ++; 
    }
 }
 

@@ -5,7 +5,8 @@ LIBRARY_NAME = bbb_gpio
 # variable, help files will be included automatically, and for GUI
 # objects, the matching .tcl file too
 # SOURCES = bbb_input.c bbb_output.c
-SOURCES = bbb_input.c bbb_input~.c
+# SOURCES = bbb_input.c bbb_input~.c
+SOURCES = bbb_input.c
 
 
 
@@ -36,8 +37,10 @@ UNITTESTS =
 #
 #------------------------------------------------------------------------------#
 
+# ALL_CFLAGS = -I"$(PD_INCLUDE)" `pkg-config glib-2.0 --cflags` 
 ALL_CFLAGS = -I"$(PD_INCLUDE)" `pkg-config glib-2.0 --cflags` 
-ALL_LDFLAGS =  -lrt
+ALL_LDFLAGS =  -lrt -lbbb_pruio
+# ALL_LDFLAGS =  -lrt
 SHARED_LDFLAGS =
 ALL_LIBS = `pkg-config glib-2.0 --libs`
 

@@ -37,7 +37,7 @@ int bbb_pruio_stop_adc();
 inline int bbb_pruio_messages_are_available();
 
 /**
- * "returns" the next message available from the PRU without copying it.
+ * "returns" the next message available from the PRU copying it.
  */
 inline void bbb_pruio_read_message(unsigned int *message);
 
@@ -67,11 +67,11 @@ unsigned int bbb_pruio_buffer_size;
 volatile unsigned int *bbb_pruio_buffer_start;
 volatile unsigned int *bbb_pruio_buffer_end;
 
-inline int bbb_pruio_messages_are_available(){
+inline __attribute__ ((always_inline)) int bbb_pruio_messages_are_available(){
    return (*bbb_pruio_buffer_start != *bbb_pruio_buffer_end);
 }
 
-inline void bbb_pruio_read_message(unsigned int* message){
+inline __attribute__ ((always_inline)) void bbb_pruio_read_message(unsigned int* message){
    *message = bbb_pruio_shared_ram[*bbb_pruio_buffer_start & (bbb_pruio_buffer_size-1)];
 
    // Don't write buffer start before reading message (mem barrier)
