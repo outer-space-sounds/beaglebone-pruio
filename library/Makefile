@@ -3,9 +3,9 @@
 # Constants
 #
 
-PREFIX=/usr
-# PREFIX=/usr/local
-# PREFIX=/root/libbbb_pruio/repo/library
+# PREFIX?=/usr
+# PREFIX?=/usr/local
+PREFIX?=/root/libbbb_pruio/repo/library
 
 # Make makefile silent, you can do `VERBOSE=1 make whatever` to get messages
 ifndef VERBOSE
@@ -19,7 +19,7 @@ PRU_LD_FLAGS=-llibc.a
 
 HOST_C_FLAGS += -Wall -g -O2 -mtune=cortex-a8 -march=armv7-a -fPIC -Isrc/ 
 HOST_LD_FLAGS += -shared -Wl,-soname,libbbb_pruio.so
-HOST_LIBS += -lprussdrv -lpthread -lrt
+HOST_LIBS += -lprussdrv
 
 FIND_ADDRESS_0_COMMAND=`$(PRU_COMPILER_DIR)/bin/dispru src/pru0.elf \
 							  | grep _c_int00 | cut -f1 -d\  `

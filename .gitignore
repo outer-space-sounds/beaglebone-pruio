@@ -1,9 +1,11 @@
-example/example
+c-example/example
+*.so
 *.o
 *.obj
 *.a
 *.elf
 *.map
+*.bin
 
 # Vim
 [._]*.s[a-w][a-z]

@@ -50,11 +50,6 @@ typedef struct channel{
 unsigned int mux_control;
 channel channels[14];
 
-/* unsigned int average_counter; */
-/* unsigned int need_interrupt; */
-/* unsigned int interrupt_counter=0; */
-/* unsigned int interrupt_counter2=0; */
-
 inline void process_value(unsigned int channel_number, unsigned int value){
 
    // Channel is OFF
@@ -82,20 +77,20 @@ inline void process_value(unsigned int channel_number, unsigned int value){
             average = average >> 3;  // Integer division by 8.
 
             // Send the value to ARM
-            if(channels[channel_number].value != average){
+            /* if(channels[channel_number].value != average){ */
                channels[channel_number].value = average;
                message = (channel_number << 16) + (average);
                buffer_write(&message);
-            }
+            /* } */
          }
       }
       else{ // channels 6 to 13
          // Send the value to ARM
-         if(channels[channel_number].value != value){
+         /* if(channels[channel_number].value != value){ */
             channels[channel_number].value = value;
             message = (channel_number << 16) + (value);
             buffer_write(&message);
-         }
+         /* } */
       }
    /* } */
 }
@@ -162,8 +157,10 @@ int main(int argc, const char *argv[]){
    unsigned int i;
    mux_control = 7;
 
+   unsigned int finished = 0;
+
    // TODO: exit condition
-   while(1){
+   while(!finished){
       mux_control>6 ? mux_control=0 : mux_control++;
       set_mux_control(mux_control);
 

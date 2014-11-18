@@ -22,6 +22,14 @@ library:
 run:
 	LD_LIBRARY_PATH=../library/lib ./example
 
+.PHONY:debugger
+debugger:
+	LD_LIBRARY_PATH=../library/lib gdb ./example
+
+.PHONY:valgrind
+valgrind:
+	LD_LIBRARY_PATH=../library/lib valgrind ./example
+
 .PHONY:clean
 clean:
 	-rm example.o 2> /dev/null
