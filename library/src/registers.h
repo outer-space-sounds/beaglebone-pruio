@@ -1,3 +1,8 @@
+#ifndef REGISTERS_H
+#define REGISTERS_H
+
+#include "pins.h"
+
 /////////////////////////////////////////////////////////////////////
 // Register addresses
 //
@@ -25,6 +30,7 @@
 #define CONF_P9_27 0x9a4
 #define CONF_P9_30 0x998
 #define CONF_P9_42A 0x964
+// TODO: all of them!
 
 // Clock Module registers
 #define CM_PER 0x44e00000
@@ -36,10 +42,14 @@
 // GPIO Module registers
 #define GPIO0 0x44e07000
 #define GPIO1 0x4804c000
+#define GPIO2 0x481ac000
 #define GPIO3 0x481ae000
 #define GPIO_CTRL 0x130
 #define GPIO_OE 0x134
+#define GPIO_DATAIN 0x138
 #define GPIO_DATAOUT 0x13c
+#define GPIO_DEBOUNCENABLE 0x150
+#define GPIO_DEBOUNCINGTIME 0x154
 #define GPIO_CLEARDATAOUT 0x190
 #define GPIO_SETDATAOUT 0x194
 
@@ -87,3 +97,39 @@
 #define ADC_TSC_FIFO1COUNT 0xf0
 #define ADC_TSC_FIFO0DATA 0x100
 #define ADC_TSC_FIFO1DATA 0x200
+
+char * get_gpio_pin_configuration_register(int pin_number){
+   int r;
+   switch (pin_number) {
+      case P9_11:
+         r = CONF_P9_11;
+         break;
+
+      case P9_12:
+         r = CONF_P9_12;
+         break;
+
+      case P9_13:
+         r = CONF_P9_13;
+         break;
+
+      case P9_27:
+         r = CONF_P9_27;
+         break;
+
+      case P9_30:
+         r = CONF_P9_30;
+         break;
+
+      case P9_42A:
+         r = CONF_P9_42A;
+         break;
+
+      default:
+         r = 0;
+   }
+   return (char*)r;
+}
+
+#endif //REGISTERS_H
+

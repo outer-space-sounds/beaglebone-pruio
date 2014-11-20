@@ -134,14 +134,14 @@ static void *bbb_input_new(void) {
    // Use a pd clock to tick every 0.666 millisecond
    clock_delay(x->clock, 0.666);
 
-   bbb_pruio_start_adc();
+   bbb_pruio_start();
 
    return (void *)x;
 }
 
 static void bbb_input_free(t_input *x) { 
    clock_free(x->clock);
-   bbb_pruio_stop_adc();
+   bbb_pruio_stop();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

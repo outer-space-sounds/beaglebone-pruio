@@ -1,15 +1,17 @@
 #include "registers.h"
+#include "pins.h"
 
 /////////////////////////////////////////////////////////////////////
 // UTIL
 //
 #define HWREG(x) (*((volatile unsigned int *)(x)))
-/* #define min(a,b) (a<b ? a : b) */
-
 
 /////////////////////////////////////////////////////////////////////
 // DECLARATIONS
 //
+
+#define MAX_ADC_CHANNELS 14
+#define MAX_GPIO_CHANNELS 69
 
 volatile unsigned int* shared_ram;
 volatile register unsigned int __R31;
@@ -23,42 +25,30 @@ inline void wait_for_timer();
 inline void wait_for_short_timer();
 inline void wait_for_adc();
 inline void adc_start_sampling();
-inline void process_values();
+inline void process_adc_values();
+inline void process_gpio_values();
+void init_gpio_pin(int gpio_number, int mode);
 void init_buffer();
 inline void buffer_write(unsigned int *message);
-
-/* typedef enum channel_mode{ */
-/*    CHANNEL_MODE_OFF = 0, */
-/*    CHANNEL_MODE_RAW, */
-/*    CHANNEL_MODE_STEPPED */
-/* } channel_mode; */
-
-typedef struct channel{
-   /* channel_mode mode;  */
-   unsigned int value; 
-   unsigned int past_values[8]; 
-   unsigned int steps;
-   unsigned int lower_bound;
-   unsigned int upper_bound;
-} channel;
-
+inline char * get_gpio_module_address(int module_number);
 
 /////////////////////////////////////////////////////////////////////
-// ANALYZE VALUES 
+// ANALYZE ADC VALUES 
 //
 
+typedef struct adc_channel{
+   int mode; 
+   unsigned int value; 
+   unsigned int past_values[8]; 
+} adc_channel;
+
+adc_channel adc_channels[MAX_ADC_CHANNELS];
+
 unsigned int mux_control;
-channel channels[14];
 
-inline void process_value(unsigned int channel_number, unsigned int value){
-
-   // Channel is OFF
-   /* if(channels[channel_number].mode == CHANNEL_MODE_OFF){ */
-   /*    return; */
-   /* } */
-
+inline void process_adc_value(unsigned int channel_number, unsigned int value){
    // Channel is in RAW mode. Send new value if it's different to the old one.
-   /* if(channels[channel_number].mode == CHANNEL_MODE_RAW){ */
+   if(adc_channels[channel_number].mode == 1){
       unsigned int i, average;
       unsigned int message;
 
@@ -68,37 +58,39 @@ inline void process_value(unsigned int channel_number, unsigned int value){
       // Calculate 8 times average. mux_control counter is re-used to count 
       // the 8 samples.
       if(channel_number < 6){
-         channels[channel_number].past_values[mux_control] = value;
+         adc_channels[channel_number].past_values[mux_control] = value;
          if(mux_control==7){
             average = 0;
             for(i=0; i<7; i++) {
-               average += channels[channel_number].past_values[i];
+               average += adc_channels[channel_number].past_values[i];
             }
             average = average >> 3;  // Integer division by 8.
 
-            // Send the value to ARM
-            /* if(channels[channel_number].value != average){ */
-               channels[channel_number].value = average;
-               message = (channel_number << 16) + (average);
+            // Send the value to ARM. See message format in comments 
+            // in ring buffer section below
+            /* if(adc_channels[channel_number].value != average){ */
+               adc_channels[channel_number].value = average;
+               message = ((unsigned int)1<<31) | (average<<4) | (channel_number);
                buffer_write(&message);
             /* } */
          }
       }
       else{ // channels 6 to 13
-         // Send the value to ARM
-         /* if(channels[channel_number].value != value){ */
-            channels[channel_number].value = value;
-            message = (channel_number << 16) + (value);
+         // Send the value to ARM. See message format in comments 
+         // in ring buffer section below
+         /* if(adc_channels[channel_number].value != value){ */
+            adc_channels[channel_number].value = value;
+            message = ((unsigned int)1<<31) | (value<<4) | (channel_number);
             buffer_write(&message);
          /* } */
       }
-   /* } */
+   }
 }
 
 // Read available samples from fifo0 in blocks of seven, figure out
 // which channel they belong to (using step id and mux control) and
-// send them to process_value (singular) function.
-inline void process_values(){
+// send them to process_adc_value (singular) function.
+inline void process_adc_values(){
    unsigned int data, i, step_id, value, channel_number;
    unsigned int count = HWREG(ADC_TSC + ADC_TSC_FIFO0COUNT);
    while(count > 6){
@@ -118,28 +110,85 @@ inline void process_values(){
          else{ // Other channels
             channel_number = step_id;
          }
-         process_value(channel_number, value);
+         process_adc_value(channel_number, value);
       }
       count = HWREG(ADC_TSC + ADC_TSC_FIFO0COUNT);
    }
 }
 
-void init_values(){
+void init_adc_values(){
    int i;
 
-   channel new_channel;
-   /* new_channel.mode = CHANNEL_MODE_RAW; */
-   new_channel.value = 0;
-   new_channel.steps = 0;
-   new_channel.upper_bound = 0;
-   new_channel.lower_bound = 0;
+   adc_channel new_channel;
+   new_channel.mode = 1; // 1 is on, TODO default should be off and dynamic.
+   new_channel.value = 0xFF;
    for(i=0; i<8; i++) {
-      new_channel.past_values[i] = 0;
+      new_channel.past_values[i] = 0xFF;
    }
 
-   for(i=0; i<14; i++){
-      channels[i] = new_channel; 
+   for(i=0; i<MAX_ADC_CHANNELS; i++){
+      adc_channels[i] = new_channel; 
    }
+}
+
+/////////////////////////////////////////////////////////////////////
+// ANALYZE GPIO VALUES 
+//
+
+typedef struct gpio_channel{
+   int mode; // 0 is output, 1 is input
+   int gpio_number; 
+   unsigned int value; 
+} gpio_channel;
+
+gpio_channel gpio_channels[MAX_GPIO_CHANNELS];
+int gpio_channel_count;
+
+
+inline void process_gpio_values(){
+   int i, module_number, pin;
+   unsigned int new_value, message;
+   char *module;
+   gpio_channel *channel;
+
+   for(i=0; i<gpio_channel_count; i++){
+      channel = &gpio_channels[i];
+      if(channel->mode == 1){
+         module_number = channel->gpio_number >> 5; // integer division by 32
+         pin = channel->gpio_number % 32;
+         module = get_gpio_module_address(module_number);
+         new_value = ((HWREG(module+GPIO_DATAIN)&(1<<pin)) != 0);
+
+         if(channel->value != new_value){
+            // See message format explanation in comments in ring buffer section
+            message = (0<<31) | (new_value<<8) | channel->gpio_number; 
+            buffer_write(&message);
+
+            channel->value = new_value;
+         }
+      }
+   }
+}
+
+void init_gpio_values(){
+   // Init all channels to off, no need?
+   /* int i; */
+   /* gpio_channel new_channel; */
+   /* new_channel.value = 2; */
+   /* new_channel.mode = -1; */
+   /* new_channel.gpio_number = 0; */
+   /* for(i=0; i<MAX_GPIO_CHANNELS; i++){ */
+   /*    gpio_channels[i] = new_channel;  */
+   /* gpio_channel_count++; */
+   /* } */
+
+   gpio_channel_count = 0;
+
+   // Manual for now, should be dynamic:
+   init_gpio_pin(P9_11, 1);
+   init_gpio_pin(P9_12, 1);
+   /* init_gpio_pin(P9_13, 0); */
+   /* init_gpio_pin(P9_14, 0); */
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -147,14 +196,17 @@ void init_values(){
 //
 
 int main(int argc, const char *argv[]){
-   init_values();
    init_ocp();
    init_buffer();
-   init_gpio();
    init_adc();
+   init_adc_values();
+   init_gpio();
+   init_gpio_values();
    init_iep_timer();
 
-   unsigned int i;
+   // Debug:
+   /* unsigned int i; */
+
    mux_control = 7;
 
    unsigned int finished = 0;
@@ -163,14 +215,15 @@ int main(int argc, const char *argv[]){
    while(!finished){
       mux_control>6 ? mux_control=0 : mux_control++;
       set_mux_control(mux_control);
-
       adc_start_sampling();
-      process_values();
+      
+      process_adc_values();
+      process_gpio_values();
 
       // Debug:
-      HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<30);
-      for(i=0; i<20; i++); 
-      HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<30);
+      /* HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<30); */
+      /* for(i=0; i<20; i++);  */
+      /* HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<30); */
 
       // Debug:
       /* wait_for_short_timer(); */
@@ -179,10 +232,10 @@ int main(int argc, const char *argv[]){
       /* HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<30); */
 
       // Debug:
-      wait_for_adc();
-      HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<30);
-      for(i=0; i<20; i++); 
-      HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<30);
+      /* wait_for_adc(); */
+      /* HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<30); */
+      /* for(i=0; i<20; i++);  */
+      /* HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<30); */
 
       wait_for_timer(); // Timer resets itself after this
    }
@@ -210,10 +263,33 @@ void init_ocp(){
 // shared_ram[1024] is the start (read) pointer.
 // shared_ram[1025] is the end (write) pointer.
 //
-// Messages are 32 bit unsigned ints. The 16 MSbits are the channel 
-// number and the 16 LSbits are the value.
-// 
-// Read these:
+// Messages are 32 bit unsigned integers:
+//
+// A GPIO Message:
+// 0XXX XXXX XXXX XXXX XXXX XXXV NNNN NNNN
+// |             |             |      |
+// |             |             |      |-- 7-0: GPIO number
+// |             |             |
+// |             |             |-- 8: Value
+// |             |         
+// |             |-- 30-9: Unused
+// |
+// |-- 31: Always 0, indicates this is a gpio message
+//
+//
+//
+// An ADC Message:
+// 1XXX XXXX XXXX XXXX VVVV VVVV VVVV NNNN
+// |             |             |       |
+// |             |             |       |-- 3-0: ADC Channel
+// |             |             |
+// |             |             |-- 4-15: Value
+// |             |         
+// |             |-- 30-16: Unused
+// |
+// |-- 31: Always 1, indicates this is an adc message
+//
+// Read these to understand the ring buffer:
 // * http://en.wikipedia.org/wiki/Circular_buffer#Use_a_Fill_Count
 // * https://groups.google.com/forum/#!category-topic/beagleboard/F9JI8_vQ-mE
 
@@ -301,8 +377,50 @@ inline void wait_for_short_timer(){
 }
 
 /////////////////////////////////////////////////////////////////////
-// GPIO (Mux control)
+// GPIO and Mux Control
 //
+
+// mode is 0:out, 1:in
+void init_gpio_pin(int gpio_number, int mode){
+   // TODO: check if channel already exists in gpio_channels and 
+   // return error. We dont want to set as input and output 
+   // from 2 parts of the program
+
+   gpio_channel new_channel;
+   new_channel.value = 2;
+   new_channel.mode = mode;
+   new_channel.gpio_number = gpio_number;
+   gpio_channels[gpio_channel_count] = new_channel;
+   gpio_channel_count++;
+
+   int module_number = gpio_number >> 5; // integer division by 32
+   int pin = gpio_number % 32;
+   char *module = get_gpio_module_address(module_number);
+   char *config_register = get_gpio_pin_configuration_register(gpio_number);
+   
+   if(mode==1) {
+      // Pin as an input, pull up. 
+      /* HWREG(CONTROL_MODULE + config_register) = 0x37; */
+      /* HWREG(module + GPIO_OE) |= (1<<pin); */
+
+      // TODO pinmuxing does not work from here. Look at:
+      // https://github.com/cdsteinkuehler/beaglebone-universal-io
+      
+      // Pin as an input, pull down.
+      HWREG(CONTROL_MODULE + config_register) = 0x27;
+      HWREG(module + GPIO_OE) |= (1<<pin);
+
+      // Enable debounce for pin
+      HWREG(module + GPIO_DEBOUNCENABLE) |= (1 << pin);
+   }
+   else{
+      // P9_11 pin as an output, GPIO0[30], no pull. 
+      // We'll use it for debugging DAC timing
+      /* HWREG(CONTROL_MODULE + CONF_P9_11) = 0x0F; */
+      /* HWREG(GPIO0 + GPIO_OE) &= ~(1<<30); */
+   }
+}
+
 void init_gpio(){
    // See BeagleboneBlackP9HeaderTable.pdf from derekmolloy.ie
    // Way easier to read than TI's manual
@@ -319,10 +437,11 @@ void init_gpio(){
    // Enable clock for GPIO3 module. 
    HWREG(CM_PER + CM_PER_GPIO3_CLKCTRL) = (0x02) | (1<<18);
    
-   // P9_11 pin as an output, GPIO0[30], no pull. 
-   // We'll use it for debugging DAC timing
-   HWREG(CONTROL_MODULE + CONF_P9_11) = 0x0F;
-   HWREG(GPIO0 + GPIO_OE) &= ~(1<<30);
+   // Set debounce time for GPIO0 module
+   // time = (DEBOUNCINGTIME + 1) * 31uSec
+   HWREG(GPIO0 + GPIO_DEBOUNCINGTIME) = 255;
+
+   // Mux control pins:
 
    // P9_27 pin as an output, GPIO3[19], no pull.
    HWREG(CONTROL_MODULE + CONF_P9_27) = 0x0F;
@@ -389,6 +508,25 @@ inline void set_mux_control(unsigned int ctl){
          HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<7);
          break;
    }
+}
+
+inline char * get_gpio_module_address(int module_number){
+   int r;
+   switch(module_number) {
+      case 0:
+         r = GPIO0; 
+         break;
+      case 1:
+         r = GPIO1; 
+         break;
+      case 2:
+         r = GPIO2; 
+         break;
+      case 3:
+         r = GPIO3; 
+         break;
+   }
+   return (char *)r;
 }
 
 /////////////////////////////////////////////////////////////////////

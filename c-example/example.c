@@ -32,7 +32,7 @@ int main(int argc, const char *argv[]){
    // Listen to SIGINT signals (program termination)
    signal(SIGINT, signal_handler);
 
-   bbb_pruio_start_adc();
+   bbb_pruio_start();
 
    // We're getting data for 14 channels at 1500 Samples/sec.
    // Let's get 10 secs of data.
@@ -44,46 +44,59 @@ int main(int argc, const char *argv[]){
       }
    }
 
-
    unsigned int message = 0;
-   int row_counter = 0;
-   int sample_counter = 0;
-   int channel_number;
-   int value;
-   while(!finished && row_counter<15000){
+   int row_counter=0;
+   int sample_counter=0;
+   int channel_number, gpio_number, value;
+   /* while(!finished && row_counter<15000){ */
+   while(!finished){
       while(bbb_pruio_messages_are_available()){
          bbb_pruio_read_message(&message);
 
-         channel_number = 0xFFFF & (message >> 16);
-         value = message & 0xFFFF;
-
-         data[row_counter][channel_number] = value;
-
-         if(row_counter%100==0 && sample_counter==13){
-            printf("%i: ", row_counter);
-            for(j=0; j<14; j++) {
-               printf("%4X ", data[row_counter][j]);
-            }
-            printf("\n");
+         // Message from gpio
+         if((message & (1<<31)) == 0){
+            gpio_number = message & 0xFF;
+            value = (message>>8) & 1;
+            printf("\nDigital: 0x%X %i %i", message, gpio_number, value);
          }
+         // Message from adc
+         else{
+            channel_number = message & 0xF;
+            value = (0xFFF0 & message)>>4;
 
-         sample_counter++;
-         if(sample_counter > 13){
-            sample_counter=0;
-            row_counter++;
+            data[row_counter][channel_number] = value;
+
+            // Print every 1000th row to stdout
+            /* if(row_counter%1000==0 && sample_counter==13){ */
+            /*    printf("\nAnalog: "); */
+            /*    for(j=0; j<14; j++) { */
+            /*       printf("%4X ", data[row_counter][j]); */
+            /*    } */
+            /* } */
+
+            sample_counter++;
+            if(sample_counter > 13){
+               sample_counter=0;
+               row_counter++;
+               if(row_counter>14999){
+                  row_counter=0;
+               }
+            }
          }
       }
       usleep(1000); 
    }
    
-   for(i=0; i<15000; i++) {
-      printf("%i: ", i);
-      for(j=0; j<14; j++) {
-         printf("%4X ", data[i][j]);
-      }
-      printf("\n");
-   }
+   // Print everything to stdout
+   /* for(i=0; i<15000; i++) { */
+   /*    printf("%i: ", i); */
+   /*    for(j=0; j<14; j++) { */
+   /*       printf("%4X ", data[i][j]); */
+   /*    } */
+   /*    printf("\n"); */
+   /* } */
 
+   // Save everything to out.txt file
    /* FILE* f = fopen("./out.txt", "w"); */
    /* if(f==NULL){ */
    /*    printf("Could not open output file\n"); */
@@ -98,7 +111,7 @@ int main(int argc, const char *argv[]){
    /* } */
    /* fclose(f); */
 
-   bbb_pruio_stop_adc();
+   bbb_pruio_stop();
 
    return 0;
 }

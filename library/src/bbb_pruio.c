@@ -25,10 +25,10 @@ static void buffer_init();
 static int start_pru0_program();
 
 /////////////////////////////////////////////////////////////////////
-// "Public" functions. ADC API.
+// "Public" functions.
 //
 
-int bbb_pruio_start_adc(){
+int bbb_pruio_start(){
    int err;
    if(load_device_tree_overlay()){
       fprintf(stderr, "libbbb_pruio: Could not load device tree overlay.\n");
@@ -50,14 +50,15 @@ int bbb_pruio_start_adc(){
    return 0;
 }
 
-/* int bbb_pruio_init_adc_pin(unsigned int pin_number, unsigned int steps, bbb_pruio_adc_callback){ */
-/*  */
-/*    adc_callbacks[pin_number] = callback; */
-/*  */
+/* int bbb_pruio_init_adc_pin(unsigned int pin_number){ */
 /*    return 0; */
 /* } */
 
-int bbb_pruio_stop_adc(){
+/* int bbb_pruio_init_gpio_pin(unsigned int pin_number){ */
+/*    return 0; */
+/* } */
+
+int bbb_pruio_stop(){
    // TODO: send terminate message to PRU
 
    prussdrv_pru_disable(0);
@@ -66,6 +67,9 @@ int bbb_pruio_stop_adc(){
    return 0;
 }
 
+inline void bbb_pruio_set_pin_value(int gpio_number, int value){
+
+}
 
 /////////////////////////////////////////////////////////////////////
 // PRU Initialization
