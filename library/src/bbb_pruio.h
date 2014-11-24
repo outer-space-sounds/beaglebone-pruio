@@ -29,7 +29,7 @@ int bbb_pruio_stop();
 /**
  * Configures how an ADC channel is read
  */
-// int bbb_pruio_init_adc_pin(unsigned int pin_number, unsigned int steps, bbb_pruio_adc_callback); 
+int bbb_pruio_init_adc_pin(unsigned int pin_number); 
 
 /**
  * Returns 1 if there is data available from the PRU

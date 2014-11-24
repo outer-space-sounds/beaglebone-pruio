@@ -23,19 +23,19 @@
 #include <unistd.h>
 #include <bbb_pruio.h>
 
+/////////////////////////////////////////////////////////////////////
 unsigned int finished = 0;
 void signal_handler(int signal){
    finished = 1;
 }
 
-int main(int argc, const char *argv[]){
-   // Listen to SIGINT signals (program termination)
-   signal(SIGINT, signal_handler);
 
-   bbb_pruio_start();
+/////////////////////////////////////////////////////////////////////
+static pthread_t monitor_thread;
 
+static void* monitor_inputs(void* param){
    // We're getting data for 14 channels at 1500 Samples/sec.
-   // Let's get 10 secs of data.
+   // Separate memory for 10 seconds of data.
    unsigned int data[15000][14];
    int i,j;
    for(i=0; i<15000; i++) {
@@ -48,7 +48,6 @@ int main(int argc, const char *argv[]){
    int row_counter=0;
    int sample_counter=0;
    int channel_number, gpio_number, value;
-   /* while(!finished && row_counter<15000){ */
    while(!finished){
       while(bbb_pruio_messages_are_available()){
          bbb_pruio_read_message(&message);
@@ -110,8 +109,47 @@ int main(int argc, const char *argv[]){
    /*    fprintf(f,"\n"); */
    /* } */
    /* fclose(f); */
+   return 0;
+}
+
+static int start_monitor_thread(){
+   // TODO: set real time priority to this thread
+   pthread_attr_t attr;
+   if(pthread_attr_init(&attr)){
+      return 1;
+   }
+   if(pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED)){
+      return 1;
+   }
+   if(pthread_create(&monitor_thread, &attr, &monitor_inputs, NULL)){
+      return 1;
+   }
+
+   return 0;
+}
+
+static void stop_monitor_thread(){
+   while(pthread_cancel(monitor_thread)){}
+}
+
+int main(int argc, const char *argv[]){
+   // Listen to SIGINT signals (program termination)
+   signal(SIGINT, signal_handler);
+
+   bbb_pruio_start();
+
+   start_monitor_thread();
+
+   while(!finished){
+   
+      sleep(1);
+   }
 
    bbb_pruio_stop();
 
    return 0;
 }
+
+
+
+
