@@ -14,7 +14,7 @@ This is a software library that allows access to the General Purpose Inputs and 
  
 ### From a PD patch
 
-![img](images/lib-bbb-pruio-example.pd.png)
+![img](docs/images/lib-bbb-pruio-example.pd.png)
 
 ### From a C program
 
@@ -71,7 +71,7 @@ int main(int argc, const char *argv[]){
 
 ## More Info
 
-More info in the [project's wiki](http://github.com/rvega/libbbb_pruio/wiki).
+More info in the [docs directory](docs/manual.md).
 
 ## License
 
