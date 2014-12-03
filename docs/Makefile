@@ -1,6 +1,5 @@
 all:
-	grip --export ../../README.md ../../docs/index.html
-	grip --export ../../HACKING.md ../../docs/hacking
+	grip --export README.md readme.html
 
 install-dependencies:
 	sudo apt-get install python-pip
