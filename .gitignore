@@ -14,3 +14,4 @@ c-example/example
 Session.vim
 .netrwhist
 *~
+*.pyc

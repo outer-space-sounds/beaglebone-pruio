@@ -32,6 +32,11 @@ int bbb_pruio_stop();
 int bbb_pruio_init_adc_pin(unsigned int pin_number); 
 
 /**
+ * Returns 1 if the passed message is a gpio message
+ */
+int bbb_pruio_message_is_gpio(unsigned int *message);
+
+/**
  * Returns 1 if there is data available from the PRU
  */
 inline int bbb_pruio_messages_are_available();
