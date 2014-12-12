@@ -1,7 +1,17 @@
-This device tree overlay enables the PRU system hardware and loads the appropriate kernel module.
+This device tree overlay for the Beagle Bone Black turns on the PRU0 system and allows for changing the pinmux configuration during runtime by writing to the filesystem (no need to modify or load a DTO).
 
-*PIN CONFIGURATION IS DONE IN RUNTIME* from the PRU code so you have to be careful not to use the same pins that other capes/programs/kernel are using.
+Setting a pin to input sets its pinmux register to 0x37 (input with pullup resistor). Setting it to output is 0x0F (output, no pullup, no pulldown).
 
-See [this](https://www.youtube.com/watch?v=wui_wU1AeQc) and [this](https://learn.adafruit.com/introduction-to-the-beaglebone-black-device-tree/device-tree-overlays) to understand how device tree overlays work. This one enables the PRU system so that it can be used by libbbb_pruio.
+To use:
 
-Also, take a look at the makefile to understand what's going on.
+    cd libbbb_pruio/device-tree-overlay
+    make load
+    cd /sys/devices/ocp.3/P9_11_mux.12   # Each pin has it's directory
+    echo input > state                   # input or output are valid options
+    cat state
+
+To verify that the register values are actually beign changed in the hardware, you can check the output of:
+
+    cat /sys/kernel/debug/pinctrl/44e10800.pinmux/pins
+
+This is largely based in [this](https://github.com/cdsteinkuehler/beaglebone-universal-io) and the dts file in [this project](http://www.freebasic-portal.de/downloads/fb-on-arm/libpruio-325.html). Also see [this](https://www.youtube.com/watch?v=wui_wU1AeQc) and [this](https://learn.adafruit.com/introduction-to-the-beaglebone-black-device-tree/device-tree-overlays) to understand how device tree overlays work.

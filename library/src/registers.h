@@ -1,7 +1,7 @@
 #ifndef REGISTERS_H
 #define REGISTERS_H
 
-#include "pins.h"
+#include "bbb_pruio_pins.h"
 
 /////////////////////////////////////////////////////////////////////
 // Register addresses

@@ -16,6 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
+
+/**
+ * A structure for easy reading of incoming messages.
+ */
+typedef struct bbb_pruio_message{
+   int is_gpio_value; // 1 if gpio, 0 if adc
+   int adc_channel;
+   int value;
+   char pin_name[6];
+   int gpio_number;
+} bbb_pruio_message;
+
+typedef enum{  
+   BBB_PRUIO_OUTPUT_MODE = 0,
+   BBB_PRUIO_INPUT_MODE = 1
+} bbb_pruio_gpio_mode;
+
 /**
  * Initializes PRU, GPIO and ADC hardware and starts sampling ADC channels.
  */
@@ -26,15 +44,26 @@ int bbb_pruio_start();
  */
 int bbb_pruio_stop();
 
-/**
- * Configures how an ADC channel is read
- */
-int bbb_pruio_init_adc_pin(unsigned int pin_number); 
 
 /**
- * Returns 1 if the passed message is a gpio message
+ * Returns a gpio number from a string with the pin name "P9_11" for example
  */
-int bbb_pruio_message_is_gpio(unsigned int *message);
+int bbb_pruio_get_gpio_number(char* pin_name);  
+
+/**
+ * Configures how a GPIO channel is used
+ */
+int bbb_pruio_init_gpio_pin(int gpio_number, bbb_pruio_gpio_mode mode);  
+
+/**
+ * Sets the value of an output pin (0 or 1)
+ */
+void bbb_pruio_set_pin_value(int gpio_number, int value);
+
+/**
+ * Starts reading from an ADC pin
+ */
+int bbb_pruio_init_adc_pin(int channel_number); 
 
 /**
  * Returns 1 if there is data available from the PRU
@@ -47,9 +76,9 @@ inline int bbb_pruio_messages_are_available();
 inline void bbb_pruio_read_message(unsigned int *message);
 
 /**
- * Sets the value of an output pin (0 or 1)
+ * Returns a structure for easy interpretation of the message.
  */
-inline void bbb_pruio_set_pin_value(int gpio_number, int value);
+inline void bbb_pruio_parse_message(unsigned int *message, bbb_pruio_message* parsed_message);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,4 +120,8 @@ inline __attribute__ ((always_inline)) void bbb_pruio_read_message(unsigned int*
 
    // Increment buffer start, wrap around 2*size
    *bbb_pruio_buffer_start = (*bbb_pruio_buffer_start+1) & (2*bbb_pruio_buffer_size - 1);
+}
+
+inline __attribute__ ((always_inline)) void bbb_pruio_parse_message(unsigned int *message, bbb_pruio_message* parsed_message){
+
 }

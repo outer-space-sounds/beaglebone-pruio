@@ -155,42 +155,6 @@ inline int bbb_pruio_messages_are_available();
 inline void bbb_pruio_read_message(unsigned int *message);
 ```
 
-```C
-/**
- * Retorna 1 si el mensaje proviene de un pin digital.
- */
-int bbb_pruio_message_is_gpio(unsigned int *message);
-```
-
-```C
-/**
- * Retorna una cadena con el nombre del pin digital al que 
- * corresponde el mensaje.
- */
-char* bbb_pruio_get_gpio_name(unsigned int *message);
-```
-
-```C
-/**
- * Retorna el valor en el que se encuentra el pin digital.
- */
-int bbb_pruio_get_gpio_value(unsigned int *message);
-```
-
-```C
-/**
- * Retorna el número del canal analógico al que corresponde el
- * mensaje.
- */
-int bbb_pruio_get_adc_channel(unsigned int *message);
-```
-
-```C
-/**
- * Retorna el valor en el que se encuentra el pin análogico.
- */
-int bbb_pruio_get_adc_value(unsigned int *message);
-```
 
 ## Licencia
 

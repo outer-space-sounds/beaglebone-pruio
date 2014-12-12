@@ -63,6 +63,7 @@ src/bbb_pruio.o: src/bbb_pruio.c src/pru0.elf lib/libbbb_pruio_text0.bin
 lib/libbbb_pruio.a: src/bbb_pruio.o device-tree-overlay/LIB-BBB-PRUIO-DTO-00A0.dtb
 	ar rcs lib/libbbb_pruio.a src/bbb_pruio.o
 	cp src/bbb_pruio.h include/
+	cp src/bbb_pruio_pins.h include/
 	gcc $(HOST_LD_FLAGS) -o lib/libbbb_pruio.so src/bbb_pruio.o $(HOST_LIBS)
 
 
@@ -90,3 +91,4 @@ install:
 uninstall:
 	-rm $(PREFIX)/lib/libbbb_pruio*
 	-rm $(PREFIX)/include/bbb_pruio.h
+	-rm $(PREFIX)/include/bbb_pruio_pins.h

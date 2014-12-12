@@ -5,40 +5,259 @@
    compatible = "ti,beaglebone", "ti,beaglebone-black";
    part-number = "PRUIO-DTO";
    version = "00A0";
-
-   /*fragment@0 {*/
-   /*   target = <&am33xx_pinmux>;*/
-   /*   __overlay__ {*/
-   /*      pinctrl_pruio: pinmux_pinctrl_pruio{*/
-   /*         pinctrl-single,pins = < */
-               /* PINMUX IS DONE AT RUNTIME, BE CAREFUL! */
-
-               /* P9_11 input pullup */ 
-               /* 0x070 0x37  */
-
-               /* P9_12 input pullup */ 
-               /* 0x078 0x37 */
-   /*         >;*/
-   /*      };*/
-   /*   };*/
-   /*};*/
-
-   /*fragment@1 {*/
-   /*   target = <&ocp>;*/
-   /*   __overlay__ {*/
-   /*      test_helper: helper {*/
-   /*         compatible = "bone-pinmux-helper";*/
-   /*         pinctrl-names = "default";*/
-   /*         pinctrl-0 = <&pinctrl_pruio>;*/
-   /*         status = "okay";*/
-   /*      };*/
-   /*   };*/
-   /*};*/
+   exclusive-use =
+      "pruss",
+      "pru0",
+      "P9.11",
+      "P9.12",
+      "P9.13",
+      "P9.14",
+      "P9.15",
+      "P9.16",
+      "P9.17",
+      "P9.18",
+      "P9.21",
+      "P9.22",
+      "P9.23",
+      "P9.24",
+      "P9.26",
+      "P9.27",
+      "P9.30",
+      "P9.41",
+      "P9.41.1",
+      "P9.42",
+      "P9.42.1";
 
    fragment@0{
       target = <&pruss>;
       __overlay__ {
          status = "okay";
+      };
+   };
+
+   // This section specifies the the pairs of gpio config register 
+   // addresses (offsets) and values that we'll allow to set in runtime.
+   //
+   // Inputs will always have pullup resistors enabled (0x37) and 
+   // outputs never have a pull resistor (0x0F)
+   fragment@1{
+      target = <&am33xx_pinmux>;
+      __overlay__ {
+         P9_11_i: P9_11_in{pinctrl-single,pins = <0x070 0x37>;};
+         P9_11_o: P9_11_out{pinctrl-single,pins = <0x070 0x0F>;};
+
+         P9_12_i: P9_12_in{pinctrl-single,pins = <0x078 0x37>;};
+         P9_12_o: P9_12_out{pinctrl-single,pins = <0x078 0x0F>;};
+
+         P9_13_i: P9_13_in{pinctrl-single,pins = <0x074 0x37>;};
+         P9_13_o: P9_13_out{pinctrl-single,pins = <0x074 0x0F>;};
+
+         P9_14_i: P9_14_in{pinctrl-single,pins = <0x048 0x37>;};
+         P9_14_o: P9_14_out{pinctrl-single,pins = <0x048 0x0F>;};
+
+         P9_15_i: P9_15_in{pinctrl-single,pins = <0x040 0x37>;};
+         P9_15_o: P9_15_out{pinctrl-single,pins = <0x040 0x0F>;};
+
+         P9_16_i: P9_16_in{pinctrl-single,pins = <0x04C 0x37>;};
+         P9_16_o: P9_16_out{pinctrl-single,pins = <0x04C 0x0F>;};
+
+         P9_17_i: P9_17_in{pinctrl-single,pins = <0x15C 0x37>;};
+         P9_17_o: P9_17_out{pinctrl-single,pins = <0x15C 0x0F>;};
+
+         P9_18_i: P9_18_in{pinctrl-single,pins = <0x158 0x37>;};
+         P9_18_o: P9_18_out{pinctrl-single,pins = <0x158 0x0F>;};
+
+         P9_21_i: P9_21_in{pinctrl-single,pins = <0x154 0x37>;};
+         P9_21_o: P9_21_out{pinctrl-single,pins = <0x154 0x0F>;};
+
+         P9_22_i: P9_22_in{pinctrl-single,pins = <0x150 0x37>;};
+         P9_22_o: P9_22_out{pinctrl-single,pins = <0x150 0x0F>;};
+
+         P9_23_i: P9_23_in{pinctrl-single,pins = <0x044 0x37>;};
+         P9_23_o: P9_23_out{pinctrl-single,pins = <0x044 0x0F>;};
+
+         P9_24_i: P9_24_in{pinctrl-single,pins = <0x184 0x37>;};
+         P9_24_o: P9_24_out{pinctrl-single,pins = <0x184 0x0F>;};
+
+         P9_26_i: P9_26_in{pinctrl-single,pins = <0x180 0x37>;};
+         P9_26_o: P9_26_out{pinctrl-single,pins = <0x180 0x0F>;};
+
+         P9_27_i: P9_27_in{pinctrl-single,pins = <0x1A4 0x37>;};
+         P9_27_o: P9_27_out{pinctrl-single,pins = <0x1A4 0x0F>;};
+
+         P9_30_i: P9_30_in{pinctrl-single,pins = <0x198 0x37>;};
+         P9_30_o: P9_30_out{pinctrl-single,pins = <0x198 0x0F>;};
+
+         P9_41A_i: P9_41A_in{pinctrl-single,pins = <0x1B4 0x37>;};
+         P9_41A_o: P9_41A_out{pinctrl-single,pins = <0x1B4 0x0F  0x1A8 0x37>;};
+
+         P9_41B_i: P9_41B_in{pinctrl-single,pins = <0x1A8 0x37>;};
+         P9_41B_o: P9_41B_out{pinctrl-single,pins = <0x1A8 0x0F  0x1B4 0x37>;};
+
+         P9_42A_i: P9_42A_in{pinctrl-single,pins = <0x164 0x37>;};
+         P9_42A_o: P9_42A_out{pinctrl-single,pins = <0x164 0x0F  0x1A0 0x37>;};
+
+         P9_42B_i: P9_42B_in{pinctrl-single,pins = <0x1A0 0x37>;};
+         P9_42B_o: P9_42B_out{pinctrl-single,pins = <0x1A0 0x0F  0x164 0x37>;};
+      };
+   };
+
+   // This section names the possible configurations for each pin and the
+   // directories that will be created in /sys/devices/ocp.*
+   fragment@2{
+      target = <&ocp>;
+      __overlay__ {
+         P9_11_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_11_i>;
+            pinctrl-1 = <&P9_11_o>;
+         };
+
+         P9_12_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_12_i>;
+            pinctrl-1 = <&P9_12_o>;
+         };
+
+         P9_13_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_13_i>;
+            pinctrl-1 = <&P9_13_o>;
+         };
+
+         P9_14_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_14_i>;
+            pinctrl-1 = <&P9_14_o>;
+         };
+
+         P9_15_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_15_i>;
+            pinctrl-1 = <&P9_15_o>;
+         };
+
+         P9_16_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_16_i>;
+            pinctrl-1 = <&P9_16_o>;
+         };
+
+         P9_17_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_17_i>;
+            pinctrl-1 = <&P9_17_o>;
+         };
+
+         P9_18_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_18_i>;
+            pinctrl-1 = <&P9_18_o>;
+         };
+
+         P9_21_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_21_i>;
+            pinctrl-1 = <&P9_21_o>;
+         };
+
+         P9_22_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_22_i>;
+            pinctrl-1 = <&P9_22_o>;
+         };
+
+         P9_23_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_23_i>;
+            pinctrl-1 = <&P9_23_o>;
+         };
+
+         P9_24_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_24_i>;
+            pinctrl-1 = <&P9_24_o>;
+         };
+
+         P9_26_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_26_i>;
+            pinctrl-1 = <&P9_26_o>;
+         };
+
+         P9_27_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_27_i>;
+            pinctrl-1 = <&P9_27_o>;
+         };
+
+         P9_30_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_30_i>;
+            pinctrl-1 = <&P9_30_o>;
+         };
+
+         P9_41A_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_41A_i>;
+            pinctrl-1 = <&P9_41A_o>;
+         };
+
+         P9_41B_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_41B_i>;
+            pinctrl-1 = <&P9_41B_o>;
+         };
+
+         P9_42A_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_42A_i>;
+            pinctrl-1 = <&P9_42A_o>;
+         };
+
+         P9_42B_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_42B_i>;
+            pinctrl-1 = <&P9_42B_o>;
+         };
       };
    };
 };
