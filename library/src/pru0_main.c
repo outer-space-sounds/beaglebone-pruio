@@ -10,9 +10,6 @@
 // DECLARATIONS
 //
 
-#define MAX_ADC_CHANNELS 14
-#define MAX_GPIO_CHANNELS 69
-
 volatile unsigned int* shared_ram;
 volatile register unsigned int __R31;
 

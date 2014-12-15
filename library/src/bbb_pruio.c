@@ -20,16 +20,9 @@
 
 /* #define DEBUG */
 
+
 /////////////////////////////////////////////////////////////////////
-// Forward declarations
-//
-static int load_device_tree_overlays();
-static int load_device_tree_overlay();
-static int init_pru_system();
-static void buffer_init();
-static int start_pru0_program();
-static int get_gpio_config_file(int gpio_number, char* path);
-static int map_device_registers();
+// MEMORY MAP
 
 volatile unsigned int* gpio0_output_enable = NULL;
 volatile unsigned int* gpio1_output_enable = NULL;
@@ -39,169 +32,6 @@ volatile unsigned int* gpio0_data_out = NULL;
 volatile unsigned int* gpio1_data_out = NULL;
 volatile unsigned int* gpio2_data_out = NULL;
 volatile unsigned int* gpio3_data_out = NULL;
-
-/////////////////////////////////////////////////////////////////////
-// "Public" functions.
-//
-
-int bbb_pruio_start(){
-   int err;
-   if(load_device_tree_overlays()){
-      fprintf(stderr, "libbbb_pruio: Could not load device tree overlays.\n");
-      return 1;
-   }
-
-   if(map_device_registers()){
-      fprintf(stderr, "libbbb_pruio: Could not map device's registers to memory.\n");
-      return 1;
-   }
-
-   if((err=init_pru_system())){
-      fprintf(stderr, "libbbb_pruio: Could not init PRU system: %i \n", err);
-      return 1;
-   }
-
-   buffer_init();
-
-   if((err=start_pru0_program())){
-      fprintf(stderr, "libbbb_pruio: Could not load PRU0 program: %i \n", err);
-      return 1;
-   }
-
-   return 0;
-}
-
-int bbb_pruio_get_gpio_number(char* pin_name){
-   if(strcmp(pin_name, "P9_11") == 0){
-      return P9_11;
-   }
-   else if(strcmp(pin_name, "P9_12") == 0){
-      return P9_12;
-   }
-   else if(strcmp(pin_name, "P9_13") == 0){
-      return P9_13;
-   }
-   else if(strcmp(pin_name, "P9_14") == 0){
-      return P9_14;
-   }
-   else if(strcmp(pin_name, "P9_15") == 0){
-      return P9_15;
-   }
-   else if(strcmp(pin_name, "P9_16") == 0){
-      return P9_16;
-   }
-   else if(strcmp(pin_name, "P9_17") == 0){
-      return P9_17;
-   }
-   else if(strcmp(pin_name, "P9_18") == 0){
-      return P9_18;
-   }
-   else if(strcmp(pin_name, "P9_21") == 0){
-      return P9_21;
-   }
-   else if(strcmp(pin_name, "P9_22") == 0){
-      return P9_22;
-   }
-   else if(strcmp(pin_name, "P9_23") == 0){
-      return P9_23;
-   }
-   else if(strcmp(pin_name, "P9_24") == 0){
-      return P9_24;
-   }
-   else if(strcmp(pin_name, "P9_26") == 0){
-      return P9_26;
-   }
-   else if(strcmp(pin_name, "P9_27") == 0){
-      return P9_27;
-   }
-   else if(strcmp(pin_name, "P9_30") == 0){
-      return P9_30;
-   }
-   else if(strcmp(pin_name, "P9_41A") == 0){
-      return P9_41A;
-   }
-   else if(strcmp(pin_name, "P9_41B") == 0){
-      return P9_41B;
-   }
-   else if(strcmp(pin_name, "P9_42A") == 0){
-      return P9_42A;
-   }
-   else if(strcmp(pin_name, "P9_42B") == 0){
-      return P9_42B;
-   }
-   return -1;
-}
-
-/* int bbb_pruio_init_adc_pin(unsigned int pin_number){ */
-/*    return 0; */
-/* } */
-
-int bbb_pruio_init_gpio_pin(int gpio_number, bbb_pruio_gpio_mode mode){
-   // Set the pinmux of the pin by writing to the appropriate config file
-   char path[256] = "";
-   if(get_gpio_config_file(gpio_number, path)){
-      return 1;
-   }
-   FILE *f = fopen(path, "rt");
-   if(f==NULL){
-      return 1;
-   }
-   int gpio_module = gpio_number >> 5;
-   int gpio_bit = gpio_number % 32;
-   if(mode == BBB_PRUIO_OUTPUT_MODE){
-      fprintf(f, "%s\n", "output"); 
-      // Reset the output enable bit in the gpio config register to actually enable output.
-      switch(gpio_module){
-         case 0: *gpio0_output_enable &= ~(1<<gpio_bit); break;
-         case 1: *gpio1_output_enable &= ~(1<<gpio_bit); break;
-         case 2: *gpio2_output_enable &= ~(1<<gpio_bit); break;
-         case 3: *gpio3_output_enable &= ~(1<<gpio_bit); break;
-      }
-   }
-   else{
-      fprintf(f, "%s\n", "input"); 
-      // Set the output enable bit in the gpio config register to disable output.
-      switch(gpio_module){
-         case 0: *gpio0_output_enable |= (1<<gpio_bit); break;
-         case 1: *gpio1_output_enable |= (1<<gpio_bit); break;
-         case 2: *gpio2_output_enable |= (1<<gpio_bit); break;
-         case 3: *gpio3_output_enable |= (1<<gpio_bit); break;
-      }
-   }
-   fclose(f);
-   return 0;
-}
-
-void bbb_pruio_set_pin_value(int gpio_number, int value){
-   int gpio_module = gpio_number >> 5;
-   int gpio_bit = gpio_number % 32;
-   volatile unsigned int* reg=NULL;
-   switch(gpio_module){
-      case 0: reg = gpio0_data_out; break;
-      case 1: reg = gpio1_data_out; break;
-      case 2: reg = gpio2_data_out; break;
-      case 3: reg = gpio3_data_out; break;
-   }
-   if(value==1){
-      *reg |= (1<<gpio_bit);
-   }
-   else{
-      *reg &= ~(1<<gpio_bit);
-   }
-}
-
-int bbb_pruio_stop(){
-   // TODO: send terminate message to PRU
-
-   prussdrv_pru_disable(0);
-   prussdrv_exit();
-
-   return 0;
-}
-
-
-/////////////////////////////////////////////////////////////////////
-// MEMORY MAP
 
 static int map_device_registers(){
    // Get pointers to hardware registers. See memory map in manual for addresses.
@@ -239,9 +69,16 @@ static int map_device_registers(){
    return 0;
 }
 
-
 /////////////////////////////////////////////////////////////////////
 // GPIO PINS
+
+typedef struct gpio_pin{ 
+   bbb_pruio_gpio_mode mode;
+   int gpio_number;
+} gpio_pin;
+
+static gpio_pin used_pins[MAX_GPIO_CHANNELS];
+static int used_pins_count = 0;
 
 static int get_gpio_pin_name(int gpio_number, char* pin_name){
    switch(gpio_number){
@@ -438,3 +275,182 @@ static void buffer_init(){
    bbb_pruio_buffer_start = &(bbb_pruio_shared_ram[1024]); // value inited to 0 in pru
    bbb_pruio_buffer_end = &(bbb_pruio_shared_ram[1025]); // value inited to 0 in pru
 }
+
+/////////////////////////////////////////////////////////////////////
+// "Public" functions.
+//
+
+int bbb_pruio_start(){
+   int err;
+   if(load_device_tree_overlays()){
+      fprintf(stderr, "libbbb_pruio: Could not load device tree overlays.\n");
+      return 1;
+   }
+
+   if(map_device_registers()){
+      fprintf(stderr, "libbbb_pruio: Could not map device's registers to memory.\n");
+      return 1;
+   }
+
+   if((err=init_pru_system())){
+      fprintf(stderr, "libbbb_pruio: Could not init PRU system: %i \n", err);
+      return 1;
+   }
+
+   buffer_init();
+
+   if((err=start_pru0_program())){
+      fprintf(stderr, "libbbb_pruio: Could not load PRU0 program: %i \n", err);
+      return 1;
+   }
+
+   return 0;
+}
+
+int bbb_pruio_get_gpio_number(char* pin_name){
+   if(strcmp(pin_name, "P9_11") == 0){
+      return P9_11;
+   }
+   else if(strcmp(pin_name, "P9_12") == 0){
+      return P9_12;
+   }
+   else if(strcmp(pin_name, "P9_13") == 0){
+      return P9_13;
+   }
+   else if(strcmp(pin_name, "P9_14") == 0){
+      return P9_14;
+   }
+   else if(strcmp(pin_name, "P9_15") == 0){
+      return P9_15;
+   }
+   else if(strcmp(pin_name, "P9_16") == 0){
+      return P9_16;
+   }
+   else if(strcmp(pin_name, "P9_17") == 0){
+      return P9_17;
+   }
+   else if(strcmp(pin_name, "P9_18") == 0){
+      return P9_18;
+   }
+   else if(strcmp(pin_name, "P9_21") == 0){
+      return P9_21;
+   }
+   else if(strcmp(pin_name, "P9_22") == 0){
+      return P9_22;
+   }
+   else if(strcmp(pin_name, "P9_23") == 0){
+      return P9_23;
+   }
+   else if(strcmp(pin_name, "P9_24") == 0){
+      return P9_24;
+   }
+   else if(strcmp(pin_name, "P9_26") == 0){
+      return P9_26;
+   }
+   else if(strcmp(pin_name, "P9_27") == 0){
+      return P9_27;
+   }
+   else if(strcmp(pin_name, "P9_30") == 0){
+      return P9_30;
+   }
+   else if(strcmp(pin_name, "P9_41A") == 0){
+      return P9_41A;
+   }
+   else if(strcmp(pin_name, "P9_41B") == 0){
+      return P9_41B;
+   }
+   else if(strcmp(pin_name, "P9_42A") == 0){
+      return P9_42A;
+   }
+   else if(strcmp(pin_name, "P9_42B") == 0){
+      return P9_42B;
+   }
+   return -1;
+}
+
+/* int bbb_pruio_init_adc_pin(unsigned int pin_number){ */
+/*    return 0; */
+/* } */
+
+int bbb_pruio_init_gpio_pin(int gpio_number, bbb_pruio_gpio_mode mode){
+   // Check if pin already in use.
+   int i;
+   for(i=0; i<used_pins_count; ++i){
+      gpio_pin pin = used_pins[i];
+      if(pin.gpio_number==gpio_number && pin.mode==mode){
+         return 0;
+      }
+      else if(pin.gpio_number==gpio_number && pin.mode!=mode){
+         return 1;
+      }
+   }
+
+   // Save new pin info;
+   gpio_pin new_pin;
+   new_pin.gpio_number = gpio_number;
+   new_pin.mode = mode;
+   used_pins[used_pins_count] = new_pin;
+   used_pins_count++;
+   
+   // Set the pinmux of the pin by writing to the appropriate config file
+   char path[256] = "";
+   if(get_gpio_config_file(gpio_number, path)){
+      return 1;
+   }
+   FILE *f = fopen(path, "rt");
+   if(f==NULL){
+      return 1;
+   }
+   int gpio_module = gpio_number >> 5;
+   int gpio_bit = gpio_number % 32;
+   if(mode == BBB_PRUIO_OUTPUT_MODE){
+      fprintf(f, "%s\n", "output"); 
+      // Reset the output enable bit in the gpio config register to actually enable output.
+      switch(gpio_module){
+         case 0: *gpio0_output_enable &= ~(1<<gpio_bit); break;
+         case 1: *gpio1_output_enable &= ~(1<<gpio_bit); break;
+         case 2: *gpio2_output_enable &= ~(1<<gpio_bit); break;
+         case 3: *gpio3_output_enable &= ~(1<<gpio_bit); break;
+      }
+   }
+   else{
+      fprintf(f, "%s\n", "input"); 
+      // Set the output enable bit in the gpio config register to disable output.
+      switch(gpio_module){
+         case 0: *gpio0_output_enable |= (1<<gpio_bit); break;
+         case 1: *gpio1_output_enable |= (1<<gpio_bit); break;
+         case 2: *gpio2_output_enable |= (1<<gpio_bit); break;
+         case 3: *gpio3_output_enable |= (1<<gpio_bit); break;
+      }
+   }
+   fclose(f);
+   return 0;
+}
+
+void bbb_pruio_set_pin_value(int gpio_number, int value){
+   int gpio_module = gpio_number >> 5;
+   int gpio_bit = gpio_number % 32;
+   volatile unsigned int* reg=NULL;
+   switch(gpio_module){
+      case 0: reg = gpio0_data_out; break;
+      case 1: reg = gpio1_data_out; break;
+      case 2: reg = gpio2_data_out; break;
+      case 3: reg = gpio3_data_out; break;
+   }
+   if(value==1){
+      *reg |= (1<<gpio_bit);
+   }
+   else{
+      *reg &= ~(1<<gpio_bit);
+   }
+}
+
+int bbb_pruio_stop(){
+   // TODO: send terminate message to PRU
+
+   prussdrv_pru_disable(0);
+   prussdrv_exit();
+
+   return 0;
+}
+

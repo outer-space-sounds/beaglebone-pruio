@@ -1,5 +1,9 @@
 #ifndef PINS_H
 #define PINS_H
+
+#define MAX_ADC_CHANNELS 14
+#define MAX_GPIO_CHANNELS 69
+
 // These defines map the beagle bone's pin names to the AM335X's 
 // gpio numbers. GPIO numbers can be used like:
 // 
