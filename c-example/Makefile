@@ -4,7 +4,7 @@ ifndef VERBOSE
 endif
 
 CFLAGS = -Wall -g -O2 -mtune=cortex-a8 -march=armv7-a -I../library/include
-LDFLAGS = -L../library/lib -lbbb_pruio
+LDFLAGS = -L../library/lib -lbbb_pruio -lpthread
 
 all: example
 

@@ -32,106 +32,53 @@ void signal_handler(int signal){
 }
 
 /////////////////////////////////////////////////////////////////////
-/* static pthread_t monitor_thread; */
+static pthread_t monitor_thread;
 
-/* static void* monitor_inputs(void* param){ */
-/*    #<{(| #<{(| // We're getting data for 14 channels at 1500 Samples/sec. |)}># |)}># */
-/*    #<{(| // Separate memory for 10 seconds of data. |)}># */
-/*    #<{(| unsigned int data[15000][14]; |)}># */
-/*    #<{(| int i,j; |)}># */
-/*    #<{(| for(i=0; i<15000; i++) { |)}># */
-/*    #<{(|    for(j=0; j<14; j++) { |)}># */
-/*    #<{(|       data[i][j] = 0; |)}># */
-/*    #<{(|    } |)}># */
-/*    #<{(| } |)}># */
-/*    #<{(|  |)}># */
-/*    #<{(| unsigned int message = 0; |)}># */
-/*    #<{(| int row_counter=0; |)}># */
-/*    #<{(| int sample_counter=0; |)}># */
-/*    #<{(| int channel_number, gpio_number, value; |)}># */
-/*    #<{(| while(!finished){ |)}># */
-/*    #<{(|    while(bbb_pruio_messages_are_available()){ |)}># */
-/*    #<{(|       bbb_pruio_read_message(&message); |)}># */
-/*    #<{(|  |)}># */
-/*    #<{(|       // Message from gpio |)}># */
-/*    #<{(|       if((message & (1<<31)) == 0){ |)}># */
-/*    #<{(|          gpio_number = message & 0xFF; |)}># */
-/*    #<{(|          value = (message>>8) & 1; |)}># */
-/*    #<{(|          printf("\nDigital: 0x%X %i %i", message, gpio_number, value); |)}># */
-/*    #<{(|       } |)}># */
-/*    #<{(|       // Message from adc |)}># */
-/*    #<{(|       else{ |)}># */
-/*    #<{(|          channel_number = message & 0xF; |)}># */
-/*    #<{(|          value = (0xFFF0 & message)>>4; |)}># */
-/*    #<{(|  |)}># */
-/*    #<{(|          data[row_counter][channel_number] = value; |)}># */
-/*    #<{(|  |)}># */
-/*    #<{(|          // Print every 1000th row to stdout |)}># */
-/*    #<{(|          #<{(| if(row_counter%1000==0 && sample_counter==13){ |)}># |)}># */
-/*    #<{(|          #<{(|    printf("\nAnalog: "); |)}># |)}># */
-/*    #<{(|          #<{(|    for(j=0; j<14; j++) { |)}># |)}># */
-/*    #<{(|          #<{(|       printf("%4X ", data[row_counter][j]); |)}># |)}># */
-/*    #<{(|          #<{(|    } |)}># |)}># */
-/*    #<{(|          #<{(| } |)}># |)}># */
-/*    #<{(|  |)}># */
-/*    #<{(|          sample_counter++; |)}># */
-/*    #<{(|          if(sample_counter > 13){ |)}># */
-/*    #<{(|             sample_counter=0; |)}># */
-/*    #<{(|             row_counter++; |)}># */
-/*    #<{(|             if(row_counter>14999){ |)}># */
-/*    #<{(|                row_counter=0; |)}># */
-/*    #<{(|             } |)}># */
-/*    #<{(|          } |)}># */
-/*    #<{(|       } |)}># */
-/*    #<{(|    } |)}># */
-/*    #<{(|    usleep(1000);  |)}># */
-/*    #<{(| } |)}># */
-/*    #<{(|  |)}># */
-/*    #<{(| // Print everything to stdout |)}># */
-/*    #<{(| #<{(| for(i=0; i<15000; i++) { |)}># |)}># */
-/*    #<{(| #<{(|    printf("%i: ", i); |)}># |)}># */
-/*    #<{(| #<{(|    for(j=0; j<14; j++) { |)}># |)}># */
-/*    #<{(| #<{(|       printf("%4X ", data[i][j]); |)}># |)}># */
-/*    #<{(| #<{(|    } |)}># |)}># */
-/*    #<{(| #<{(|    printf("\n"); |)}># |)}># */
-/*    #<{(| #<{(| } |)}># |)}># */
-/*    #<{(|  |)}># */
-/*    #<{(| // Save everything to out.txt file |)}># */
-/*    #<{(| #<{(| FILE* f = fopen("./out.txt", "w"); |)}># |)}># */
-/*    #<{(| #<{(| if(f==NULL){ |)}># |)}># */
-/*    #<{(| #<{(|    printf("Could not open output file\n"); |)}># |)}># */
-/*    #<{(| #<{(|    return 1; |)}># |)}># */
-/*    #<{(| #<{(| } |)}># |)}># */
-/*    #<{(| #<{(| for(i=0; i<15000; i++) { |)}># |)}># */
-/*    #<{(| #<{(|    fprintf(f, "%i: ", i); |)}># |)}># */
-/*    #<{(| #<{(|    for(j=0; j<14; j++) { |)}># |)}># */
-/*    #<{(| #<{(|       fprintf(f, "%4X ", data[i][j]); |)}># |)}># */
-/*    #<{(| #<{(|    } |)}># |)}># */
-/*    #<{(| #<{(|    fprintf(f,"\n"); |)}># |)}># */
-/*    #<{(| #<{(| } |)}># |)}># */
-/*    #<{(| #<{(| fclose(f); |)}># |)}># */
-/*    #<{(| return 0; |)}># */
-/* } */
-/*  */
-/* static int start_monitor_thread(){ */
-/*    #<{(| // TODO: set real time priority to this thread |)}># */
-/*    #<{(| pthread_attr_t attr; |)}># */
-/*    #<{(| if(pthread_attr_init(&attr)){ |)}># */
-/*    #<{(|    return 1; |)}># */
-/*    #<{(| } |)}># */
-/*    #<{(| if(pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED)){ |)}># */
-/*    #<{(|    return 1; |)}># */
-/*    #<{(| } |)}># */
-/*    #<{(| if(pthread_create(&monitor_thread, &attr, &monitor_inputs, NULL)){ |)}># */
-/*    #<{(|    return 1; |)}># */
-/*    #<{(| } |)}># */
-/*    #<{(|  |)}># */
-/*    #<{(| return 0; |)}># */
-/* } */
-/*  */
-/* static void stop_monitor_thread(){ */
-/*    #<{(| while(pthread_cancel(monitor_thread)){} |)}># */
-/* } */
+static void* monitor_inputs(void* param){
+   if(bbb_pruio_init_gpio_pin(P9_13, BBB_PRUIO_INPUT_MODE)){
+      fprintf(stderr, "%s\n", "Could not initialize P9_13");
+   }
+   if(bbb_pruio_init_gpio_pin(P9_11, BBB_PRUIO_INPUT_MODE)){
+      fprintf(stderr, "%s\n", "Could not initialize P9_11");
+   }
+
+   bbb_pruio_message message;
+   while(!finished){
+      while(bbb_pruio_messages_are_available() && !finished){
+         bbb_pruio_read_message(&message);
+
+         // Message from gpio
+         if(message.is_gpio && message.gpio_number==P9_11){
+            printf("P9_11: %i\n", message.value);
+         }
+         if(message.is_gpio && message.gpio_number==P9_13){
+            printf("P9_13: %i\n", message.value);
+         }
+      }
+   }
+
+   return NULL;
+}
+
+static int start_monitor_thread(){
+   // TODO: set real time priority to this thread
+   pthread_attr_t attr;
+   if(pthread_attr_init(&attr)){
+      return 1;
+   }
+   if(pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED)){
+      return 1;
+   }
+   if(pthread_create(&monitor_thread, &attr, &monitor_inputs, NULL)){
+      return 1;
+   }
+
+   return 0;
+}
+
+static void stop_monitor_thread(){
+   pthread_cancel(monitor_thread);
+}
 
 int main(int argc, const char *argv[]){
    // Listen to SIGINT signals (program termination)
@@ -139,7 +86,7 @@ int main(int argc, const char *argv[]){
 
    bbb_pruio_start();
 
-   /* start_monitor_thread(); */
+   start_monitor_thread();
 
    // Initialize 2 pins as outputs
    if(bbb_pruio_init_gpio_pin(P9_12, BBB_PRUIO_OUTPUT_MODE)){
@@ -171,6 +118,7 @@ int main(int argc, const char *argv[]){
    }
 
    bbb_pruio_stop();
+   stop_monitor_thread();
 
    return 0;
 }

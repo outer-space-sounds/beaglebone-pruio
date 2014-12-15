@@ -8,6 +8,7 @@
 #include <sys/mman.h>
 
 #include "bbb_pruio.h"
+#include "registers.h"
 #include "bbb_pruio_pins.h"
 
 #ifndef BBB_PRUIO_START_ADDR_0
@@ -39,32 +40,32 @@ static int map_device_registers(){
    int memdev = open("/dev/mem", O_RDWR | O_SYNC);
    
    // Get pointer to gpio0 registers (start at address 0x44e07000, length 0x1000 (4KB)).
-   volatile void* gpio0 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, 0x44e07000);
+   volatile void* gpio0 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, GPIO0);
    if(gpio0 == MAP_FAILED){ return 1; }
-   gpio0_output_enable = (unsigned int*)(gpio0 + 0x134);
-   gpio0_data_out = (unsigned int*)(gpio0 + 0x13C);
+   gpio0_output_enable = (unsigned int*)(gpio0 + GPIO_OE);
+   gpio0_data_out = (unsigned int*)(gpio0 + GPIO_DATAOUT);
 
    // same for gpio1, 2 and 3.
-   volatile void* gpio1 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, 0x4804c000);
+   volatile void* gpio1 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, GPIO2);
    if(gpio1 == MAP_FAILED){
       return 1;
    }
-   gpio1_output_enable = (unsigned int*)(gpio1+0x134);
-   gpio1_data_out = (unsigned int*)(gpio1 + 0x13C);
+   gpio1_output_enable = (unsigned int*)(gpio1+GPIO_OE);
+   gpio1_data_out = (unsigned int*)(gpio1 + GPIO_DATAOUT);
 
-   volatile void* gpio2 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, 0x481ac000);
+   volatile void* gpio2 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, GPIO2);
    if(gpio2 == MAP_FAILED){
       return 1;
    }
-   gpio2_output_enable = (unsigned int*)(gpio2+0x134);
-   gpio2_data_out = (unsigned int*)(gpio2 + 0x13C);
+   gpio2_output_enable = (unsigned int*)(gpio2+GPIO_OE);
+   gpio2_data_out = (unsigned int*)(gpio2 + GPIO_DATAOUT);
 
-   volatile void* gpio3 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, 0x4804e000);
+   volatile void* gpio3 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, GPIO3);
    if(gpio3 == MAP_FAILED){
       return 1;
    }
-   gpio3_output_enable = (unsigned int*)(gpio3+0x134);
-   gpio3_data_out = (unsigned int*)(gpio3 + 0x13C);
+   gpio3_output_enable = (unsigned int*)(gpio3+GPIO_OE);
+   gpio3_data_out = (unsigned int*)(gpio3 + GPIO_DATAOUT);
 
    return 0;
 }
@@ -76,9 +77,25 @@ typedef struct gpio_pin{
    bbb_pruio_gpio_mode mode;
    int gpio_number;
 } gpio_pin;
-
 static gpio_pin used_pins[MAX_GPIO_CHANNELS];
 static int used_pins_count = 0;
+
+static int init_gpio(){
+   // Only pinmux is set here, enabling GPIO modules, 
+   // clocks, debounce, etc. is set on the PRU side.
+   
+   // Pins used to control analog mux:
+   int e1 = bbb_pruio_init_gpio_pin(P9_27, BBB_PRUIO_OUTPUT_MODE);
+   int e2 = bbb_pruio_init_gpio_pin(P9_30, BBB_PRUIO_OUTPUT_MODE);
+   int e3 = bbb_pruio_init_gpio_pin(P9_42A, BBB_PRUIO_OUTPUT_MODE);
+
+   if(e1 || e2 || e3){
+      return 1;
+   } 
+   else{
+      return 0;
+   }
+}
 
 static int get_gpio_pin_name(int gpio_number, char* pin_name){
    switch(gpio_number){
@@ -304,6 +321,11 @@ int bbb_pruio_start(){
       return 1;
    }
 
+   if(init_gpio()){
+      fprintf(stderr, "libbbb_pruio: Could not init GPIO\n");
+   }
+
+
    return 0;
 }
 
@@ -422,6 +444,23 @@ int bbb_pruio_init_gpio_pin(int gpio_number, bbb_pruio_gpio_mode mode){
          case 2: *gpio2_output_enable |= (1<<gpio_bit); break;
          case 3: *gpio3_output_enable |= (1<<gpio_bit); break;
       }
+
+      /** 
+       * Tell the PRU unit that we are interested in input from this pin.
+       *
+       * Each one of the 32 bits in shared_ram[1026] represent the 32 pins for
+       * the GPIO0 module. If a bit is set, it means that we need
+       * input for that GPIO channel. Same mechanism is used for GPIO1, 2 and 3
+       * using the following shared ram positions:
+       *
+       * shared_ram[1026] -> GPIO0
+       * shared_ram[1027] -> GPIO1
+       * shared_ram[1028] -> GPIO2
+       * shared_ram[1029] -> GPIO3
+       *
+       */
+      bbb_pruio_shared_ram[gpio_module+1026] |= (1<<gpio_bit);
+ 
    }
    fclose(f);
    return 0;

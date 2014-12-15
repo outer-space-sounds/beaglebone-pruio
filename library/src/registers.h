@@ -22,18 +22,10 @@
 #define IEP_TMR_CMP0 0x48
 #define IEP_TMR_CMP1 0x4C
 
-// Control Module Registers
-#define CONTROL_MODULE 0x44e10000
-#define CONF_P9_11 0x870
-#define CONF_P9_12 0x878
-#define CONF_P9_13 0x874
-#define CONF_P9_27 0x9a4
-#define CONF_P9_30 0x998
-#define CONF_P9_42A 0x964
-// TODO: all of them!
-
 // Clock Module registers
 #define CM_PER 0x44e00000
+#define CM_PER_GPIO1_CLKCTRL 0xac
+#define CM_PER_GPIO2_CLKCTRL 0xb0
 #define CM_PER_GPIO3_CLKCTRL 0xb4
 #define CM_WKUP 0x44e00400
 #define CM_WKUP_GPIO0_CLKCTRL 0x08
@@ -98,38 +90,4 @@
 #define ADC_TSC_FIFO0DATA 0x100
 #define ADC_TSC_FIFO1DATA 0x200
 
-char * get_gpio_pin_configuration_register(int pin_number){
-   int r;
-   switch (pin_number) {
-      case P9_11:
-         r = CONF_P9_11;
-         break;
-
-      case P9_12:
-         r = CONF_P9_12;
-         break;
-
-      case P9_13:
-         r = CONF_P9_13;
-         break;
-
-      case P9_27:
-         r = CONF_P9_27;
-         break;
-
-      case P9_30:
-         r = CONF_P9_30;
-         break;
-
-      case P9_42A:
-         r = CONF_P9_42A;
-         break;
-
-      default:
-         r = 0;
-   }
-   return (char*)r;
-}
-
 #endif //REGISTERS_H
-

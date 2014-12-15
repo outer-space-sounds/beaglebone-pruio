@@ -22,10 +22,9 @@
  * A structure for easy reading of incoming messages.
  */
 typedef struct bbb_pruio_message{
-   int is_gpio_value; // 1 if gpio, 0 if adc
-   int adc_channel;
+   int is_gpio; // 1 if gpio, 0 if adc
    int value;
-   char pin_name[6];
+   int adc_channel;
    int gpio_number;
 } bbb_pruio_message;
 
@@ -73,7 +72,7 @@ inline int bbb_pruio_messages_are_available();
 /**
  * Puts the next message available from the PRU in the message address.
  */
-inline void bbb_pruio_read_message(unsigned int *message);
+inline void bbb_pruio_read_message(bbb_pruio_message *message);
 
 /**
  * Returns a structure for easy interpretation of the message.
@@ -94,8 +93,7 @@ inline void bbb_pruio_parse_message(unsigned int *message, bbb_pruio_message* pa
 // shared_ram[1024] is the start (read) pointer.
 // shared_ram[1025] is the end (write) pointer.
 //
-// Messages are 32 bit unsigned ints. The 16 MSbits are the channel 
-// number and the 16 LSbits are the value.
+// Messages are 32 bit unsigned ints.
 // 
 // Read these:
 // * http://en.wikipedia.org/wiki/Circular_buffer#Mirroring
@@ -110,8 +108,18 @@ inline __attribute__ ((always_inline)) int bbb_pruio_messages_are_available(){
    return (*bbb_pruio_buffer_start != *bbb_pruio_buffer_end);
 }
 
-inline __attribute__ ((always_inline)) void bbb_pruio_read_message(unsigned int* message){
-   *message = bbb_pruio_shared_ram[*bbb_pruio_buffer_start & (bbb_pruio_buffer_size-1)];
+inline __attribute__ ((always_inline)) void bbb_pruio_read_message(bbb_pruio_message* message){
+   unsigned int raw_message = bbb_pruio_shared_ram[*bbb_pruio_buffer_start & (bbb_pruio_buffer_size-1)];
+
+   message->is_gpio = (raw_message&(1<<31))==0;
+   if(message->is_gpio){
+      message->value = (raw_message&(1<<8))==0;
+      message->gpio_number = raw_message & 0xFF;
+   }
+   else{
+      message->value = (raw_message >> 4) & 0xFFF; 
+      message->adc_channel = raw_message & 0xF;
+   }
 
    // Don't write buffer start before reading message (mem barrier)
    // http://stackoverflow.com/questions/982129/what-does-sync-synchronize-do
