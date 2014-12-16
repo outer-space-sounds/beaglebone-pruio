@@ -35,6 +35,13 @@ void signal_handler(int signal){
 static pthread_t monitor_thread;
 
 static void* monitor_inputs(void* param){
+   if(bbb_pruio_init_adc_pin(1)){
+      fprintf(stderr, "%s\n", "Could not initialize analog pin 1");
+   }
+   if(bbb_pruio_init_adc_pin(14)){
+      fprintf(stderr, "%s\n", "Could not initialize 14");
+   }
+
    if(bbb_pruio_init_gpio_pin(P9_13, BBB_PRUIO_INPUT_MODE)){
       fprintf(stderr, "%s\n", "Could not initialize P9_13");
    }

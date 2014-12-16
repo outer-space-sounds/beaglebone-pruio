@@ -87,58 +87,56 @@ ACOTF	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/syntd.h	2
 ACOTF	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/syntf.h	233;"	d	language:C++
 ACOTHF	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/syntd.h	242;"	d	language:C++
 ACOTHF	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/syntf.h	242;"	d	language:C++
-adc_channel	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^   int adc_channel;$/;"	m	language:C++	struct:bbb_pruio_message
 adc_channel	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^typedef struct adc_channel{$/;"	s	language:C++	file:
 adc_channel	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^} adc_channel;$/;"	t	language:C++	typeref:struct:adc_channel	file:
 adc_channel::mode	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^   int mode; $/;"	m	language:C++	struct:adc_channel	file:
 adc_channel::past_values	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^   unsigned int past_values[8]; $/;"	m	language:C++	struct:adc_channel	file:
 adc_channel::value	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^   unsigned int value; $/;"	m	language:C++	struct:adc_channel	file:
 adc_channels	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^adc_channel adc_channels[MAX_ADC_CHANNELS];$/;"	v	language:C++
-adc_start_sampling	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void adc_start_sampling();$/;"	p	language:C++	file:
 adc_start_sampling	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void adc_start_sampling(){$/;"	f	language:C++
-ADC_TSC	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	49;"	d	language:C++
-ADC_TSC_ADCRANGE	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	53;"	d	language:C++
-ADC_TSC_CLKDIV	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	54;"	d	language:C++
-ADC_TSC_CTRL	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	52;"	d	language:C++
-ADC_TSC_FIFO0COUNT	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	88;"	d	language:C++
-ADC_TSC_FIFO0DATA	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	90;"	d	language:C++
-ADC_TSC_FIFO1COUNT	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	89;"	d	language:C++
-ADC_TSC_FIFO1DATA	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	91;"	d	language:C++
-ADC_TSC_IRQENABLE_SET	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	51;"	d	language:C++
-ADC_TSC_IRQSTATUS	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	50;"	d	language:C++
-ADC_TSC_STEPCONFIG1	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	56;"	d	language:C++
-ADC_TSC_STEPCONFIG10	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	74;"	d	language:C++
-ADC_TSC_STEPCONFIG11	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	76;"	d	language:C++
-ADC_TSC_STEPCONFIG12	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	78;"	d	language:C++
-ADC_TSC_STEPCONFIG13	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	80;"	d	language:C++
-ADC_TSC_STEPCONFIG14	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	82;"	d	language:C++
-ADC_TSC_STEPCONFIG15	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	84;"	d	language:C++
-ADC_TSC_STEPCONFIG16	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	86;"	d	language:C++
-ADC_TSC_STEPCONFIG2	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	58;"	d	language:C++
-ADC_TSC_STEPCONFIG3	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	60;"	d	language:C++
-ADC_TSC_STEPCONFIG4	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	62;"	d	language:C++
-ADC_TSC_STEPCONFIG5	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	64;"	d	language:C++
-ADC_TSC_STEPCONFIG6	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	66;"	d	language:C++
-ADC_TSC_STEPCONFIG7	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	68;"	d	language:C++
-ADC_TSC_STEPCONFIG8	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	70;"	d	language:C++
-ADC_TSC_STEPCONFIG9	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	72;"	d	language:C++
-ADC_TSC_STEPDELAY1	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	57;"	d	language:C++
-ADC_TSC_STEPDELAY10	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	75;"	d	language:C++
-ADC_TSC_STEPDELAY11	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	77;"	d	language:C++
-ADC_TSC_STEPDELAY12	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	79;"	d	language:C++
-ADC_TSC_STEPDELAY13	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	81;"	d	language:C++
-ADC_TSC_STEPDELAY14	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	83;"	d	language:C++
-ADC_TSC_STEPDELAY15	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	85;"	d	language:C++
-ADC_TSC_STEPDELAY16	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	87;"	d	language:C++
-ADC_TSC_STEPDELAY2	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	59;"	d	language:C++
-ADC_TSC_STEPDELAY3	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	61;"	d	language:C++
-ADC_TSC_STEPDELAY4	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	63;"	d	language:C++
-ADC_TSC_STEPDELAY5	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	65;"	d	language:C++
-ADC_TSC_STEPDELAY6	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	67;"	d	language:C++
-ADC_TSC_STEPDELAY7	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	69;"	d	language:C++
-ADC_TSC_STEPDELAY8	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	71;"	d	language:C++
-ADC_TSC_STEPDELAY9	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	73;"	d	language:C++
-ADC_TSC_STEPENABLE	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	55;"	d	language:C++
+ADC_TSC	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	54;"	d	language:C++
+ADC_TSC_ADCRANGE	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	58;"	d	language:C++
+ADC_TSC_CLKDIV	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	59;"	d	language:C++
+ADC_TSC_CTRL	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	57;"	d	language:C++
+ADC_TSC_FIFO0COUNT	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	93;"	d	language:C++
+ADC_TSC_FIFO0DATA	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	95;"	d	language:C++
+ADC_TSC_FIFO1COUNT	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	94;"	d	language:C++
+ADC_TSC_FIFO1DATA	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	96;"	d	language:C++
+ADC_TSC_IRQENABLE_SET	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	56;"	d	language:C++
+ADC_TSC_IRQSTATUS	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	55;"	d	language:C++
+ADC_TSC_STEPCONFIG1	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	61;"	d	language:C++
+ADC_TSC_STEPCONFIG10	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	79;"	d	language:C++
+ADC_TSC_STEPCONFIG11	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	81;"	d	language:C++
+ADC_TSC_STEPCONFIG12	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	83;"	d	language:C++
+ADC_TSC_STEPCONFIG13	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	85;"	d	language:C++
+ADC_TSC_STEPCONFIG14	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	87;"	d	language:C++
+ADC_TSC_STEPCONFIG15	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	89;"	d	language:C++
+ADC_TSC_STEPCONFIG16	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	91;"	d	language:C++
+ADC_TSC_STEPCONFIG2	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	63;"	d	language:C++
+ADC_TSC_STEPCONFIG3	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	65;"	d	language:C++
+ADC_TSC_STEPCONFIG4	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	67;"	d	language:C++
+ADC_TSC_STEPCONFIG5	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	69;"	d	language:C++
+ADC_TSC_STEPCONFIG6	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	71;"	d	language:C++
+ADC_TSC_STEPCONFIG7	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	73;"	d	language:C++
+ADC_TSC_STEPCONFIG8	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	75;"	d	language:C++
+ADC_TSC_STEPCONFIG9	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	77;"	d	language:C++
+ADC_TSC_STEPDELAY1	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	62;"	d	language:C++
+ADC_TSC_STEPDELAY10	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	80;"	d	language:C++
+ADC_TSC_STEPDELAY11	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	82;"	d	language:C++
+ADC_TSC_STEPDELAY12	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	84;"	d	language:C++
+ADC_TSC_STEPDELAY13	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	86;"	d	language:C++
+ADC_TSC_STEPDELAY14	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	88;"	d	language:C++
+ADC_TSC_STEPDELAY15	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	90;"	d	language:C++
+ADC_TSC_STEPDELAY16	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	92;"	d	language:C++
+ADC_TSC_STEPDELAY2	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	64;"	d	language:C++
+ADC_TSC_STEPDELAY3	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	66;"	d	language:C++
+ADC_TSC_STEPDELAY4	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	68;"	d	language:C++
+ADC_TSC_STEPDELAY5	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	70;"	d	language:C++
+ADC_TSC_STEPDELAY6	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	72;"	d	language:C++
+ADC_TSC_STEPDELAY7	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	74;"	d	language:C++
+ADC_TSC_STEPDELAY8	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	76;"	d	language:C++
+ADC_TSC_STEPDELAY9	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	78;"	d	language:C++
+ADC_TSC_STEPENABLE	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	60;"	d	language:C++
 ADDEND1	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/example_apps/PRU_memAccessPRUDataRam/PRU_memAccessPRUDataRam.c	77;"	d	language:C	file:
 ADDEND1	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/example_apps/PRU_memAccess_DDR_PRUsharedRAM/PRU_memAcc_DDR_sharedRAM.c	85;"	d	language:C	file:
 ADDEND1	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/old_example/PRU_access_const_table/PRU_access_const_table.c	66;"	d	language:C	file:
@@ -616,36 +614,12 @@ bbb_input_tilde_free	/media/beagle/root/libbbb_pruio/repo/puredata-external/tild
 bbb_input_tilde_new	/media/beagle/root/libbbb_pruio/repo/puredata-external/tilde-object/bbb_input~.c	/^static void *bbb_input_tilde_new(void) {$/;"	f	language:C	file:
 bbb_input_tilde_perform	/media/beagle/root/libbbb_pruio/repo/puredata-external/tilde-object/bbb_input~.c	/^static t_int *bbb_input_tilde_perform(t_int *w){$/;"	f	language:C	file:
 bbb_input_tilde_setup	/media/beagle/root/libbbb_pruio/repo/puredata-external/tilde-object/bbb_input~.c	/^void bbb_input_tilde_setup(void) {$/;"	f	language:C
-bbb_pruio_buffer_end	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^volatile unsigned int *bbb_pruio_buffer_end;$/;"	v	language:C++
-bbb_pruio_buffer_size	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^unsigned int bbb_pruio_buffer_size;$/;"	v	language:C++
-bbb_pruio_buffer_start	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^volatile unsigned int *bbb_pruio_buffer_start;$/;"	v	language:C++
 bbb_pruio_get_gpio_number	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^int bbb_pruio_get_gpio_number(char* pin_name){$/;"	f	language:C++
-bbb_pruio_get_gpio_number	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^int bbb_pruio_get_gpio_number(char* pin_name);  $/;"	p	language:C++
-bbb_pruio_gpio_mode	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^} bbb_pruio_gpio_mode;$/;"	t	language:C++	typeref:enum:__anon1
-bbb_pruio_init_adc_pin	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^int bbb_pruio_init_adc_pin(int channel_number); $/;"	p	language:C++
+bbb_pruio_init_adc_pin	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^int bbb_pruio_init_adc_pin(int channel_number){$/;"	f	language:C++
 bbb_pruio_init_gpio_pin	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^int bbb_pruio_init_gpio_pin(int gpio_number, bbb_pruio_gpio_mode mode){$/;"	f	language:C++
-bbb_pruio_init_gpio_pin	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^int bbb_pruio_init_gpio_pin(int gpio_number, bbb_pruio_gpio_mode mode);  $/;"	p	language:C++
-BBB_PRUIO_INPUT_MODE	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^   BBB_PRUIO_INPUT_MODE = 1$/;"	e	language:C++	enum:__anon1
-bbb_pruio_message	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^typedef struct bbb_pruio_message{$/;"	s	language:C++
-bbb_pruio_message	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^} bbb_pruio_message;$/;"	t	language:C++	typeref:struct:bbb_pruio_message
-bbb_pruio_message::adc_channel	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^   int adc_channel;$/;"	m	language:C++	struct:bbb_pruio_message
-bbb_pruio_message::gpio_number	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^   int gpio_number;$/;"	m	language:C++	struct:bbb_pruio_message
-bbb_pruio_message::is_gpio	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^   int is_gpio; \/\/ 1 if gpio, 0 if adc$/;"	m	language:C++	struct:bbb_pruio_message
-bbb_pruio_message::value	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^   int value;$/;"	m	language:C++	struct:bbb_pruio_message
-bbb_pruio_messages_are_available	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^inline int bbb_pruio_messages_are_available();$/;"	p	language:C++
-bbb_pruio_messages_are_available	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^inline __attribute__ ((always_inline)) int bbb_pruio_messages_are_available(){$/;"	f	language:C++
-BBB_PRUIO_OUTPUT_MODE	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^   BBB_PRUIO_OUTPUT_MODE = 0,$/;"	e	language:C++	enum:__anon1
-bbb_pruio_parse_message	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^inline void bbb_pruio_parse_message(unsigned int *message, bbb_pruio_message* parsed_message);$/;"	p	language:C++
-bbb_pruio_parse_message	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^inline __attribute__ ((always_inline)) void bbb_pruio_parse_message(unsigned int *message, bbb_pruio_message* parsed_message){$/;"	f	language:C++
-bbb_pruio_read_message	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^inline void bbb_pruio_read_message(bbb_pruio_message *message);$/;"	p	language:C++
-bbb_pruio_read_message	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^inline __attribute__ ((always_inline)) void bbb_pruio_read_message(bbb_pruio_message* message){$/;"	f	language:C++
 bbb_pruio_set_pin_value	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^void bbb_pruio_set_pin_value(int gpio_number, int value){$/;"	f	language:C++
-bbb_pruio_set_pin_value	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^void bbb_pruio_set_pin_value(int gpio_number, int value);$/;"	p	language:C++
-bbb_pruio_shared_ram	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^volatile unsigned int *bbb_pruio_shared_ram = NULL;$/;"	v	language:C++
 bbb_pruio_start	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^int bbb_pruio_start(){$/;"	f	language:C++
-bbb_pruio_start	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^int bbb_pruio_start();$/;"	p	language:C++
 bbb_pruio_stop	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^int bbb_pruio_stop(){$/;"	f	language:C++
-bbb_pruio_stop	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^int bbb_pruio_stop();$/;"	p	language:C++
 BBITS	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/frcmpyf1_i.h	68;"	d	language:C++
 bcmp	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/include/strings.h	/^_IDECL int    bcmp(const void *, const void *, size_t);$/;"	p	language:C++
 bcmp	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/include/strings.h	/^_IDEFN int bcmp(const void *b1, const void *b2, size_t n)$/;"	f	language:C++
@@ -764,8 +738,7 @@ buffer_end	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^volati
 buffer_init	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^static void buffer_init(){$/;"	f	language:C++	file:
 buffer_size	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^unsigned int buffer_size;$/;"	v	language:C++
 buffer_start	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^volatile unsigned int *buffer_start;$/;"	v	language:C++
-buffer_write	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void buffer_write(unsigned int *message);$/;"	p	language:C++	file:
-buffer_write	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void buffer_write(unsigned int *message){$/;"	f	language:C++
+buffer_write	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^void buffer_write(unsigned int *message){$/;"	f	language:C++
 buff_stop	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/include/stdio.h	/^      unsigned char* buff_stop;  \/* Pointer to last read char in buffer *\/$/;"	m	language:C++	struct:std::__anon32
 buff_stop	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/stdio.h	/^      unsigned char* buff_stop;  \/* Pointer to last read char in buffer *\/$/;"	m	language:C++	struct:std::__anon9
 BUFLEN	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/ltoa.c	38;"	d	language:C	file:
@@ -991,6 +964,7 @@ CLOSE	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/lowlev.c	
 close	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/lowlev.c	/^_CODE_ACCESS int close(int llv_fd)$/;"	f	language:C
 CloseSourceFile	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasm.h	/^void CloseSourceFile( SOURCEFILE *ps );$/;"	p	language:C++
 CloseSourceFile	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasmpp.c	/^void CloseSourceFile( SOURCEFILE *ps )$/;"	f	language:C
+close_memory_map	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^static void close_memory_map(){$/;"	f	language:C++	file:
 cmdLine	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasm.c	/^SOURCEFILE cmdLine = { 0, 0, 0, 0, 0, 0, 0, 0, "[CommandLine]", "" };$/;"	v	language:C
 cmdLineData	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasm.c	/^char cmdLineData[MAX_CMD_EQUATE][EQUATE_DATA_LEN];$/;"	v	language:C
 cmdLineEquates	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasm.c	/^int cmdLineEquates = 0;$/;"	v	language:C
@@ -999,13 +973,13 @@ CMPF	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/syntd.h	85
 CMPF	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/syntf.h	85;"	d	language:C++
 CMPF3	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/syntd.h	86;"	d	language:C++
 CMPF3	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/syntf.h	86;"	d	language:C++
-CM_PER	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	26;"	d	language:C++
-CM_PER_GPIO1_CLKCTRL	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	27;"	d	language:C++
-CM_PER_GPIO2_CLKCTRL	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	28;"	d	language:C++
-CM_PER_GPIO3_CLKCTRL	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	29;"	d	language:C++
-CM_WKUP	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	30;"	d	language:C++
-CM_WKUP_ADC_TSK_CLKCTL	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	32;"	d	language:C++
-CM_WKUP_GPIO0_CLKCTRL	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	31;"	d	language:C++
+CM_PER	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	31;"	d	language:C++
+CM_PER_GPIO1_CLKCTRL	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	32;"	d	language:C++
+CM_PER_GPIO2_CLKCTRL	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	33;"	d	language:C++
+CM_PER_GPIO3_CLKCTRL	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	34;"	d	language:C++
+CM_WKUP	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	35;"	d	language:C++
+CM_WKUP_ADC_TSK_CLKCTL	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	37;"	d	language:C++
+CM_WKUP_GPIO0_CLKCTRL	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	36;"	d	language:C++
 CNAME	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/xxcctype.h	4;"	d	language:C++
 CNST	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/syntd.h	44;"	d	language:C++
 CNST	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/syntf.h	44;"	d	language:C++
@@ -2725,7 +2699,6 @@ get_basename	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru
 get_dirname	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/path_utils.c	/^int get_dirname( const char * filename, char * dir, const size_t sz)$/;"	f	language:C
 get_dirname	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/path_utils.h	/^int get_dirname( const char * filename, char * dir, const size_t sz);$/;"	p	language:C++
 get_gpio_config_file	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^static int get_gpio_config_file(int gpio_number, char* path){$/;"	f	language:C++	file:
-get_gpio_module_address	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline char * get_gpio_module_address(int module_number);$/;"	p	language:C++	file:
 get_gpio_module_address	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline char * get_gpio_module_address(int module_number){$/;"	f	language:C++
 get_gpio_pin_name	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^static int get_gpio_pin_name(int gpio_number, char* pin_name){$/;"	f	language:C++	file:
 get_offset	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/rtti.cpp	108;"	d	language:C++	file:
@@ -2740,18 +2713,14 @@ gmake	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/mklib.c	/^str
 gmtime	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/include/time.h	/^_CODE_ACCESS struct tm *gmtime(const time_t *_timer);$/;"	p	language:C++	namespace:std
 gmtime	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/gmtime.c	/^_CODE_ACCESS struct tm *gmtime(const time_t *timer)$/;"	f	language:C
 gmtime	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/time.h	/^_CODE_ACCESS struct tm *gmtime(const time_t *_timer);$/;"	p	language:C++	namespace:std
-GPIO0	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	35;"	d	language:C++
-gpio0_data_out	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^volatile unsigned int* gpio0_data_out = NULL;$/;"	v	language:C++
-gpio0_output_enable	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^volatile unsigned int* gpio0_output_enable = NULL;$/;"	v	language:C++
-GPIO1	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	36;"	d	language:C++
-gpio1_data_out	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^volatile unsigned int* gpio1_data_out = NULL;$/;"	v	language:C++
-gpio1_output_enable	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^volatile unsigned int* gpio1_output_enable = NULL;$/;"	v	language:C++
-GPIO2	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	37;"	d	language:C++
-gpio2_data_out	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^volatile unsigned int* gpio2_data_out = NULL;$/;"	v	language:C++
-gpio2_output_enable	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^volatile unsigned int* gpio2_output_enable = NULL;$/;"	v	language:C++
-GPIO3	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	38;"	d	language:C++
-gpio3_data_out	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^volatile unsigned int* gpio3_data_out = NULL;$/;"	v	language:C++
-gpio3_output_enable	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^volatile unsigned int* gpio3_output_enable = NULL;$/;"	v	language:C++
+gpio0	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^static volatile char* gpio0 = NULL;$/;"	v	language:C++	file:
+GPIO0	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	40;"	d	language:C++
+gpio1	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^static volatile char* gpio1 = NULL;$/;"	v	language:C++	file:
+GPIO1	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	41;"	d	language:C++
+gpio2	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^static volatile char* gpio2 = NULL;$/;"	v	language:C++	file:
+GPIO2	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	42;"	d	language:C++
+gpio3	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^static volatile char* gpio3 = NULL;$/;"	v	language:C++	file:
+GPIO3	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	43;"	d	language:C++
 GPIO_BIT	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/old_example/PRU_gpioToggle/PRU_gpioToggle.hp	39;"	d	language:C++	file:
 gpio_channel	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^typedef struct gpio_channel{$/;"	s	language:C++	file:
 gpio_channel	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^} gpio_channel;$/;"	t	language:C++	typeref:struct:gpio_channel	file:
@@ -2759,22 +2728,21 @@ gpio_channel::gpio_number	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_
 gpio_channel::value	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^   unsigned int value; $/;"	m	language:C++	struct:gpio_channel	file:
 gpio_channels	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^gpio_channel gpio_channels[MAX_GPIO_CHANNELS];$/;"	v	language:C++
 gpio_channel_count	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^int gpio_channel_count;$/;"	v	language:C++
-GPIO_CLEARDATAOUT	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	45;"	d	language:C++
+GPIO_CLEARDATAOUT	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	50;"	d	language:C++
 GPIO_COUNT	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/old_example/PRU_gpioToggle/PRU_gpioToggle.hp	40;"	d	language:C++	file:
-GPIO_CTRL	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	39;"	d	language:C++
-GPIO_DATAIN	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	41;"	d	language:C++
-GPIO_DATAOUT	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	42;"	d	language:C++
-GPIO_DEBOUNCENABLE	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	43;"	d	language:C++
-GPIO_DEBOUNCINGTIME	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	44;"	d	language:C++
+GPIO_CTRL	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	44;"	d	language:C++
+GPIO_DATAIN	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	46;"	d	language:C++
+GPIO_DATAOUT	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	47;"	d	language:C++
+GPIO_DEBOUNCENABLE	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	48;"	d	language:C++
+GPIO_DEBOUNCINGTIME	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	49;"	d	language:C++
 gpio_number	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^   int gpio_number;$/;"	m	language:C++	struct:gpio_pin	file:
-gpio_number	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^   int gpio_number;$/;"	m	language:C++	struct:bbb_pruio_message
 gpio_number	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^   int gpio_number; $/;"	m	language:C++	struct:gpio_channel	file:
-GPIO_OE	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	40;"	d	language:C++
+GPIO_OE	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	45;"	d	language:C++
 gpio_pin	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^typedef struct gpio_pin{ $/;"	s	language:C++	file:
 gpio_pin	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^} gpio_pin;$/;"	t	language:C++	typeref:struct:gpio_pin	file:
 gpio_pin::gpio_number	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^   int gpio_number;$/;"	m	language:C++	struct:gpio_pin	file:
 gpio_pin::mode	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^   bbb_pruio_gpio_mode mode;$/;"	m	language:C++	struct:gpio_pin	file:
-GPIO_SETDATAOUT	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	46;"	d	language:C++
+GPIO_SETDATAOUT	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	51;"	d	language:C++
 grouping	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/include/locale.h	/^    char *grouping;$/;"	m	language:C++	struct:std::lconv
 grouping	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/locale.h	/^    char *grouping;$/;"	m	language:C++	struct:std::lconv
 GROWF	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/syntd.h	197;"	d	language:C++
@@ -2882,7 +2850,8 @@ HUGE_VALL	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/include/math.
 HUGE_VALL	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/math.h	107;"	d	language:C++
 HUGE_VALL	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/math.h	89;"	d	language:C++
 HUGE_VALL	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/math.h	96;"	d	language:C++
-HWREG	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	7;"	d	language:C++	file:
+HWREG	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	30;"	d	language:C++	file:
+HWREG	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	8;"	d	language:C++	file:
 hypot	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/include/math.h	/^double hypot(double, double);$/;"	p	language:C++
 hypot	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/include/mathcpp.h	/^inline float hypot(float _Left, float _Right)$/;"	f	language:C++
 hypot	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/include/mathcpp.h	/^inline long double hypot(long double _Left, long double _Right)$/;"	f	language:C++
@@ -2901,15 +2870,15 @@ Id	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/
 IEEE	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/formi32.h	52;"	d	language:C++
 IEEE	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/formi64.h	53;"	d	language:C++
 IEEE_Hardware	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/pru_math.h	74;"	d	language:C++
-IEP	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	15;"	d	language:C++
-IEP_TMR_CMP0	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	22;"	d	language:C++
-IEP_TMR_CMP1	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	23;"	d	language:C++
-IEP_TMR_CMP_CFG	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	20;"	d	language:C++
-IEP_TMR_CMP_STS	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	21;"	d	language:C++
-IEP_TMR_CNT	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	19;"	d	language:C++
-IEP_TMR_COMPEN	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	18;"	d	language:C++
-IEP_TMR_GLB_CFG	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	16;"	d	language:C++
-IEP_TMR_GLB_STS	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	17;"	d	language:C++
+IEP	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	20;"	d	language:C++
+IEP_TMR_CMP0	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	27;"	d	language:C++
+IEP_TMR_CMP1	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	28;"	d	language:C++
+IEP_TMR_CMP_CFG	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	25;"	d	language:C++
+IEP_TMR_CMP_STS	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	26;"	d	language:C++
+IEP_TMR_CNT	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	24;"	d	language:C++
+IEP_TMR_COMPEN	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	23;"	d	language:C++
+IEP_TMR_GLB_CFG	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	21;"	d	language:C++
+IEP_TMR_GLB_STS	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	22;"	d	language:C++
 IfDefProcess	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasmpp.c	/^static int IfDefProcess( SOURCEFILE *ps, char *Src, int fTrue )$/;"	f	language:C	file:
 IfDefProcess	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasmpp.c	/^static int IfDefProcess( SOURCEFILE *ps, char *Src, int fTrue );$/;"	p	language:C	file:
 ilogb	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/include/math.h	/^int ilogb(double);$/;"	p	language:C++
@@ -2965,25 +2934,19 @@ initial_value	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/e
 initial_value	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/eh.h	/^                                       initial_value(STD_NAMESPACE::terminate);$/;"	p	language:C++
 InitSourceFile	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasm.h	/^SOURCEFILE *InitSourceFile( SOURCEFILE *pParent, char *filename, int$/;"	p	language:C++
 InitSourceFile	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasmpp.c	/^SOURCEFILE *InitSourceFile( SOURCEFILE *pParent, char *filename,$/;"	f	language:C
-init_adc	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^void init_adc();$/;"	p	language:C++	file:
-init_adc	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^void init_adc(){$/;"	f	language:C++
+init_adc	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^static int init_adc(){$/;"	f	language:C++	file:
+init_adc_channels	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void init_adc_channels(){$/;"	f	language:C++
 init_adc_values	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^void init_adc_values(){$/;"	f	language:C++
-init_buffer	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^void init_buffer();$/;"	p	language:C++	file:
 init_buffer	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^void init_buffer(){$/;"	f	language:C++
 init_curr_vla_pool	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/vla_alloc.cpp	/^static void init_curr_vla_pool(void)$/;"	f	language:C++	file:
 init_eh_memory_management	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/throw_edg.cpp	/^static void init_eh_memory_management(void)$/;"	f	language:C++	file:
 init_gpio	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^static int init_gpio(){$/;"	f	language:C++	file:
-init_gpio	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^void init_gpio();$/;"	p	language:C++	file:
-init_gpio	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^void init_gpio(){$/;"	f	language:C++
 init_gpio_channel	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void init_gpio_channel(int gpio_module, int bit){$/;"	f	language:C++
 init_gpio_channels	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void init_gpio_channels(){$/;"	f	language:C++
-init_gpio_pin	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^void init_gpio_pin(int gpio_number, int mode);$/;"	p	language:C++	file:
 init_gpio_values	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^void init_gpio_values(){$/;"	f	language:C++
-init_iep_timer	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^void init_iep_timer();$/;"	p	language:C++	file:
 init_iep_timer	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^void init_iep_timer(){$/;"	f	language:C++
 init_mutexes	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/_mutex.c	/^static void init_mutexes()$/;"	f	language:C	file:
 init_mutexes	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/_mutex.c	/^static void init_mutexes(void);$/;"	p	language:C	file:
-init_ocp	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^void init_ocp();$/;"	p	language:C++	file:
 init_ocp	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^void init_ocp(){$/;"	f	language:C++
 init_pru_system	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^static int init_pru_system(){$/;"	f	language:C++	file:
 input	/media/beagle/root/libbbb_pruio/repo/puredata-external/bbb_input.c	/^typedef struct input {$/;"	s	language:C	file:
@@ -3366,7 +3329,6 @@ is_const	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/eh.h	2
 is_definite	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/path_utils.c	/^int is_definite( const char * filename )$/;"	f	language:C
 is_definite	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/path_utils.h	/^int is_definite( const char * filename );$/;"	p	language:C++
 is_ellipsis	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/eh.h	282;"	d	language:C++
-is_gpio	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^   int is_gpio; \/\/ 1 if gpio, 0 if adc$/;"	m	language:C++	struct:bbb_pruio_message
 is_last	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/eh.h	283;"	d	language:C++
 is_mem_block_descr_allocation	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/throw_edg.cpp	/^		is_mem_block_descr_allocation;$/;"	m	language:C++	struct:a_mem_allocation	file:
 is_pointer	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/eh.h	257;"	d	language:C++
@@ -3987,7 +3949,8 @@ Map::_Iter	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/stl.
 Map::_Myt	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/include/stl.h	/^	typedef Map<_Kty, _Ty, _Pr> _Myt;$/;"	t	language:C++	class:Map
 Map::_Myt	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/stl.h	/^	typedef Map<_Kty, _Ty, _Pr> _Myt;$/;"	t	language:C++	class:Map
 MappedReg	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasmstruct.c	/^    char            MappedReg[STRUCT_MAX_ELEM][STRUCT_NAME_LEN];$/;"	m	language:C	struct:_ASSIGN	file:
-map_device_registers	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^static int map_device_registers(){$/;"	f	language:C++	file:
+map_hardware_address	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^static int map_hardware_address(int address, int size, volatile char* pointer){$/;"	f	language:C++	file:
+map_hardware_memory	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^static void map_hardware_memory(){$/;"	f	language:C++	file:
 MASK	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/old_example/PRU_miscOperations/PRU_miscOperations.c	70;"	d	language:C	file:
 MASK	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/ieeemask.h	228;"	d	language:C++
 Mask_4bit_extract	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/old_example/PRU_miscOperations/PRU_miscOperations.hp	68;"	d	language:C++	file:
@@ -4004,11 +3967,11 @@ MATH_ERRNO	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/include/math
 MATH_ERRNO	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/math.h	129;"	d	language:C++
 MAXFILE	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasm.c	107;"	d	language:C	file:
 MAXTERM	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasmexp.c	74;"	d	language:C	file:
-MAX_ADC_CHANNELS	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	4;"	d	language:C++
+MAX_ADC_CHANNELS	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	9;"	d	language:C++
 MAX_ATEXIT_FUN	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/atexit.c	60;"	d	language:C	file:
 MAX_CMD_EQUATE	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasm.c	109;"	d	language:C	file:
 max_free	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/memory.c	/^int max_free(void)$/;"	f	language:C
-MAX_GPIO_CHANNELS	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	5;"	d	language:C++
+MAX_GPIO_CHANNELS	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	10;"	d	language:C++
 MAX_HOSTS_SUPPORTED	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/app_loader/interface/__prussdrv.h	164;"	d	language:C++
 MAX_PREDICATE	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/mklib.c	37;"	d	language:C	file:
 MAX_PROGRAM	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasm.c	108;"	d	language:C	file:
@@ -4047,6 +4010,7 @@ memcmp	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/string.h
 memcpy	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/include/string.h	/^_CODE_ACCESS void   *memcpy(void *_s1, const void *_s2, size_t _n);$/;"	p	language:C++	namespace:std
 memcpy	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/memcpy.asm	/^memcpy:$/;"	l	language:Asm
 memcpy	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/string.h	/^_CODE_ACCESS void   *memcpy(void *_s1, const void *_s2, size_t _n);$/;"	p	language:C++	namespace:std
+memdev	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.c	/^int memdev;$/;"	v	language:C++
 memmove	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/include/string.h	/^_CODE_ACCESS void   *memmove(void *_s1, const void *_s2, size_t _n);$/;"	p	language:C++	namespace:std
 memmove	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/memmov.c	/^void *memmove(void *s1, const void *s2, size_t n)$/;"	f	language:C
 memmove	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/string.h	/^_CODE_ACCESS void   *memmove(void *_s1, const void *_s2, size_t _n);$/;"	p	language:C++	namespace:std
@@ -4581,25 +4545,25 @@ p0	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/frcmpyf2_i.h
 p1	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/frcmpyf2_i.h	/^   unsigned __int40_t p0, p1, p2, p3, msh;$/;"	v	language:C++
 p2	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/frcmpyf2_i.h	/^   unsigned __int40_t p0, p1, p2, p3, msh;$/;"	v	language:C++
 p3	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/frcmpyf2_i.h	/^   unsigned __int40_t p0, p1, p2, p3, msh;$/;"	v	language:C++
-P9_11	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	58;"	d	language:C++
-P9_12	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	59;"	d	language:C++
-P9_13	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	60;"	d	language:C++
-P9_14	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	61;"	d	language:C++
-P9_15	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	62;"	d	language:C++
-P9_16	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	63;"	d	language:C++
-P9_17	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	64;"	d	language:C++
-P9_18	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	65;"	d	language:C++
-P9_21	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	68;"	d	language:C++
-P9_22	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	69;"	d	language:C++
-P9_23	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	70;"	d	language:C++
-P9_24	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	71;"	d	language:C++
-P9_26	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	73;"	d	language:C++
-P9_27	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	74;"	d	language:C++
-P9_30	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	77;"	d	language:C++
-P9_41A	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	79;"	d	language:C++
-P9_41B	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	80;"	d	language:C++
-P9_42A	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	81;"	d	language:C++
-P9_42B	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	82;"	d	language:C++
+P9_11	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	55;"	d	language:C++
+P9_12	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	56;"	d	language:C++
+P9_13	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	57;"	d	language:C++
+P9_14	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	58;"	d	language:C++
+P9_15	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	59;"	d	language:C++
+P9_16	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	60;"	d	language:C++
+P9_17	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	61;"	d	language:C++
+P9_18	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	62;"	d	language:C++
+P9_21	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	65;"	d	language:C++
+P9_22	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	66;"	d	language:C++
+P9_23	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	67;"	d	language:C++
+P9_24	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	68;"	d	language:C++
+P9_26	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	70;"	d	language:C++
+P9_27	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	71;"	d	language:C++
+P9_30	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	74;"	d	language:C++
+P9_41A	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	76;"	d	language:C++
+P9_41B	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	77;"	d	language:C++
+P9_42A	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	78;"	d	language:C++
+P9_42B	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio_pins.h	79;"	d	language:C++
 PACKCHAR	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/include/trgcio.h	85;"	d	language:C++
 PACKCHAR	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/trgcio.h	85;"	d	language:C++
 PACKET	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/memory.c	/^} PACKET;$/;"	t	language:C	typeref:struct:fpack	file:
@@ -5038,11 +5002,9 @@ ProcessSourceFile	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_packag
 ProcessSourceLine	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasm.c	/^int ProcessSourceLine( SOURCEFILE *ps, int length, char *src, int MaxLen )$/;"	f	language:C
 ProcessSourceLine	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasm.h	/^int ProcessSourceLine( SOURCEFILE *ps, int length, char *src, int MaxLen );$/;"	p	language:C++
 process_adc_value	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void process_adc_value(unsigned int channel_number, unsigned int value){$/;"	f	language:C++
-process_adc_values	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void process_adc_values();$/;"	p	language:C++	file:
 process_adc_values	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void process_adc_values(){$/;"	f	language:C++
 process_args	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/mklib.c	/^void process_args(int argc, char *argv[])$/;"	f	language:C
 process_function	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/rtti.cpp	/^		process_function;$/;"	m	language:C++	struct:a_base_class_traversal_block	file:
-process_gpio_values	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void process_gpio_values();$/;"	p	language:C++	file:
 process_gpio_values	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void process_gpio_values(){$/;"	f	language:C++
 process_post_function	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/rtti.cpp	/^		process_post_function;$/;"	m	language:C++	struct:a_base_class_traversal_block	file:
 product	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/frcmpyf_div_i.h	/^  mantissa_t temp, carry, product;$/;"	v	language:C++
@@ -5295,8 +5257,8 @@ PRU_EVTOUT_6	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru
 PRU_EVTOUT_6	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/app_loader/python/prussdrv/constants_simple.py	/^PRU_EVTOUT_6           =  6$/;"	v	language:Python
 PRU_EVTOUT_7	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/app_loader/include/prussdrv.h	87;"	d	language:C++
 PRU_EVTOUT_7	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/app_loader/python/prussdrv/constants_simple.py	/^PRU_EVTOUT_7           =  7$/;"	v	language:Python
-PRU_ICSS_CFG	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	11;"	d	language:C++
-PRU_ICSS_CFG_SYSCFG	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	12;"	d	language:C++
+PRU_ICSS_CFG	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	16;"	d	language:C++
+PRU_ICSS_CFG_SYSCFG	/media/beagle/root/libbbb_pruio/repo/library/src/registers.h	17;"	d	language:C++
 PRU_INST	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pru_ins.h	/^} PRU_INST;$/;"	t	language:C++	typeref:struct:_PRU_INST
 PRU_INTC_CMR10_REG	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/app_loader/interface/__prussdrv.h	143;"	d	language:C++
 PRU_INTC_CMR11_REG	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/app_loader/interface/__prussdrv.h	144;"	d	language:C++
@@ -6105,7 +6067,6 @@ setvbuf	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/setvbuf
 setvbuf	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/stdio.h	/^extern _CODE_ACCESS int     setvbuf(register FILE *_fp, register char *_buf, $/;"	p	language:C++	namespace:std
 setw	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/iomanip.cpp	/^_Smanip<streamsize> setw(streamsize wide)$/;"	f	language:C++
 setw	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/iomanip.cpp	/^_SMNAME(str) setw(streamsize wide)$/;"	f	language:C++
-set_mux_control	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void set_mux_control(unsigned int ctl);$/;"	p	language:C++	file:
 set_mux_control	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void set_mux_control(unsigned int ctl){$/;"	f	language:C++
 set_working_directory	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/mklib.c	/^bool set_working_directory(const string &pathname)$/;"	f	language:C
 set_working_directory	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/mklib.c	/^bool set_working_directory(const string &pathname)$/;"	f	language:C
@@ -7722,7 +7683,6 @@ UTOF	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/xxfftype.h
 UTOF	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/xxlftype.h	75;"	d	language:C++
 ValidateOffset	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasm.c	/^static int ValidateOffset( SOURCEFILE *ps )$/;"	f	language:C	file:
 ValidateOffset	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasm.c	/^static int ValidateOffset( SOURCEFILE *ps );$/;"	p	language:C	file:
-value	/media/beagle/root/libbbb_pruio/repo/library/src/bbb_pruio.h	/^   int value;$/;"	m	language:C++	struct:bbb_pruio_message
 value	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^   unsigned int value; $/;"	m	language:C++	struct:adc_channel	file:
 value	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^   unsigned int value; $/;"	m	language:C++	struct:gpio_channel	file:
 Value	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pru_ins.h	/^    uint        Value;              \/* Reg #, Imm Val, Count Val *\/$/;"	m	language:C++	struct:_PRU_ARG
@@ -7790,11 +7750,6 @@ vscanf	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/fscanf.c
 vsnprintf	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/vsnprintf.c	/^_CODE_ACCESS int vsnprintf(char *_string, size_t _n,$/;"	f	language:C
 vsprintf	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/vsprintf.c	/^_CODE_ACCESS int vsprintf(char *_string, const char *_format, va_list _ap)$/;"	f	language:C
 vsscanf	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/sscanf.c	/^_CODE_ACCESS int vsscanf(const char *_str, const char *_fmt, va_list _ap)$/;"	f	language:C
-wait_for_adc	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void wait_for_adc();$/;"	p	language:C++	file:
-wait_for_adc	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void wait_for_adc(){$/;"	f	language:C++
-wait_for_short_timer	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void wait_for_short_timer();$/;"	p	language:C++	file:
-wait_for_short_timer	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void wait_for_short_timer(){$/;"	f	language:C++
-wait_for_timer	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void wait_for_timer();$/;"	p	language:C++	file:
 wait_for_timer	/media/beagle/root/libbbb_pruio/repo/library/src/pru0_main.c	/^inline void wait_for_timer(){$/;"	f	language:C++
 Warnings	/media/beagle/root/libbbb_pruio/repo/vendors/am335x_pru_package/pru_sw/utils/pasm_source/pasm.c	/^int  Warnings;              \/* Total number of warnings *\/$/;"	v	language:C
 wcerr	/media/beagle/root/libbbb_pruio/repo/vendors/pru_2.0.0B2/lib/src/wiostrea.cpp	/^wostream wcerr(_Noinit);	\/\/ uninitialized wcerr$/;"	p	language:C++	file:

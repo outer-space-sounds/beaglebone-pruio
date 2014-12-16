@@ -4,9 +4,14 @@
 #include "bbb_pruio_pins.h"
 
 /////////////////////////////////////////////////////////////////////
+// Misc
+//
+#define MAX_ADC_CHANNELS 14
+#define MAX_GPIO_CHANNELS 69
+
+/////////////////////////////////////////////////////////////////////
 // Register addresses
 //
-
 // PRU Module Registers
 #define PRU_ICSS_CFG 0x26000
 #define PRU_ICSS_CFG_SYSCFG 0x04

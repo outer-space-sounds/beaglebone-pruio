@@ -1,11 +1,8 @@
 #ifndef PINS_H
 #define PINS_H
 
-#define MAX_ADC_CHANNELS 14
-#define MAX_GPIO_CHANNELS 69
-
 // These defines map the beagle bone's pin names to the AM335X's 
-// gpio numbers. GPIO numbers can be used like:
+// GPIO numbers. GPIO numbers can be used like:
 // 
 //    int gpioModule = P9_11 >> 5;
 //    int gpioPin = P9_11 % 32;

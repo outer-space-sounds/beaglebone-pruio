@@ -25,48 +25,26 @@
 /////////////////////////////////////////////////////////////////////
 // MEMORY MAP
 
-volatile unsigned int* gpio0_output_enable = NULL;
-volatile unsigned int* gpio1_output_enable = NULL;
-volatile unsigned int* gpio2_output_enable = NULL;
-volatile unsigned int* gpio3_output_enable = NULL;
-volatile unsigned int* gpio0_data_out = NULL;
-volatile unsigned int* gpio1_data_out = NULL;
-volatile unsigned int* gpio2_data_out = NULL;
-volatile unsigned int* gpio3_data_out = NULL;
+// These functions and macros allow for accessing hardware registers
 
-static int map_device_registers(){
-   // Get pointers to hardware registers. See memory map in manual for addresses.
-   
-   int memdev = open("/dev/mem", O_RDWR | O_SYNC);
-   
-   // Get pointer to gpio0 registers (start at address 0x44e07000, length 0x1000 (4KB)).
-   volatile void* gpio0 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, GPIO0);
-   if(gpio0 == MAP_FAILED){ return 1; }
-   gpio0_output_enable = (unsigned int*)(gpio0 + GPIO_OE);
-   gpio0_data_out = (unsigned int*)(gpio0 + GPIO_DATAOUT);
+#define HWREG(pointer, offset) (*((volatile unsigned int *)(pointer+offset)))
 
-   // same for gpio1, 2 and 3.
-   volatile void* gpio1 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, GPIO2);
-   if(gpio1 == MAP_FAILED){
-      return 1;
-   }
-   gpio1_output_enable = (unsigned int*)(gpio1+GPIO_OE);
-   gpio1_data_out = (unsigned int*)(gpio1 + GPIO_DATAOUT);
+int memdev;
+static void map_hardware_memory(){
+   // TODO: close
+   memdev = open("/dev/mem", O_RDWR | O_SYNC);
+}
 
-   volatile void* gpio2 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, GPIO2);
-   if(gpio2 == MAP_FAILED){
-      return 1;
-   }
-   gpio2_output_enable = (unsigned int*)(gpio2+GPIO_OE);
-   gpio2_data_out = (unsigned int*)(gpio2 + GPIO_DATAOUT);
+static void close_memory_map(){
+   close(memdev);
+}
 
-   volatile void* gpio3 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, GPIO3);
-   if(gpio3 == MAP_FAILED){
-      return 1;
-   }
-   gpio3_output_enable = (unsigned int*)(gpio3+GPIO_OE);
-   gpio3_data_out = (unsigned int*)(gpio3 + GPIO_DATAOUT);
-
+static int map_hardware_address(int address, int size, volatile char* pointer){
+   // Sets the pointer to a hardware address, with access to a chunk
+   // of memory of a given size.
+   void* ptr = mmap(0, size, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, address);
+   if(ptr == MAP_FAILED){ return 1; }
+   pointer = (char*)ptr;
    return 0;
 }
 
@@ -77,24 +55,54 @@ typedef struct gpio_pin{
    bbb_pruio_gpio_mode mode;
    int gpio_number;
 } gpio_pin;
+
 static gpio_pin used_pins[MAX_GPIO_CHANNELS];
 static int used_pins_count = 0;
+static volatile char* gpio0 = NULL;
+static volatile char* gpio1 = NULL;
+static volatile char* gpio2 = NULL;
+static volatile char* gpio3 = NULL;
 
 static int init_gpio(){
-   // Only pinmux is set here, enabling GPIO modules, 
-   // clocks, debounce, etc. is set on the PRU side.
-   
-   // Pins used to control analog mux:
-   int e1 = bbb_pruio_init_gpio_pin(P9_27, BBB_PRUIO_OUTPUT_MODE);
-   int e2 = bbb_pruio_init_gpio_pin(P9_30, BBB_PRUIO_OUTPUT_MODE);
-   int e3 = bbb_pruio_init_gpio_pin(P9_42A, BBB_PRUIO_OUTPUT_MODE);
+   // Get pointers to GPIO modules registers
+   if(map_hardware_address(GPIO0, 0x1000, gpio0)){ return 1; } 
+   if(map_hardware_address(GPIO1, 0x1000, gpio1)){ return 1; } 
+   if(map_hardware_address(GPIO2, 0x1000, gpio2)){ return 1; }
+   if(map_hardware_address(GPIO3, 0x1000, gpio3)){ return 1; }
 
-   if(e1 || e2 || e3){
-      return 1;
-   } 
-   else{
-      return 0;
-   }
+   // Enable GPIO0 module
+   HWREG(gpio0, GPIO_CTRL) = 0x00;
+   // Enable clock for GPIO0 module. 
+   HWREG(CM_WKUP, CM_WKUP_GPIO0_CLKCTRL) = (0x02) | (1<<18);
+   // Set debounce time for GPIO0 module
+   // time = (DEBOUNCINGTIME + 1) * 31uSec
+   HWREG(GPIO0, GPIO_DEBOUNCINGTIME) = 255;
+
+   // Enable GPIO1 Module.
+   HWREG(GPIO1, GPIO_CTRL) = 0x00;
+   // Enable clock for GPIO1 module. 
+   HWREG(CM_PER, CM_PER_GPIO1_CLKCTRL) = (0x02) | (1<<18);
+   // Set debounce time for GPIO1 module
+   // time = (DEBOUNCINGTIME + 1) * 31uSec
+   HWREG(GPIO1, GPIO_DEBOUNCINGTIME) = 255;
+
+   // Enable GPIO2 Module.
+   HWREG(GPIO2, GPIO_CTRL) = 0x00;
+   // Enable clock for GPIO2 module. 
+   HWREG(CM_PER, CM_PER_GPIO2_CLKCTRL) = (0x02) | (1<<18);
+   // Set debounce time for GPIO2 module
+   // time = (DEBOUNCINGTIME + 1) * 31uSec
+   HWREG(GPIO2, GPIO_DEBOUNCINGTIME) = 255;
+
+   // Enable GPIO3 Module.
+   HWREG(GPIO3, GPIO_CTRL) = 0x00;
+   // Enable clock for GPIO3 module. 
+   HWREG(CM_PER, CM_PER_GPIO3_CLKCTRL) = (0x02) | (1<<18);
+   // Set debounce time for GPIO3 module
+   // time = (DEBOUNCINGTIME + 1) * 31uSec
+   HWREG(GPIO3, GPIO_DEBOUNCINGTIME) = 255;
+
+   return 0;
 }
 
 static int get_gpio_pin_name(int gpio_number, char* pin_name){
@@ -217,7 +225,112 @@ static int get_gpio_config_file(int gpio_number, char* path){
 }
 
 /////////////////////////////////////////////////////////////////////
-// PRU Initialization
+// ANALOG DIGITAL CONVERTER
+
+static int init_adc(){
+   // Get pointers to ADC config registers
+   volatile char* adc_tsc = NULL;
+   if(map_hardware_address(ADC_TSC, 0x2000, adc_tsc)){return 1;}
+
+   volatile char* cm_wkup = NULL;
+   if(map_hardware_address(CM_WKUP, 0x100, cm_wkup)){return 1;}
+
+   // Enable clock for adc module.
+   HWREG(cm_wkup, CM_WKUP_ADC_TSK_CLKCTL) = 0x02;
+
+   // Disable ADC module temporarily.
+   HWREG(adc_tsc, ADC_TSC_CTRL) &= ~(0x01);
+
+   // To calculate sample rate:
+   // fs = 24MHz / (CLK_DIV*2*Channels*(OpenDly+Average*(14+SampleDly)))
+   // We want 48KHz. (Compromising to 50KHz)
+   unsigned int clock_divider = 1;
+   unsigned int open_delay = 0;
+   unsigned int average = 0;       // can be 0 (no average), 1 (2 samples), 
+   // 2 (4 samples),  3 (8 samples) 
+   // or 4 (16 samples)
+   unsigned int sample_delay = 0;
+
+   // Set clock divider (set register to desired value minus one). 
+   HWREG(adc_tsc, ADC_TSC_CLKDIV) = clock_divider - 1;
+
+   // Set values range from 0 to FFF.
+   HWREG(adc_tsc, ADC_TSC_ADCRANGE) = (0xfff << 16) & (0x000);
+
+   // Disable all steps. STEPENABLE register
+   HWREG(adc_tsc, ADC_TSC_STEPENABLE) &= ~(0xff);
+
+   // Unlock step config register.
+   HWREG(adc_tsc, ADC_TSC_CTRL) |= (1 << 2);
+
+   // Set config and delays for step 1: 
+   // Sw mode, one shot mode, fifo0, channel 0.
+   HWREG(adc_tsc, ADC_TSC_STEPCONFIG1) = 0 | (0<<26) | (0<<19) | (0<<15) | (average<<2) | (0);
+   HWREG(adc_tsc, ADC_TSC_STEPDELAY1)  = 0 | (sample_delay - 1)<<24 | open_delay;
+
+   // Set config and delays for step 2: 
+   // Sw mode, one shot mode, fifo0, channel 1.
+   HWREG(adc_tsc, ADC_TSC_STEPCONFIG2) = 0 | (0x0<<26) | (0x01<<19) | (0x01<<15) | (average<<2) | (0x00);
+   HWREG(adc_tsc, ADC_TSC_STEPDELAY2)  = 0 | (sample_delay - 1)<<24 | open_delay;
+
+   // Set config and delays for step 3: 
+   // Sw mode, one shot mode, fifo0, channel 2.
+   HWREG(adc_tsc, ADC_TSC_STEPCONFIG3) = 0 | (0x0<<26) | (0x02<<19) | (0x02<<15) | (average<<2) | (0x00);
+   HWREG(adc_tsc, ADC_TSC_STEPDELAY3)  = 0 | ((sample_delay - 1)<<24) | open_delay;
+
+   // Set config and delays for step 4: 
+   // Sw mode, one shot mode, fifo0, channel 3.
+   HWREG(adc_tsc, ADC_TSC_STEPCONFIG4) = 0 | (0x0<<26) | (0x03<<19) | (0x03<<15) | (average<<2) | (0x00);
+   HWREG(adc_tsc, ADC_TSC_STEPDELAY4)  = 0 | ((sample_delay - 1)<<24) | open_delay;
+
+   // Set config and delays for step 5: 
+   // Sw mode, one shot mode, fifo0, channel 4.
+   HWREG(adc_tsc, ADC_TSC_STEPCONFIG5) = 0 | (0x0<<26) | (0x04<<19) | (0x04<<15) | (average<<2) | (0x00);
+   HWREG(adc_tsc, ADC_TSC_STEPDELAY5)  = 0 | ((sample_delay - 1)<<24) | open_delay;
+
+   // Set config and delays for step 6: 
+   // Sw mode, one shot mode, fifo0, CHANNEL 6!
+   HWREG(adc_tsc, ADC_TSC_STEPCONFIG6) = 0 | (0x0<<26) | (0x06<<19) | (0x06<<15) | (average<<2) | (0x00);
+   HWREG(adc_tsc, ADC_TSC_STEPDELAY6)  = 0 | ((sample_delay - 1)<<24) | open_delay;
+
+   // Set config and delays for step 7: 
+   // Sw mode, one shot mode, fifo0, CHANNEL 5!
+   HWREG(adc_tsc, ADC_TSC_STEPCONFIG7) = 0 | (0x0<<26) | (0x05<<19) | (0x05<<15) | (average<<2) | (0x00);
+   HWREG(adc_tsc, ADC_TSC_STEPDELAY7)  = 0 | ((sample_delay - 1)<<24) | open_delay;
+
+   // Enable tag channel id. Samples in fifo will have channel id bits ADC_CTRL register
+   HWREG(adc_tsc, ADC_TSC_CTRL) |= (1 << 1);
+
+   // Clear End_of_sequence interrupt
+   HWREG(adc_tsc, ADC_TSC_IRQSTATUS) |= (1<<1);
+
+   // Enable End_of_sequence interrupt
+   HWREG(adc_tsc, ADC_TSC_IRQENABLE_SET) |= (1 << 1);
+
+   // Lock step config register. ACD_CTRL register
+   HWREG(adc_tsc, ADC_TSC_CTRL) &= ~(1 << 2);
+
+   // Clear FIFO0 by reading from it.
+   unsigned int count = HWREG(adc_tsc, ADC_TSC_FIFO0COUNT);
+   unsigned int i;
+   for(i=0; i<count; i++){
+      HWREG(adc_tsc, ADC_TSC_FIFO0DATA);
+   }
+
+   // Clear FIFO1 by reading from it.
+   count = HWREG(adc_tsc, ADC_TSC_FIFO1COUNT);
+   for(i=0; i<count; i++){
+      HWREG(adc_tsc, ADC_TSC_FIFO1DATA);
+   }
+
+   // Enable ADC Module. ADC_CTRL register
+   HWREG(adc_tsc, ADC_TSC_CTRL) |= 1;
+
+   return 0;
+}
+
+/////////////////////////////////////////////////////////////////////
+// DEVICE TREE OVERLAY
 //
 
 static int load_device_tree_overlay(char* dto){
@@ -256,6 +369,10 @@ static int load_device_tree_overlays(){
    return 0;
 }
 
+/////////////////////////////////////////////////////////////////////
+// PRU Initialization
+//
+
 static int init_pru_system(){
    tpruss_intc_initdata pruss_intc_initdata = PRUSS_INTC_INITDATA;
    if(prussdrv_init()) return 1;
@@ -289,8 +406,10 @@ static int start_pru0_program(){
 
 static void buffer_init(){
    bbb_pruio_buffer_size = 1024;
-   bbb_pruio_buffer_start = &(bbb_pruio_shared_ram[1024]); // value inited to 0 in pru
-   bbb_pruio_buffer_end = &(bbb_pruio_shared_ram[1025]); // value inited to 0 in pru
+   bbb_pruio_buffer_start = &(bbb_pruio_shared_ram[1024]); 
+   bbb_pruio_buffer_end = &(bbb_pruio_shared_ram[1025]); 
+   *bbb_pruio_buffer_start = 0;
+   *bbb_pruio_buffer_end = 0;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -298,34 +417,57 @@ static void buffer_init(){
 //
 
 int bbb_pruio_start(){
-   int err;
+   // DTOs
    if(load_device_tree_overlays()){
       fprintf(stderr, "libbbb_pruio: Could not load device tree overlays.\n");
       return 1;
    }
+    
+   // Allow access to hardware registers
+   map_hardware_memory();
 
-   if(map_device_registers()){
-      fprintf(stderr, "libbbb_pruio: Could not map device's registers to memory.\n");
-      return 1;
-   }
-
-   if((err=init_pru_system())){
-      fprintf(stderr, "libbbb_pruio: Could not init PRU system: %i \n", err);
-      return 1;
-   }
-
-   buffer_init();
-
-   if((err=start_pru0_program())){
-      fprintf(stderr, "libbbb_pruio: Could not load PRU0 program: %i \n", err);
-      return 1;
-   }
-
+   // Init GPIO hardware
    if(init_gpio()){
       fprintf(stderr, "libbbb_pruio: Could not init GPIO\n");
+      return 1;
+   }
+   
+   // Init GPIO pins used to control analog mux:
+   int e1 = bbb_pruio_init_gpio_pin(P9_27, BBB_PRUIO_OUTPUT_MODE);
+   int e2 = bbb_pruio_init_gpio_pin(P9_30, BBB_PRUIO_OUTPUT_MODE);
+   int e3 = bbb_pruio_init_gpio_pin(P9_42A, BBB_PRUIO_OUTPUT_MODE);
+   if(e1 || e2 || e3){
+      fprintf(stderr, "libbbb_pruio: Could not init mux control pins.\n");
+      return 1;
+   } 
+
+   // PRU
+   if(init_pru_system()){
+      fprintf(stderr, "libbbb_pruio: Could not init PRU system.\n");
+      return 1;
    }
 
+   // Ring Buffer
+   buffer_init();
 
+   // Analog digital converter
+   init_adc();
+
+   // Start the PRU software
+   if(start_pru0_program()){
+      fprintf(stderr, "libbbb_pruio: Could not load PRU0 program.\n");
+      return 1;
+   }
+
+   return 0;
+}
+
+int bbb_pruio_stop(){
+   // TODO: send terminate message to PRU
+   prussdrv_pru_disable(0);
+   prussdrv_exit();
+
+   close_memory_map();
    return 0;
 }
 
@@ -390,9 +532,20 @@ int bbb_pruio_get_gpio_number(char* pin_name){
    return -1;
 }
 
-/* int bbb_pruio_init_adc_pin(unsigned int pin_number){ */
-/*    return 0; */
-/* } */
+int bbb_pruio_init_adc_pin(int channel_number){
+   /** 
+    * Tell the PRU unit that we are interested in input from this channel.
+    *
+    * Each one of the 14 least significant bits in shared_ram[1030]
+    * represent the 14 ADC channels. If a bit is set, it means that we need
+    * input for that ADC channel.
+    *
+    * shared_ram[1030] -> ADC Channels in use
+    *
+    */
+   bbb_pruio_shared_ram[1030] |= (1<<channel_number);
+   return 0;
+}
 
 int bbb_pruio_init_gpio_pin(int gpio_number, bbb_pruio_gpio_mode mode){
    // Check if pin already in use.
@@ -429,20 +582,20 @@ int bbb_pruio_init_gpio_pin(int gpio_number, bbb_pruio_gpio_mode mode){
       fprintf(f, "%s\n", "output"); 
       // Reset the output enable bit in the gpio config register to actually enable output.
       switch(gpio_module){
-         case 0: *gpio0_output_enable &= ~(1<<gpio_bit); break;
-         case 1: *gpio1_output_enable &= ~(1<<gpio_bit); break;
-         case 2: *gpio2_output_enable &= ~(1<<gpio_bit); break;
-         case 3: *gpio3_output_enable &= ~(1<<gpio_bit); break;
+         case 0: HWREG(gpio0, GPIO_OE) &= ~(1<<gpio_bit); break;
+         case 1: HWREG(gpio1, GPIO_OE) &= ~(1<<gpio_bit); break;
+         case 2: HWREG(gpio2, GPIO_OE) &= ~(1<<gpio_bit); break;
+         case 3: HWREG(gpio3, GPIO_OE) &= ~(1<<gpio_bit); break;
       }
    }
    else{
       fprintf(f, "%s\n", "input"); 
       // Set the output enable bit in the gpio config register to disable output.
       switch(gpio_module){
-         case 0: *gpio0_output_enable |= (1<<gpio_bit); break;
-         case 1: *gpio1_output_enable |= (1<<gpio_bit); break;
-         case 2: *gpio2_output_enable |= (1<<gpio_bit); break;
-         case 3: *gpio3_output_enable |= (1<<gpio_bit); break;
+         case 0: HWREG(gpio0, GPIO_OE) |= (1<<gpio_bit); break;
+         case 1: HWREG(gpio1, GPIO_OE) |= (1<<gpio_bit); break;
+         case 2: HWREG(gpio2, GPIO_OE) |= (1<<gpio_bit); break;
+         case 3: HWREG(gpio3, GPIO_OE) |= (1<<gpio_bit); break;
       }
 
       /** 
@@ -469,27 +622,19 @@ int bbb_pruio_init_gpio_pin(int gpio_number, bbb_pruio_gpio_mode mode){
 void bbb_pruio_set_pin_value(int gpio_number, int value){
    int gpio_module = gpio_number >> 5;
    int gpio_bit = gpio_number % 32;
-   volatile unsigned int* reg=NULL;
+   volatile char* reg=NULL;
    switch(gpio_module){
-      case 0: reg = gpio0_data_out; break;
-      case 1: reg = gpio1_data_out; break;
-      case 2: reg = gpio2_data_out; break;
-      case 3: reg = gpio3_data_out; break;
+      case 0: reg = gpio0; break;
+      case 1: reg = gpio1; break;
+      case 2: reg = gpio2; break;
+      case 3: reg = gpio3; break;
    }
    if(value==1){
-      *reg |= (1<<gpio_bit);
+      HWREG(reg, GPIO_DATAOUT) |= (1<<gpio_bit);
    }
    else{
-      *reg &= ~(1<<gpio_bit);
+      HWREG(reg, GPIO_DATAOUT) &= ~(1<<gpio_bit);
    }
 }
 
-int bbb_pruio_stop(){
-   // TODO: send terminate message to PRU
-
-   prussdrv_pru_disable(0);
-   prussdrv_exit();
-
-   return 0;
-}
 
