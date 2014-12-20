@@ -27,25 +27,18 @@
 
 // These functions and macros allow for accessing hardware registers
 
+/* #define MAP(pointer, address, size) pointer = (volatile char *)mmap(0, size, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, address); if(pointer==MAP_FAILED){return 1;} */
+
 #define HWREG(pointer, offset) (*((volatile unsigned int *)(pointer+offset)))
 
-int memdev;
+/* int emdev; */
 static void map_hardware_memory(){
    // TODO: close
-   memdev = open("/dev/mem", O_RDWR | O_SYNC);
+   /* memdev = open("/dev/mem", O_RDWR | O_SYNC); */
 }
 
 static void close_memory_map(){
-   close(memdev);
-}
-
-static int map_hardware_address(int address, int size, volatile char* pointer){
-   // Sets the pointer to a hardware address, with access to a chunk
-   // of memory of a given size.
-   void* ptr = mmap(0, size, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, address);
-   if(ptr == MAP_FAILED){ return 1; }
-   pointer = (char*)ptr;
-   return 0;
+   /* close(memdev); */
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -58,49 +51,86 @@ typedef struct gpio_pin{
 
 static gpio_pin used_pins[MAX_GPIO_CHANNELS];
 static int used_pins_count = 0;
+
 static volatile char* gpio0 = NULL;
 static volatile char* gpio1 = NULL;
 static volatile char* gpio2 = NULL;
 static volatile char* gpio3 = NULL;
+/* static volatile char* cm_wkup = NULL; */
 
 static int init_gpio(){
-   // Get pointers to GPIO modules registers
-   if(map_hardware_address(GPIO0, 0x1000, gpio0)){ return 1; } 
-   if(map_hardware_address(GPIO1, 0x1000, gpio1)){ return 1; } 
-   if(map_hardware_address(GPIO2, 0x1000, gpio2)){ return 1; }
-   if(map_hardware_address(GPIO3, 0x1000, gpio3)){ return 1; }
+   // Get pointers to GPIO registers
+   
+   int memdev0 = open("/dev/mem", O_RDWR|O_SYNC);
+   gpio0 = (volatile char *)mmap(0, 0xFFF, PROT_READ|PROT_WRITE, MAP_SHARED, memdev0, GPIO0); 
+   printf("%i %p\n", memdev0, gpio0);
+   if(gpio0==MAP_FAILED){ return 1; }
+
+   gpio1 = (volatile char *)mmap(0, 0xFFF, PROT_READ|PROT_WRITE, MAP_SHARED, memdev0, GPIO1); 
+   printf("%i %p\n", memdev0, gpio1);
+   if(gpio1==MAP_FAILED){return 1;}
+
+   /* int memdev2 = open("/dev/mem", O_RDWR|O_SYNC); */
+   /* gpio2 = (volatile char *)mmap(0, 0xFFF, PROT_READ|PROT_WRITE, MAP_SHARED, memdev2, GPIO2);  */
+   /* printf("2 %p\n", gpio2); */
+   /* if(gpio2==MAP_FAILED){return 1;} */
+
+   /* int memdev3 = open("/dev/mem", O_RDWR|O_SYNC); */
+   /* gpio3 = (volatile char *)mmap(0, 0xFFF, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, GPIO3);  */
+   /* printf("%i %p\n", memdev, gpio3); */
+   /* if(gpio3==MAP_FAILED){return 1;} */
+
+   /* printf("%s\n", "DA"); */
+   /* HWREG(gpio3, GPIO_CTRL) &= ~(0x03); */
+
+   /* cm_wkup = (volatile char*)mmap(0, 0xFF, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, CM_WKUP); */
+   /* if(cm_wkup==MAP_FAILED){return 1;} */
+   /* if(map_hardware_address(CM_WKUP, 0xFF, cm_wkup)){return 1;} */
+   /* printf("%s\n", "E"); */
 
    // Enable GPIO0 module
-   HWREG(gpio0, GPIO_CTRL) = 0x00;
+   printf("%s\n", "AA");
+   HWREG(gpio0, GPIO_CTRL) &= ~(0x03);
+   /* *((volatile unsigned long*)(gpio0+GPIO_CTRL)) &= ~(0x03); */
    // Enable clock for GPIO0 module. 
-   HWREG(CM_WKUP, CM_WKUP_GPIO0_CLKCTRL) = (0x02) | (1<<18);
+   /* HWREG(cm_wkup, CM_WKUP_GPIO0_CLKCTRL) = (0x02) | (1<<18); */
    // Set debounce time for GPIO0 module
    // time = (DEBOUNCINGTIME + 1) * 31uSec
-   HWREG(GPIO0, GPIO_DEBOUNCINGTIME) = 255;
+   /* printf("%s\n", "AB"); */
+   HWREG(gpio0, GPIO_DEBOUNCINGTIME) |= 255;
 
    // Enable GPIO1 Module.
-   HWREG(GPIO1, GPIO_CTRL) = 0x00;
+   printf("%s\n", "BA");
+   HWREG(gpio1, GPIO_CTRL) &= ~(0x03);
+   /* *((volatile unsigned long*)(gpio1+GPIO_CTRL)) &= ~(0x03); */
    // Enable clock for GPIO1 module. 
-   HWREG(CM_PER, CM_PER_GPIO1_CLKCTRL) = (0x02) | (1<<18);
+   /* HWREG(CM_PER, CM_PER_GPIO1_CLKCTRL) = (0x02) | (1<<18); */
    // Set debounce time for GPIO1 module
    // time = (DEBOUNCINGTIME + 1) * 31uSec
-   HWREG(GPIO1, GPIO_DEBOUNCINGTIME) = 255;
+   /* printf("%s\n", "BB"); */
+   /* HWREG(gpio1, GPIO_DEBOUNCINGTIME) |= 255; */
 
    // Enable GPIO2 Module.
-   HWREG(GPIO2, GPIO_CTRL) = 0x00;
-   // Enable clock for GPIO2 module. 
-   HWREG(CM_PER, CM_PER_GPIO2_CLKCTRL) = (0x02) | (1<<18);
-   // Set debounce time for GPIO2 module
-   // time = (DEBOUNCINGTIME + 1) * 31uSec
-   HWREG(GPIO2, GPIO_DEBOUNCINGTIME) = 255;
+   /* printf("%s\n", "CA"); */
+   /* HWREG(gpio2, GPIO_CTRL) &= ~(0x03); */
+   /* // Enable clock for GPIO2 module.  */
+   /* #<{(| HWREG(CM_PER, CM_PER_GPIO2_CLKCTRL) = (0x02) | (1<<18); |)}># */
+   /* // Set debounce time for GPIO2 module */
+   /* // time = (DEBOUNCINGTIME + 1) * 31uSec */
+   /* HWREG(gpio2, GPIO_DEBOUNCINGTIME) = 255; */
 
    // Enable GPIO3 Module.
-   HWREG(GPIO3, GPIO_CTRL) = 0x00;
-   // Enable clock for GPIO3 module. 
-   HWREG(CM_PER, CM_PER_GPIO3_CLKCTRL) = (0x02) | (1<<18);
-   // Set debounce time for GPIO3 module
-   // time = (DEBOUNCINGTIME + 1) * 31uSec
-   HWREG(GPIO3, GPIO_DEBOUNCINGTIME) = 255;
+   /* printf("%s\n", "DA"); */
+   /* HWREG(gpio3, GPIO_CTRL) &= ~(0x03); */
+   /* HWREG(gpio3, GPIO_CTRL) = 0x00; */
+   /* // Enable clock for GPIO3 module.  */
+   /* #<{(| HWREG(CM_PER, CM_PER_GPIO3_CLKCTRL) = (0x02) | (1<<18); |)}># */
+   /* // Set debounce time for GPIO3 module */
+   /* // time = (DEBOUNCINGTIME + 1) * 31uSec */
+   /* HWREG(gpio3, GPIO_DEBOUNCINGTIME) = 255; */
+
+   sleep(3);
+   close(memdev0);
 
    return 0;
 }
@@ -227,107 +257,107 @@ static int get_gpio_config_file(int gpio_number, char* path){
 /////////////////////////////////////////////////////////////////////
 // ANALOG DIGITAL CONVERTER
 
-static int init_adc(){
-   // Get pointers to ADC config registers
-   volatile char* adc_tsc = NULL;
-   if(map_hardware_address(ADC_TSC, 0x2000, adc_tsc)){return 1;}
-
-   volatile char* cm_wkup = NULL;
-   if(map_hardware_address(CM_WKUP, 0x100, cm_wkup)){return 1;}
-
-   // Enable clock for adc module.
-   HWREG(cm_wkup, CM_WKUP_ADC_TSK_CLKCTL) = 0x02;
-
-   // Disable ADC module temporarily.
-   HWREG(adc_tsc, ADC_TSC_CTRL) &= ~(0x01);
-
-   // To calculate sample rate:
-   // fs = 24MHz / (CLK_DIV*2*Channels*(OpenDly+Average*(14+SampleDly)))
-   // We want 48KHz. (Compromising to 50KHz)
-   unsigned int clock_divider = 1;
-   unsigned int open_delay = 0;
-   unsigned int average = 0;       // can be 0 (no average), 1 (2 samples), 
-   // 2 (4 samples),  3 (8 samples) 
-   // or 4 (16 samples)
-   unsigned int sample_delay = 0;
-
-   // Set clock divider (set register to desired value minus one). 
-   HWREG(adc_tsc, ADC_TSC_CLKDIV) = clock_divider - 1;
-
-   // Set values range from 0 to FFF.
-   HWREG(adc_tsc, ADC_TSC_ADCRANGE) = (0xfff << 16) & (0x000);
-
-   // Disable all steps. STEPENABLE register
-   HWREG(adc_tsc, ADC_TSC_STEPENABLE) &= ~(0xff);
-
-   // Unlock step config register.
-   HWREG(adc_tsc, ADC_TSC_CTRL) |= (1 << 2);
-
-   // Set config and delays for step 1: 
-   // Sw mode, one shot mode, fifo0, channel 0.
-   HWREG(adc_tsc, ADC_TSC_STEPCONFIG1) = 0 | (0<<26) | (0<<19) | (0<<15) | (average<<2) | (0);
-   HWREG(adc_tsc, ADC_TSC_STEPDELAY1)  = 0 | (sample_delay - 1)<<24 | open_delay;
-
-   // Set config and delays for step 2: 
-   // Sw mode, one shot mode, fifo0, channel 1.
-   HWREG(adc_tsc, ADC_TSC_STEPCONFIG2) = 0 | (0x0<<26) | (0x01<<19) | (0x01<<15) | (average<<2) | (0x00);
-   HWREG(adc_tsc, ADC_TSC_STEPDELAY2)  = 0 | (sample_delay - 1)<<24 | open_delay;
-
-   // Set config and delays for step 3: 
-   // Sw mode, one shot mode, fifo0, channel 2.
-   HWREG(adc_tsc, ADC_TSC_STEPCONFIG3) = 0 | (0x0<<26) | (0x02<<19) | (0x02<<15) | (average<<2) | (0x00);
-   HWREG(adc_tsc, ADC_TSC_STEPDELAY3)  = 0 | ((sample_delay - 1)<<24) | open_delay;
-
-   // Set config and delays for step 4: 
-   // Sw mode, one shot mode, fifo0, channel 3.
-   HWREG(adc_tsc, ADC_TSC_STEPCONFIG4) = 0 | (0x0<<26) | (0x03<<19) | (0x03<<15) | (average<<2) | (0x00);
-   HWREG(adc_tsc, ADC_TSC_STEPDELAY4)  = 0 | ((sample_delay - 1)<<24) | open_delay;
-
-   // Set config and delays for step 5: 
-   // Sw mode, one shot mode, fifo0, channel 4.
-   HWREG(adc_tsc, ADC_TSC_STEPCONFIG5) = 0 | (0x0<<26) | (0x04<<19) | (0x04<<15) | (average<<2) | (0x00);
-   HWREG(adc_tsc, ADC_TSC_STEPDELAY5)  = 0 | ((sample_delay - 1)<<24) | open_delay;
-
-   // Set config and delays for step 6: 
-   // Sw mode, one shot mode, fifo0, CHANNEL 6!
-   HWREG(adc_tsc, ADC_TSC_STEPCONFIG6) = 0 | (0x0<<26) | (0x06<<19) | (0x06<<15) | (average<<2) | (0x00);
-   HWREG(adc_tsc, ADC_TSC_STEPDELAY6)  = 0 | ((sample_delay - 1)<<24) | open_delay;
-
-   // Set config and delays for step 7: 
-   // Sw mode, one shot mode, fifo0, CHANNEL 5!
-   HWREG(adc_tsc, ADC_TSC_STEPCONFIG7) = 0 | (0x0<<26) | (0x05<<19) | (0x05<<15) | (average<<2) | (0x00);
-   HWREG(adc_tsc, ADC_TSC_STEPDELAY7)  = 0 | ((sample_delay - 1)<<24) | open_delay;
-
-   // Enable tag channel id. Samples in fifo will have channel id bits ADC_CTRL register
-   HWREG(adc_tsc, ADC_TSC_CTRL) |= (1 << 1);
-
-   // Clear End_of_sequence interrupt
-   HWREG(adc_tsc, ADC_TSC_IRQSTATUS) |= (1<<1);
-
-   // Enable End_of_sequence interrupt
-   HWREG(adc_tsc, ADC_TSC_IRQENABLE_SET) |= (1 << 1);
-
-   // Lock step config register. ACD_CTRL register
-   HWREG(adc_tsc, ADC_TSC_CTRL) &= ~(1 << 2);
-
-   // Clear FIFO0 by reading from it.
-   unsigned int count = HWREG(adc_tsc, ADC_TSC_FIFO0COUNT);
-   unsigned int i;
-   for(i=0; i<count; i++){
-      HWREG(adc_tsc, ADC_TSC_FIFO0DATA);
-   }
-
-   // Clear FIFO1 by reading from it.
-   count = HWREG(adc_tsc, ADC_TSC_FIFO1COUNT);
-   for(i=0; i<count; i++){
-      HWREG(adc_tsc, ADC_TSC_FIFO1DATA);
-   }
-
-   // Enable ADC Module. ADC_CTRL register
-   HWREG(adc_tsc, ADC_TSC_CTRL) |= 1;
-
-   return 0;
-}
+/* static int init_adc(){ */
+/*    // Get pointers to ADC config registers */
+/*    volatile char* adc_tsc = NULL; */
+/*    if(map_hardware_address(ADC_TSC, 0x2000, adc_tsc)){return 1;} */
+/*  */
+/*    #<{(| volatile char* cm_wkup = NULL; |)}># */
+/*    #<{(| if(map_hardware_address(CM_WKUP, 0x100, cm_wkup)){return 1;} |)}># */
+/*  */
+/*    // Enable clock for adc module. */
+/*    #<{(| HWREG(cm_wkup, CM_WKUP_ADC_TSK_CLKCTL) = 0x02; |)}># */
+/*  */
+/*    // Disable ADC module temporarily. */
+/*    HWREG(adc_tsc, ADC_TSC_CTRL) &= ~(0x01); */
+/*  */
+/*    // To calculate sample rate: */
+/*    // fs = 24MHz / (CLK_DIV*2*Channels*(OpenDly+Average*(14+SampleDly))) */
+/*    // We want 48KHz. (Compromising to 50KHz) */
+/*    unsigned int clock_divider = 1; */
+/*    unsigned int open_delay = 0; */
+/*    unsigned int average = 0;       // can be 0 (no average), 1 (2 samples),  */
+/*    // 2 (4 samples),  3 (8 samples)  */
+/*    // or 4 (16 samples) */
+/*    unsigned int sample_delay = 0; */
+/*  */
+/*    // Set clock divider (set register to desired value minus one).  */
+/*    HWREG(adc_tsc, ADC_TSC_CLKDIV) = clock_divider - 1; */
+/*  */
+/*    // Set values range from 0 to FFF. */
+/*    HWREG(adc_tsc, ADC_TSC_ADCRANGE) = (0xfff << 16) & (0x000); */
+/*  */
+/*    // Disable all steps. STEPENABLE register */
+/*    HWREG(adc_tsc, ADC_TSC_STEPENABLE) &= ~(0xff); */
+/*  */
+/*    // Unlock step config register. */
+/*    HWREG(adc_tsc, ADC_TSC_CTRL) |= (1 << 2); */
+/*  */
+/*    // Set config and delays for step 1:  */
+/*    // Sw mode, one shot mode, fifo0, channel 0. */
+/*    HWREG(adc_tsc, ADC_TSC_STEPCONFIG1) = 0 | (0<<26) | (0<<19) | (0<<15) | (average<<2) | (0); */
+/*    HWREG(adc_tsc, ADC_TSC_STEPDELAY1)  = 0 | (sample_delay - 1)<<24 | open_delay; */
+/*  */
+/*    // Set config and delays for step 2:  */
+/*    // Sw mode, one shot mode, fifo0, channel 1. */
+/*    HWREG(adc_tsc, ADC_TSC_STEPCONFIG2) = 0 | (0x0<<26) | (0x01<<19) | (0x01<<15) | (average<<2) | (0x00); */
+/*    HWREG(adc_tsc, ADC_TSC_STEPDELAY2)  = 0 | (sample_delay - 1)<<24 | open_delay; */
+/*  */
+/*    // Set config and delays for step 3:  */
+/*    // Sw mode, one shot mode, fifo0, channel 2. */
+/*    HWREG(adc_tsc, ADC_TSC_STEPCONFIG3) = 0 | (0x0<<26) | (0x02<<19) | (0x02<<15) | (average<<2) | (0x00); */
+/*    HWREG(adc_tsc, ADC_TSC_STEPDELAY3)  = 0 | ((sample_delay - 1)<<24) | open_delay; */
+/*  */
+/*    // Set config and delays for step 4:  */
+/*    // Sw mode, one shot mode, fifo0, channel 3. */
+/*    HWREG(adc_tsc, ADC_TSC_STEPCONFIG4) = 0 | (0x0<<26) | (0x03<<19) | (0x03<<15) | (average<<2) | (0x00); */
+/*    HWREG(adc_tsc, ADC_TSC_STEPDELAY4)  = 0 | ((sample_delay - 1)<<24) | open_delay; */
+/*  */
+/*    // Set config and delays for step 5:  */
+/*    // Sw mode, one shot mode, fifo0, channel 4. */
+/*    HWREG(adc_tsc, ADC_TSC_STEPCONFIG5) = 0 | (0x0<<26) | (0x04<<19) | (0x04<<15) | (average<<2) | (0x00); */
+/*    HWREG(adc_tsc, ADC_TSC_STEPDELAY5)  = 0 | ((sample_delay - 1)<<24) | open_delay; */
+/*  */
+/*    // Set config and delays for step 6:  */
+/*    // Sw mode, one shot mode, fifo0, CHANNEL 6! */
+/*    HWREG(adc_tsc, ADC_TSC_STEPCONFIG6) = 0 | (0x0<<26) | (0x06<<19) | (0x06<<15) | (average<<2) | (0x00); */
+/*    HWREG(adc_tsc, ADC_TSC_STEPDELAY6)  = 0 | ((sample_delay - 1)<<24) | open_delay; */
+/*  */
+/*    // Set config and delays for step 7:  */
+/*    // Sw mode, one shot mode, fifo0, CHANNEL 5! */
+/*    HWREG(adc_tsc, ADC_TSC_STEPCONFIG7) = 0 | (0x0<<26) | (0x05<<19) | (0x05<<15) | (average<<2) | (0x00); */
+/*    HWREG(adc_tsc, ADC_TSC_STEPDELAY7)  = 0 | ((sample_delay - 1)<<24) | open_delay; */
+/*  */
+/*    // Enable tag channel id. Samples in fifo will have channel id bits ADC_CTRL register */
+/*    HWREG(adc_tsc, ADC_TSC_CTRL) |= (1 << 1); */
+/*  */
+/*    // Clear End_of_sequence interrupt */
+/*    HWREG(adc_tsc, ADC_TSC_IRQSTATUS) |= (1<<1); */
+/*  */
+/*    // Enable End_of_sequence interrupt */
+/*    HWREG(adc_tsc, ADC_TSC_IRQENABLE_SET) |= (1 << 1); */
+/*  */
+/*    // Lock step config register. ACD_CTRL register */
+/*    HWREG(adc_tsc, ADC_TSC_CTRL) &= ~(1 << 2); */
+/*  */
+/*    // Clear FIFO0 by reading from it. */
+/*    unsigned int count = HWREG(adc_tsc, ADC_TSC_FIFO0COUNT); */
+/*    unsigned int i; */
+/*    for(i=0; i<count; i++){ */
+/*       HWREG(adc_tsc, ADC_TSC_FIFO0DATA); */
+/*    } */
+/*  */
+/*    // Clear FIFO1 by reading from it. */
+/*    count = HWREG(adc_tsc, ADC_TSC_FIFO1COUNT); */
+/*    for(i=0; i<count; i++){ */
+/*       HWREG(adc_tsc, ADC_TSC_FIFO1DATA); */
+/*    } */
+/*  */
+/*    // Enable ADC Module. ADC_CTRL register */
+/*    HWREG(adc_tsc, ADC_TSC_CTRL) |= 1; */
+/*  */
+/*    return 0; */
+/* } */
 
 /////////////////////////////////////////////////////////////////////
 // DEVICE TREE OVERLAY
@@ -374,15 +404,15 @@ static int load_device_tree_overlays(){
 //
 
 static int init_pru_system(){
-   tpruss_intc_initdata pruss_intc_initdata = PRUSS_INTC_INITDATA;
-   if(prussdrv_init()) return 1;
-   if(prussdrv_open(PRU_EVTOUT_0)) return 1;
-   if(prussdrv_pruintc_init(&pruss_intc_initdata)) return 1;
-
-   // Get pointer to shared ram
-   void* p;
-   if(prussdrv_map_prumem(PRUSS0_SHARED_DATARAM, &p)) return 1;
-   bbb_pruio_shared_ram = (volatile unsigned int*)p;
+   /* tpruss_intc_initdata pruss_intc_initdata = PRUSS_INTC_INITDATA; */
+   /* if(prussdrv_init()) return 1; */
+   /* if(prussdrv_open(PRU_EVTOUT_0)) return 1; */
+   /* if(prussdrv_pruintc_init(&pruss_intc_initdata)) return 1; */
+   /*  */
+   /* // Get pointer to shared ram */
+   /* void* p; */
+   /* if(prussdrv_map_prumem(PRUSS0_SHARED_DATARAM, &p)) return 1; */
+   /* bbb_pruio_shared_ram = (volatile unsigned int*)p; */
 
    return 0;
 }
@@ -418,10 +448,10 @@ static void buffer_init(){
 
 int bbb_pruio_start(){
    // DTOs
-   if(load_device_tree_overlays()){
-      fprintf(stderr, "libbbb_pruio: Could not load device tree overlays.\n");
-      return 1;
-   }
+   /* if(load_device_tree_overlays()){ */
+   /*    fprintf(stderr, "libbbb_pruio: Could not load device tree overlays.\n"); */
+   /*    return 1; */
+   /* } */
     
    // Allow access to hardware registers
    map_hardware_memory();
@@ -432,40 +462,44 @@ int bbb_pruio_start(){
       return 1;
    }
    
-   // Init GPIO pins used to control analog mux:
-   int e1 = bbb_pruio_init_gpio_pin(P9_27, BBB_PRUIO_OUTPUT_MODE);
-   int e2 = bbb_pruio_init_gpio_pin(P9_30, BBB_PRUIO_OUTPUT_MODE);
-   int e3 = bbb_pruio_init_gpio_pin(P9_42A, BBB_PRUIO_OUTPUT_MODE);
-   if(e1 || e2 || e3){
-      fprintf(stderr, "libbbb_pruio: Could not init mux control pins.\n");
-      return 1;
-   } 
-
    // PRU
-   if(init_pru_system()){
-      fprintf(stderr, "libbbb_pruio: Could not init PRU system.\n");
-      return 1;
-   }
+   /* if(init_pru_system()){ */
+   /*    fprintf(stderr, "libbbb_pruio: Could not init PRU system.\n"); */
+   /*    return 1; */
+   /* } */
 
-   // Ring Buffer
-   buffer_init();
+   // Init GPIO pins used to control analog mux:
+   /* int e1 = bbb_pruio_init_gpio_pin(P9_27, BBB_PRUIO_OUTPUT_MODE); */
+   /* int e2 = bbb_pruio_init_gpio_pin(P9_30, BBB_PRUIO_OUTPUT_MODE); */
+   /* int e3 = bbb_pruio_init_gpio_pin(P9_42A, BBB_PRUIO_OUTPUT_MODE); */
+   /* if(e1 || e2 || e3){ */
+   /*    fprintf(stderr, "libbbb_pruio: Could not init mux control pins.\n"); */
+   /*    return 1; */
+   /* }  */
 
-   // Analog digital converter
-   init_adc();
 
-   // Start the PRU software
-   if(start_pru0_program()){
-      fprintf(stderr, "libbbb_pruio: Could not load PRU0 program.\n");
-      return 1;
-   }
-
+   /* // Ring Buffer */
+   /* buffer_init(); */
+   /*  */
+   /* // Analog digital converter */
+   /* if(init_adc()){ */
+   /*    fprintf(stderr, "libbbb_pruio: Could not init ADC system.\n"); */
+   /*    return 1; */
+   /* } */
+   /*  */
+   /* // Start the PRU software */
+   /* if(start_pru0_program()){ */
+   /*    fprintf(stderr, "libbbb_pruio: Could not load PRU0 program.\n"); */
+   /*    return 1; */
+   /* } */
+   /*  */
    return 0;
 }
 
 int bbb_pruio_stop(){
    // TODO: send terminate message to PRU
-   prussdrv_pru_disable(0);
-   prussdrv_exit();
+   /* prussdrv_pru_disable(0); */
+   /* prussdrv_exit(); */
 
    close_memory_map();
    return 0;
@@ -619,22 +653,20 @@ int bbb_pruio_init_gpio_pin(int gpio_number, bbb_pruio_gpio_mode mode){
    return 0;
 }
 
-void bbb_pruio_set_pin_value(int gpio_number, int value){
-   int gpio_module = gpio_number >> 5;
-   int gpio_bit = gpio_number % 32;
-   volatile char* reg=NULL;
-   switch(gpio_module){
-      case 0: reg = gpio0; break;
-      case 1: reg = gpio1; break;
-      case 2: reg = gpio2; break;
-      case 3: reg = gpio3; break;
-   }
-   if(value==1){
-      HWREG(reg, GPIO_DATAOUT) |= (1<<gpio_bit);
-   }
-   else{
-      HWREG(reg, GPIO_DATAOUT) &= ~(1<<gpio_bit);
-   }
-}
-
-
+/* void bbb_pruio_set_pin_value(int gpio_number, int value){ */
+/*    int gpio_module = gpio_number >> 5; */
+/*    int gpio_bit = gpio_number % 32; */
+/*    volatile char* reg=NULL; */
+/*    switch(gpio_module){ */
+/*       case 0: reg = gpio0; break; */
+/*       case 1: reg = gpio1; break; */
+/*       case 2: reg = gpio2; break; */
+/*       case 3: reg = gpio3; break; */
+/*    } */
+/*    if(value==1){ */
+/*       HWREG(reg, GPIO_DATAOUT) |= (1<<gpio_bit); */
+/*    } */
+/*    else{ */
+/*       HWREG(reg, GPIO_DATAOUT) &= ~(1<<gpio_bit); */
+/*    } */
+/* } */
