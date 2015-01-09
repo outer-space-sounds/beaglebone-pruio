@@ -89,31 +89,31 @@ int main(int argc, const char *argv[]){
    start_monitor_thread();
 
    // Initialize 2 pins as outputs
-   if(bbb_pruio_init_gpio_pin(P9_12, BBB_PRUIO_OUTPUT_MODE)){
+   if(bbb_pruio_init_gpio_pin(P9_16, BBB_PRUIO_OUTPUT_MODE)){
       fprintf(stderr, "%s\n", "Could not initialize pin P9_12");
    }
-   if(bbb_pruio_init_gpio_pin(P9_14, BBB_PRUIO_OUTPUT_MODE)){
+   if(bbb_pruio_init_gpio_pin(P9_18, BBB_PRUIO_OUTPUT_MODE)){
       fprintf(stderr, "%s\n", "Could not initialize pin P9_14");
    }
 
    // Check if library is returning adequately when trying to 
    // re-initialize a pin.
-   if(!bbb_pruio_init_gpio_pin(P9_12, BBB_PRUIO_INPUT_MODE)){
-      fprintf(stderr, "%s\n", "P9_12 was already initialized, should have returned error");
-      exit(1);
-   }
-   if(bbb_pruio_init_gpio_pin(P9_14, BBB_PRUIO_OUTPUT_MODE)){
-      fprintf(stderr, "%s\n", "P9_14 was already initialized as output so it's okay, should have not returned error");
-      exit(1);
-   }
+   /* if(!bbb_pruio_init_gpio_pin(P9_12, BBB_PRUIO_INPUT_MODE)){ */
+   /*    fprintf(stderr, "%s\n", "P9_12 was already initialized, should have returned error"); */
+   /*    exit(1); */
+   /* } */
+   /* if(bbb_pruio_init_gpio_pin(P9_14, BBB_PRUIO_OUTPUT_MODE)){ */
+   /*    fprintf(stderr, "%s\n", "P9_14 was already initialized as output so it's okay, should have not returned error"); */
+   /*    exit(1); */
+   /* } */
 
    // Blink 2 outputs
    while(!finished){
-      bbb_pruio_set_pin_value(P9_12, 0);
-      bbb_pruio_set_pin_value(P9_14, 1);
+      bbb_pruio_set_pin_value(P9_16, 0);
+      bbb_pruio_set_pin_value(P9_18, 1);
       sleep(3);
-      bbb_pruio_set_pin_value(P9_12, 1);
-      bbb_pruio_set_pin_value(P9_14, 0);
+      bbb_pruio_set_pin_value(P9_16, 1);
+      bbb_pruio_set_pin_value(P9_18, 0);
       sleep(3);
    }
 

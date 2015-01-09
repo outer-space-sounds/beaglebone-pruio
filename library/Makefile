@@ -1,5 +1,5 @@
 
-################################################################################
+#####################################################################
 # Constants
 #
 
@@ -7,24 +7,26 @@
 # PREFIX?=/usr/local
 PREFIX?=/root/libbbb_pruio/repo/library
 
-# Make makefile silent, you can do `VERBOSE=1 make whatever` to get messages
+# Make makefile silent, you can do `VERBOSE=1 make whatever` 
+# to get messages
 ifndef VERBOSE
 .SILENT:
 endif
 
 PRU_COMPILER_DIR=../vendors/pru_2.0.0B2
-PRU_C_FLAGS=--silicon_version=2 --hardware_mac=on -i$(PRU_COMPILER_DIR)/include \
-				-i$(PRU_COMPILER_DIR)/lib 
+PRU_C_FLAGS=--silicon_version=2 --hardware_mac=on \
+				-i$(PRU_COMPILER_DIR)/include -i$(PRU_COMPILER_DIR)/lib 
 PRU_LD_FLAGS=-llibc.a
 
-HOST_C_FLAGS += -Wall -g -O2 -mtune=cortex-a8 -march=armv7-a -fPIC -Isrc/ 
+HOST_C_FLAGS += -Wall -g -O2 -mtune=cortex-a8 -march=armv7-a \
+					 -fPIC -Isrc/ 
 HOST_LD_FLAGS += -shared -Wl,-soname,libbbb_pruio.so
 HOST_LIBS += -lprussdrv
 
 FIND_ADDRESS_0_COMMAND=`$(PRU_COMPILER_DIR)/bin/dispru src/pru0.elf \
 							  | grep _c_int00 | cut -f1 -d\  `
 
-################################################################################
+######################################################################
 # Compilation
 #
 
@@ -36,18 +38,19 @@ device-tree-overlay/LIB-BBB-PRUIO-DTO-00A0.dtb:
 
 # 1. Compile pru0_main.c into pru0_main.obj
 src/pru0_main.obj: src/pru0_main.c
-	$(PRU_COMPILER_DIR)/bin/clpru $(PRU_C_FLAGS) --output_file=src/pru0_main.obj \
-		-c src/pru0_main.c
+	$(PRU_COMPILER_DIR)/bin/clpru $(PRU_C_FLAGS) \
+		--output_file=src/pru0_main.obj -c src/pru0_main.c
 
-# 2. Link pru0_main.obj with libraries and output pru0.map and pru0.elf
+# 2. Link pru0_main.obj with libraries and output pru0.map 
+#    and pru0.elf
 src/pru0.elf: src/pru0_main.obj
 	$(PRU_COMPILER_DIR)/bin/clpru $(PRU_C_FLAGS) -z src/pru0_main.obj \
-		$(PRU_LD_FLAGS) -m src/pru0.map -o src/pru0.elf \
-		$(PRU_COMPILER_DIR)/example/AM3359_PRU.cmd
+		$(PRU_LD_FLAGS) -m src/pru0.map -o src/pru0.elf AM3359_PRU.cmd
 
-# 3. Convert pru0.elf into libbbb_pruio_text0.bin and libbbb_pruio_data0.bin
+# 3. Convert pru0.elf into libbbb_pruio_text0.bin and
+#    libbbb_pruio_data0.bin
 lib/libbbb_pruio_text0.bin: src/pru0.elf
-	$(PRU_COMPILER_DIR)/bin/hexpru $(PRU_COMPILER_DIR)/bin.cmd src/pru0.elf \
+	$(PRU_COMPILER_DIR)/bin/hexpru bin.cmd src/pru0.elf \
 		&& mv text.bin lib/libbbb_pruio_text0.bin \
 		&& mv data.bin lib/libbbb_pruio_data0.bin
 

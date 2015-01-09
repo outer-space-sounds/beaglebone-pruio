@@ -100,7 +100,7 @@ void init_gpio(){
    HWREG(CM_PER + CM_PER_GPIO1_CLKCTRL) = (0x02) | (1<<18);
    // Set debounce time for GPIO1 module
    // time = (DEBOUNCINGTIME + 1) * 31uSec
-   HWREG(GPIO1 + GPIO_DEBOUNCINGTIME) = 255;
+   /* HWREG(GPIO1 + GPIO_DEBOUNCINGTIME) = 255; */
    
    // Enable GPIO2 Module.
    HWREG(GPIO2 + GPIO_CTRL) = 0x00;
@@ -108,7 +108,7 @@ void init_gpio(){
    HWREG(CM_PER + CM_PER_GPIO2_CLKCTRL) = (0x02) | (1<<18);
    // Set debounce time for GPIO2 module
    // time = (DEBOUNCINGTIME + 1) * 31uSec
-   HWREG(GPIO2 + GPIO_DEBOUNCINGTIME) = 255;
+   /* HWREG(GPIO2 + GPIO_DEBOUNCINGTIME) = 255; */
    
    // Enable GPIO3 Module.
    HWREG(GPIO3 + GPIO_CTRL) = 0x00;
@@ -116,7 +116,7 @@ void init_gpio(){
    HWREG(CM_PER + CM_PER_GPIO3_CLKCTRL) = (0x02) | (1<<18);
    // Set debounce time for GPIO3 module
    // time = (DEBOUNCINGTIME + 1) * 31uSec
-   HWREG(GPIO3 + GPIO_DEBOUNCINGTIME) = 255;
+   /* HWREG(GPIO3 + GPIO_DEBOUNCINGTIME) = 255; */
 }
 
 inline void set_mux_control(unsigned int ctl){
@@ -272,6 +272,194 @@ inline void adc_start_sampling(){
 }
 
 void init_adc(){
+   // Enable clock for adc module.
+   HWREG(CM_WKUP + CM_WKUP_ADC_TSK_CLKCTL) = 0x02;
+
+   // Disable ADC module temporarily.
+   HWREG(ADC_TSC + ADC_TSC_CTRL) &= ~(0x01);
+
+   // To calculate sample rate:
+   // fs = 24MHz / (CLK_DIV*2*Channels*(OpenDly+Average*(14+SampleDly)))
+   // We want 48KHz. (Compromising to 50KHz)
+   unsigned int clock_divider = 1;
+   unsigned int open_delay = 0;
+   unsigned int average = 0;       // can be 0 (no average), 1 (2 samples), 
+                                   // 2 (4 samples),  3 (8 samples) 
+                                   // or 4 (16 samples)
+   unsigned int sample_delay = 0;
+
+   // Set clock divider (set register to desired value minus one). 
+   HWREG(ADC_TSC + ADC_TSC_CLKDIV) = clock_divider - 1;
+
+   // Set values range from 0 to FFF.
+   HWREG(ADC_TSC + ADC_TSC_ADCRANGE) = (0xfff << 16) & (0x000);
+
+   // Disable all steps. STEPENABLE register
+   HWREG(ADC_TSC + ADC_TSC_STEPENABLE) &= ~(0xff);
+
+   // Unlock step config register.
+   HWREG(ADC_TSC + ADC_TSC_CTRL) |= (1 << 2);
+
+   // Set config and delays for step 1: 
+   // Sw mode, one shot mode, fifo0, channel 0.
+   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG1) = 0 | (0<<26) | (0<<19) | (0<<15) | (average<<2) | (0);
+   HWREG(ADC_TSC + ADC_TSC_STEPDELAY1)  = 0 | (sample_delay - 1)<<24 | open_delay;
+
+   // Set config and delays for step 2: 
+   // Sw mode, one shot mode, fifo0, channel 1.
+   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG2) = 0 | (0x0<<26) | (0x01<<19) | (0x01<<15) | (average<<2) | (0x00);
+   HWREG(ADC_TSC + ADC_TSC_STEPDELAY2)  = 0 | (sample_delay - 1)<<24 | open_delay;
+
+   // Set config and delays for step 3: 
+   // Sw mode, one shot mode, fifo0, channel 2.
+   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG3) = 0 | (0x0<<26) | (0x02<<19) | (0x02<<15) | (average<<2) | (0x00);
+   HWREG(ADC_TSC + ADC_TSC_STEPDELAY3)  = 0 | ((sample_delay - 1)<<24) | open_delay;
+
+   // Set config and delays for step 4: 
+   // Sw mode, one shot mode, fifo0, channel 3.
+   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG4) = 0 | (0x0<<26) | (0x03<<19) | (0x03<<15) | (average<<2) | (0x00);
+   HWREG(ADC_TSC + ADC_TSC_STEPDELAY4)  = 0 | ((sample_delay - 1)<<24) | open_delay;
+
+   // Set config and delays for step 5: 
+   // Sw mode, one shot mode, fifo0, channel 4.
+   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG5) = 0 | (0x0<<26) | (0x04<<19) | (0x04<<15) | (average<<2) | (0x00);
+   HWREG(ADC_TSC + ADC_TSC_STEPDELAY5)  = 0 | ((sample_delay - 1)<<24) | open_delay;
+
+   // Set config and delays for step 6: 
+   // Sw mode, one shot mode, fifo0, CHANNEL 6!
+   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG6) = 0 | (0x0<<26) | (0x06<<19) | (0x06<<15) | (average<<2) | (0x00);
+   HWREG(ADC_TSC + ADC_TSC_STEPDELAY6)  = 0 | ((sample_delay - 1)<<24) | open_delay;
+
+   // Set config and delays for step 7: 
+   // Sw mode, one shot mode, fifo0, CHANNEL 5!
+   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG7) = 0 | (0x0<<26) | (0x05<<19) | (0x05<<15) | (average<<2) | (0x00);
+   HWREG(ADC_TSC + ADC_TSC_STEPDELAY7)  = 0 | ((sample_delay - 1)<<24) | open_delay;
+
+   // Enable tag channel id. Samples in fifo will have channel id bits ADC_CTRL register
+   HWREG(ADC_TSC + ADC_TSC_CTRL) |= (1 << 1);
+
+   // Clear End_of_sequence interrupt
+   HWREG(ADC_TSC + ADC_TSC_IRQSTATUS) |= (1<<1);
+
+   // Enable End_of_sequence interrupt
+   HWREG(ADC_TSC + ADC_TSC_IRQENABLE_SET) |= (1 << 1);
+   
+   // Lock step config register. ACD_CTRL register
+   HWREG(ADC_TSC + ADC_TSC_CTRL) &= ~(1 << 2);
+   
+   // Clear FIFO0 by reading from it.
+   unsigned int count = HWREG(ADC_TSC + ADC_TSC_FIFO0COUNT);
+   unsigned int data, i;
+   for(i=0; i<count; i++){
+      data = HWREG(ADC_TSC + ADC_TSC_FIFO0DATA);
+   }
+
+   // Clear FIFO1 by reading from it.
+   count = HWREG(ADC_TSC + ADC_TSC_FIFO1COUNT);
+   for(i=0; i<count; i++){
+      data = HWREG(ADC_TSC + ADC_TSC_FIFO1DATA);
+   }
+   shared_ram[500] = data; // just remove unused value warning;
+
+   // Enable ADC Module. ADC_CTRL register
+   HWREG(ADC_TSC + ADC_TSC_CTRL) |= 1;
+}
+
+void init_adc2(){
+   // Enable clock for adc module.
+   HWREG(CM_WKUP + CM_WKUP_ADC_TSK_CLKCTL) = 0x02;
+
+   // Disable ADC module temporarily.
+   HWREG(ADC_TSC + ADC_TSC_CTRL) &= ~(0x01);
+
+   // To calculate sample rate:
+   // fs = 24MHz / (CLK_DIV*2*Channels*(OpenDly+Average*(14+SampleDly)))
+   // We want 48KHz. (Compromising to 50KHz)
+   unsigned int clock_divider = 1;
+   unsigned int open_delay = 0;
+   unsigned int average = 0;       // can be 0 (no average), 1 (2 samples), 
+                                   // 2 (4 samples),  3 (8 samples) 
+                                   // or 4 (16 samples)
+   unsigned int sample_delay = 0;
+
+   // Set clock divider (set register to desired value minus one). 
+   HWREG(ADC_TSC + ADC_TSC_CLKDIV) = clock_divider - 1;
+
+   // Set values range from 0 to FFF.
+   HWREG(ADC_TSC + ADC_TSC_ADCRANGE) = (0xfff << 16) & (0x000);
+
+   // Disable all steps. STEPENABLE register
+   HWREG(ADC_TSC + ADC_TSC_STEPENABLE) &= ~(0xff);
+
+   // Unlock step config register.
+   HWREG(ADC_TSC + ADC_TSC_CTRL) |= (1 << 2);
+
+   // Set config and delays for step 1: 
+   // Sw mode, one shot mode, fifo0, channel 0.
+   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG1) = 0 | (0<<26) | (0<<19) | (0<<15) | (average<<2) | (0);
+   HWREG(ADC_TSC + ADC_TSC_STEPDELAY1)  = 0 | (sample_delay - 1)<<24 | open_delay;
+
+   // Set config and delays for step 2: 
+   // Sw mode, one shot mode, fifo0, channel 1.
+   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG2) = 0 | (0x0<<26) | (0x01<<19) | (0x01<<15) | (average<<2) | (0x00);
+   HWREG(ADC_TSC + ADC_TSC_STEPDELAY2)  = 0 | (sample_delay - 1)<<24 | open_delay;
+
+   // Set config and delays for step 3: 
+   // Sw mode, one shot mode, fifo0, channel 2.
+   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG3) = 0 | (0x0<<26) | (0x02<<19) | (0x02<<15) | (average<<2) | (0x00);
+   HWREG(ADC_TSC + ADC_TSC_STEPDELAY3)  = 0 | ((sample_delay - 1)<<24) | open_delay;
+
+   // Set config and delays for step 4: 
+   // Sw mode, one shot mode, fifo0, channel 3.
+   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG4) = 0 | (0x0<<26) | (0x03<<19) | (0x03<<15) | (average<<2) | (0x00);
+   HWREG(ADC_TSC + ADC_TSC_STEPDELAY4)  = 0 | ((sample_delay - 1)<<24) | open_delay;
+
+   // Set config and delays for step 5: 
+   // Sw mode, one shot mode, fifo0, channel 4.
+   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG5) = 0 | (0x0<<26) | (0x04<<19) | (0x04<<15) | (average<<2) | (0x00);
+   HWREG(ADC_TSC + ADC_TSC_STEPDELAY5)  = 0 | ((sample_delay - 1)<<24) | open_delay;
+
+   // Set config and delays for step 6: 
+   // Sw mode, one shot mode, fifo0, CHANNEL 6!
+   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG6) = 0 | (0x0<<26) | (0x06<<19) | (0x06<<15) | (average<<2) | (0x00);
+   HWREG(ADC_TSC + ADC_TSC_STEPDELAY6)  = 0 | ((sample_delay - 1)<<24) | open_delay;
+
+   // Set config and delays for step 7: 
+   // Sw mode, one shot mode, fifo0, CHANNEL 5!
+   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG7) = 0 | (0x0<<26) | (0x05<<19) | (0x05<<15) | (average<<2) | (0x00);
+   HWREG(ADC_TSC + ADC_TSC_STEPDELAY7)  = 0 | ((sample_delay - 1)<<24) | open_delay;
+
+   // Enable tag channel id. Samples in fifo will have channel id bits ADC_CTRL register
+   HWREG(ADC_TSC + ADC_TSC_CTRL) |= (1 << 1);
+
+   // Clear End_of_sequence interrupt
+   HWREG(ADC_TSC + ADC_TSC_IRQSTATUS) |= (1<<1);
+
+   // Enable End_of_sequence interrupt
+   HWREG(ADC_TSC + ADC_TSC_IRQENABLE_SET) |= (1 << 1);
+   
+   // Lock step config register. ACD_CTRL register
+   HWREG(ADC_TSC + ADC_TSC_CTRL) &= ~(1 << 2);
+   
+   // Clear FIFO0 by reading from it.
+   unsigned int count = HWREG(ADC_TSC + ADC_TSC_FIFO0COUNT);
+   unsigned int data, i;
+   for(i=0; i<count; i++){
+      data = HWREG(ADC_TSC + ADC_TSC_FIFO0DATA);
+   }
+
+   // Clear FIFO1 by reading from it.
+   count = HWREG(ADC_TSC + ADC_TSC_FIFO1COUNT);
+   for(i=0; i<count; i++){
+      data = HWREG(ADC_TSC + ADC_TSC_FIFO1DATA);
+   }
+   shared_ram[500] = data; // just remove unused value warning;
+
+   // Enable ADC Module. ADC_CTRL register
+   HWREG(ADC_TSC + ADC_TSC_CTRL) |= 1;
+}
+
+void init_adc3(){
    // Enable clock for adc module.
    HWREG(CM_WKUP + CM_WKUP_ADC_TSK_CLKCTL) = 0x02;
 
@@ -568,6 +756,8 @@ int main(int argc, const char *argv[]){
    init_ocp();
    init_buffer();
    init_adc();
+   init_adc2();
+   init_adc3();
    init_adc_values();
    init_gpio();
    init_gpio_values();
