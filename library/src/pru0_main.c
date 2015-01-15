@@ -365,194 +365,6 @@ void init_adc(){
    HWREG(ADC_TSC + ADC_TSC_CTRL) |= 1;
 }
 
-void init_adc2(){
-   // Enable clock for adc module.
-   HWREG(CM_WKUP + CM_WKUP_ADC_TSK_CLKCTL) = 0x02;
-
-   // Disable ADC module temporarily.
-   HWREG(ADC_TSC + ADC_TSC_CTRL) &= ~(0x01);
-
-   // To calculate sample rate:
-   // fs = 24MHz / (CLK_DIV*2*Channels*(OpenDly+Average*(14+SampleDly)))
-   // We want 48KHz. (Compromising to 50KHz)
-   unsigned int clock_divider = 1;
-   unsigned int open_delay = 0;
-   unsigned int average = 0;       // can be 0 (no average), 1 (2 samples), 
-                                   // 2 (4 samples),  3 (8 samples) 
-                                   // or 4 (16 samples)
-   unsigned int sample_delay = 0;
-
-   // Set clock divider (set register to desired value minus one). 
-   HWREG(ADC_TSC + ADC_TSC_CLKDIV) = clock_divider - 1;
-
-   // Set values range from 0 to FFF.
-   HWREG(ADC_TSC + ADC_TSC_ADCRANGE) = (0xfff << 16) & (0x000);
-
-   // Disable all steps. STEPENABLE register
-   HWREG(ADC_TSC + ADC_TSC_STEPENABLE) &= ~(0xff);
-
-   // Unlock step config register.
-   HWREG(ADC_TSC + ADC_TSC_CTRL) |= (1 << 2);
-
-   // Set config and delays for step 1: 
-   // Sw mode, one shot mode, fifo0, channel 0.
-   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG1) = 0 | (0<<26) | (0<<19) | (0<<15) | (average<<2) | (0);
-   HWREG(ADC_TSC + ADC_TSC_STEPDELAY1)  = 0 | (sample_delay - 1)<<24 | open_delay;
-
-   // Set config and delays for step 2: 
-   // Sw mode, one shot mode, fifo0, channel 1.
-   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG2) = 0 | (0x0<<26) | (0x01<<19) | (0x01<<15) | (average<<2) | (0x00);
-   HWREG(ADC_TSC + ADC_TSC_STEPDELAY2)  = 0 | (sample_delay - 1)<<24 | open_delay;
-
-   // Set config and delays for step 3: 
-   // Sw mode, one shot mode, fifo0, channel 2.
-   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG3) = 0 | (0x0<<26) | (0x02<<19) | (0x02<<15) | (average<<2) | (0x00);
-   HWREG(ADC_TSC + ADC_TSC_STEPDELAY3)  = 0 | ((sample_delay - 1)<<24) | open_delay;
-
-   // Set config and delays for step 4: 
-   // Sw mode, one shot mode, fifo0, channel 3.
-   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG4) = 0 | (0x0<<26) | (0x03<<19) | (0x03<<15) | (average<<2) | (0x00);
-   HWREG(ADC_TSC + ADC_TSC_STEPDELAY4)  = 0 | ((sample_delay - 1)<<24) | open_delay;
-
-   // Set config and delays for step 5: 
-   // Sw mode, one shot mode, fifo0, channel 4.
-   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG5) = 0 | (0x0<<26) | (0x04<<19) | (0x04<<15) | (average<<2) | (0x00);
-   HWREG(ADC_TSC + ADC_TSC_STEPDELAY5)  = 0 | ((sample_delay - 1)<<24) | open_delay;
-
-   // Set config and delays for step 6: 
-   // Sw mode, one shot mode, fifo0, CHANNEL 6!
-   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG6) = 0 | (0x0<<26) | (0x06<<19) | (0x06<<15) | (average<<2) | (0x00);
-   HWREG(ADC_TSC + ADC_TSC_STEPDELAY6)  = 0 | ((sample_delay - 1)<<24) | open_delay;
-
-   // Set config and delays for step 7: 
-   // Sw mode, one shot mode, fifo0, CHANNEL 5!
-   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG7) = 0 | (0x0<<26) | (0x05<<19) | (0x05<<15) | (average<<2) | (0x00);
-   HWREG(ADC_TSC + ADC_TSC_STEPDELAY7)  = 0 | ((sample_delay - 1)<<24) | open_delay;
-
-   // Enable tag channel id. Samples in fifo will have channel id bits ADC_CTRL register
-   HWREG(ADC_TSC + ADC_TSC_CTRL) |= (1 << 1);
-
-   // Clear End_of_sequence interrupt
-   HWREG(ADC_TSC + ADC_TSC_IRQSTATUS) |= (1<<1);
-
-   // Enable End_of_sequence interrupt
-   HWREG(ADC_TSC + ADC_TSC_IRQENABLE_SET) |= (1 << 1);
-   
-   // Lock step config register. ACD_CTRL register
-   HWREG(ADC_TSC + ADC_TSC_CTRL) &= ~(1 << 2);
-   
-   // Clear FIFO0 by reading from it.
-   unsigned int count = HWREG(ADC_TSC + ADC_TSC_FIFO0COUNT);
-   unsigned int data, i;
-   for(i=0; i<count; i++){
-      data = HWREG(ADC_TSC + ADC_TSC_FIFO0DATA);
-   }
-
-   // Clear FIFO1 by reading from it.
-   count = HWREG(ADC_TSC + ADC_TSC_FIFO1COUNT);
-   for(i=0; i<count; i++){
-      data = HWREG(ADC_TSC + ADC_TSC_FIFO1DATA);
-   }
-   shared_ram[500] = data; // just remove unused value warning;
-
-   // Enable ADC Module. ADC_CTRL register
-   HWREG(ADC_TSC + ADC_TSC_CTRL) |= 1;
-}
-
-void init_adc3(){
-   // Enable clock for adc module.
-   HWREG(CM_WKUP + CM_WKUP_ADC_TSK_CLKCTL) = 0x02;
-
-   // Disable ADC module temporarily.
-   HWREG(ADC_TSC + ADC_TSC_CTRL) &= ~(0x01);
-
-   // To calculate sample rate:
-   // fs = 24MHz / (CLK_DIV*2*Channels*(OpenDly+Average*(14+SampleDly)))
-   // We want 48KHz. (Compromising to 50KHz)
-   unsigned int clock_divider = 1;
-   unsigned int open_delay = 0;
-   unsigned int average = 0;       // can be 0 (no average), 1 (2 samples), 
-                                   // 2 (4 samples),  3 (8 samples) 
-                                   // or 4 (16 samples)
-   unsigned int sample_delay = 0;
-
-   // Set clock divider (set register to desired value minus one). 
-   HWREG(ADC_TSC + ADC_TSC_CLKDIV) = clock_divider - 1;
-
-   // Set values range from 0 to FFF.
-   HWREG(ADC_TSC + ADC_TSC_ADCRANGE) = (0xfff << 16) & (0x000);
-
-   // Disable all steps. STEPENABLE register
-   HWREG(ADC_TSC + ADC_TSC_STEPENABLE) &= ~(0xff);
-
-   // Unlock step config register.
-   HWREG(ADC_TSC + ADC_TSC_CTRL) |= (1 << 2);
-
-   // Set config and delays for step 1: 
-   // Sw mode, one shot mode, fifo0, channel 0.
-   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG1) = 0 | (0<<26) | (0<<19) | (0<<15) | (average<<2) | (0);
-   HWREG(ADC_TSC + ADC_TSC_STEPDELAY1)  = 0 | (sample_delay - 1)<<24 | open_delay;
-
-   // Set config and delays for step 2: 
-   // Sw mode, one shot mode, fifo0, channel 1.
-   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG2) = 0 | (0x0<<26) | (0x01<<19) | (0x01<<15) | (average<<2) | (0x00);
-   HWREG(ADC_TSC + ADC_TSC_STEPDELAY2)  = 0 | (sample_delay - 1)<<24 | open_delay;
-
-   // Set config and delays for step 3: 
-   // Sw mode, one shot mode, fifo0, channel 2.
-   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG3) = 0 | (0x0<<26) | (0x02<<19) | (0x02<<15) | (average<<2) | (0x00);
-   HWREG(ADC_TSC + ADC_TSC_STEPDELAY3)  = 0 | ((sample_delay - 1)<<24) | open_delay;
-
-   // Set config and delays for step 4: 
-   // Sw mode, one shot mode, fifo0, channel 3.
-   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG4) = 0 | (0x0<<26) | (0x03<<19) | (0x03<<15) | (average<<2) | (0x00);
-   HWREG(ADC_TSC + ADC_TSC_STEPDELAY4)  = 0 | ((sample_delay - 1)<<24) | open_delay;
-
-   // Set config and delays for step 5: 
-   // Sw mode, one shot mode, fifo0, channel 4.
-   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG5) = 0 | (0x0<<26) | (0x04<<19) | (0x04<<15) | (average<<2) | (0x00);
-   HWREG(ADC_TSC + ADC_TSC_STEPDELAY5)  = 0 | ((sample_delay - 1)<<24) | open_delay;
-
-   // Set config and delays for step 6: 
-   // Sw mode, one shot mode, fifo0, CHANNEL 6!
-   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG6) = 0 | (0x0<<26) | (0x06<<19) | (0x06<<15) | (average<<2) | (0x00);
-   HWREG(ADC_TSC + ADC_TSC_STEPDELAY6)  = 0 | ((sample_delay - 1)<<24) | open_delay;
-
-   // Set config and delays for step 7: 
-   // Sw mode, one shot mode, fifo0, CHANNEL 5!
-   HWREG(ADC_TSC + ADC_TSC_STEPCONFIG7) = 0 | (0x0<<26) | (0x05<<19) | (0x05<<15) | (average<<2) | (0x00);
-   HWREG(ADC_TSC + ADC_TSC_STEPDELAY7)  = 0 | ((sample_delay - 1)<<24) | open_delay;
-
-   // Enable tag channel id. Samples in fifo will have channel id bits ADC_CTRL register
-   HWREG(ADC_TSC + ADC_TSC_CTRL) |= (1 << 1);
-
-   // Clear End_of_sequence interrupt
-   HWREG(ADC_TSC + ADC_TSC_IRQSTATUS) |= (1<<1);
-
-   // Enable End_of_sequence interrupt
-   HWREG(ADC_TSC + ADC_TSC_IRQENABLE_SET) |= (1 << 1);
-   
-   // Lock step config register. ACD_CTRL register
-   HWREG(ADC_TSC + ADC_TSC_CTRL) &= ~(1 << 2);
-   
-   // Clear FIFO0 by reading from it.
-   unsigned int count = HWREG(ADC_TSC + ADC_TSC_FIFO0COUNT);
-   unsigned int data, i;
-   for(i=0; i<count; i++){
-      data = HWREG(ADC_TSC + ADC_TSC_FIFO0DATA);
-   }
-
-   // Clear FIFO1 by reading from it.
-   count = HWREG(ADC_TSC + ADC_TSC_FIFO1COUNT);
-   for(i=0; i<count; i++){
-      data = HWREG(ADC_TSC + ADC_TSC_FIFO1DATA);
-   }
-   shared_ram[500] = data; // just remove unused value warning;
-
-   // Enable ADC Module. ADC_CTRL register
-   HWREG(ADC_TSC + ADC_TSC_CTRL) |= 1;
-}
-
 /////////////////////////////////////////////////////////////////////
 // ANALYZE ADC VALUES 
 //
@@ -568,7 +380,7 @@ adc_channel adc_channels[MAX_ADC_CHANNELS];
 unsigned int mux_control;
 
 inline void process_adc_value(unsigned int channel_number, unsigned int value){
-   // Channel is in RAW mode. Send new value if it's different to the old one.
+   // Channel is in ON mode. Send new value if it's different to the old one.
    if(adc_channels[channel_number].mode == 1){
       unsigned int i, average;
       unsigned int message;
@@ -582,28 +394,28 @@ inline void process_adc_value(unsigned int channel_number, unsigned int value){
          adc_channels[channel_number].past_values[mux_control] = value;
          if(mux_control==7){
             average = 0;
-            for(i=0; i<7; i++) {
+            for(i=0; i<8; i++) {
                average += adc_channels[channel_number].past_values[i];
             }
             average = average >> 3;  // Integer division by 8.
 
             // Send the value to ARM. See message format in comments 
             // in ring buffer section below
-            /* if(adc_channels[channel_number].value != average){ */
+            if(adc_channels[channel_number].value != average){
                adc_channels[channel_number].value = average;
                message = ((unsigned int)1<<31) | (average<<4) | (channel_number);
                buffer_write(&message);
-            /* } */
+            }
          }
       }
       else{ // channels 6 to 13
          // Send the value to ARM. See message format in comments 
          // in ring buffer section below
-         /* if(adc_channels[channel_number].value != value){ */
+         if(adc_channels[channel_number].value != value){
             adc_channels[channel_number].value = value;
             message = ((unsigned int)1<<31) | (value<<4) | (channel_number);
             buffer_write(&message);
-         /* } */
+         }
       }
    }
 }
@@ -641,14 +453,34 @@ void init_adc_values(){
    int i;
 
    adc_channel new_channel;
-   new_channel.mode = 1; // 1 is on, TODO default should be off and dynamic.
-   new_channel.value = 0xFF;
+   new_channel.mode = 0;
+   new_channel.value = 0xFFFF;
    for(i=0; i<8; i++) {
-      new_channel.past_values[i] = 0xFF;
+      new_channel.past_values[i] = 0xFFFF;
    }
 
    for(i=0; i<MAX_ADC_CHANNELS; i++){
       adc_channels[i] = new_channel; 
+   }
+}
+
+inline void init_adc_channels(){
+   /**
+    * Checks if ARM code has requested input from new adc pins (channels) and 
+    * adds them to the adc_channels array.
+    * Each one of bit in shared_ram[1030] represent the ADC channels. If a bit 
+    * is set, it means that the ARM code needs input for that ADC channel. 
+    *
+    * shared_ram[1030]
+    *
+    */
+   unsigned int config = shared_ram[1030];
+   int bit;
+   for(bit=0; bit<MAX_ADC_CHANNELS; ++bit){
+      // If bit is set
+      if((config&(1<<bit)) != 0){
+         adc_channels[bit].mode = 1; // 1 is on
+      }
    }
 }
 
@@ -756,8 +588,6 @@ int main(int argc, const char *argv[]){
    init_ocp();
    init_buffer();
    init_adc();
-   init_adc2();
-   init_adc3();
    init_adc_values();
    init_gpio();
    init_gpio_values();
@@ -780,6 +610,7 @@ int main(int argc, const char *argv[]){
       process_gpio_values();
 
       init_gpio_channels();
+      init_adc_channels();
 
       // Debug:
       /* HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<30); */

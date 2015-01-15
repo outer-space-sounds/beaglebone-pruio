@@ -29,6 +29,7 @@ volatile unsigned int* gpio0_output_enable = NULL;
 volatile unsigned int* gpio1_output_enable = NULL;
 volatile unsigned int* gpio2_output_enable = NULL;
 volatile unsigned int* gpio3_output_enable = NULL;
+
 volatile unsigned int* gpio0_data_out = NULL;
 volatile unsigned int* gpio1_data_out = NULL;
 volatile unsigned int* gpio2_data_out = NULL;
@@ -50,21 +51,21 @@ static int map_device_registers(){
    if(gpio1 == MAP_FAILED){
       return 1;
    }
-   gpio1_output_enable = (volatile unsigned int*)(gpio1+GPIO_OE);
+   gpio1_output_enable = (volatile unsigned int*)(gpio1 + GPIO_OE);
    gpio1_data_out = (volatile unsigned int*)(gpio1 + GPIO_DATAOUT);
 
    volatile void* gpio2 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, GPIO2);
    if(gpio2 == MAP_FAILED){
       return 1;
    }
-   gpio2_output_enable = (volatile unsigned int*)(gpio2+GPIO_OE);
+   gpio2_output_enable = (volatile unsigned int*)(gpio2 + GPIO_OE);
    gpio2_data_out = (volatile unsigned int*)(gpio2 + GPIO_DATAOUT);
 
    volatile void* gpio3 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, GPIO3);
    if(gpio3 == MAP_FAILED){
       return 1;
    }
-   gpio3_output_enable = (volatile unsigned int*)(gpio3+GPIO_OE);
+   gpio3_output_enable = (volatile unsigned int*)(gpio3 + GPIO_OE);
    gpio3_data_out = (volatile unsigned int*)(gpio3 + GPIO_DATAOUT);
 
    return 0;
@@ -84,18 +85,17 @@ static int init_gpio(){
    // Only pinmux is set here, enabling GPIO modules, 
    // clocks, debounce, etc. is set on the PRU side.
    
-   // TODO!
    // Pins used to control analog mux:
-   /* int e1 = bbb_pruio_init_gpio_pin(P9_27, BBB_PRUIO_OUTPUT_MODE); */
-   /* int e2 = bbb_pruio_init_gpio_pin(P9_30, BBB_PRUIO_OUTPUT_MODE); */
-   /* int e3 = bbb_pruio_init_gpio_pin(P9_42A, BBB_PRUIO_OUTPUT_MODE); */
+   int e1 = bbb_pruio_init_gpio_pin(P9_27, BBB_PRUIO_OUTPUT_MODE);
+   int e2 = bbb_pruio_init_gpio_pin(P9_30, BBB_PRUIO_OUTPUT_MODE);
+   int e3 = bbb_pruio_init_gpio_pin(P9_42A, BBB_PRUIO_OUTPUT_MODE);
 
-   /* if(e1 || e2 || e3){ */
-      /* return 1; */
-   /* }  */
-   /* else{ */
+   if(e1 || e2 || e3){
+      return 1;
+   } 
+   else{
       return 0;
-   /* } */
+   }
 }
 
 static int get_gpio_pin_name(int gpio_number, char* pin_name){
@@ -216,6 +216,17 @@ static int get_gpio_config_file(int gpio_number, char* path){
    strcpy(path, tmp);
    return 0;
 }
+
+/////////////////////////////////////////////////////////////////////
+// ADC CHANNELS
+
+typedef struct adc_channel{ 
+   int channel_number;
+} adc_channel;
+
+static adc_channel used_adc_channels[MAX_ADC_CHANNELS];
+static int used_adc_channels_count = 0;
+
 
 /////////////////////////////////////////////////////////////////////
 // PRU Initialization
@@ -391,9 +402,33 @@ int bbb_pruio_get_gpio_number(char* pin_name){
    return -1;
 }
 
-/* int bbb_pruio_init_adc_pin(unsigned int pin_number){ */
-/*    return 0; */
-/* } */
+int bbb_pruio_init_adc_pin(int channel_number){
+   // Check if channel already in use.
+   int i;
+   for(i=0; i<used_adc_channels_count; ++i){
+      adc_channel channel = used_adc_channels[i];
+      if(channel.channel_number==channel_number){
+         return 0;
+      }
+   }
+
+   // Save new channel info;
+   adc_channel new_channel;
+   new_channel.channel_number = channel_number;
+   used_adc_channels[used_adc_channels_count] = new_channel;
+   used_adc_channels_count++;
+
+   /** 
+    * Tell the PRU unit that we are interested in input from this channel.
+    * If a bit is set in shared_ram[1030], it means that we need input 
+    * for that ADC channel.
+    *
+    * shared_ram[1030]
+    *
+    */
+   bbb_pruio_shared_ram[1030] |= (1<<channel_number);
+   return 0;
+}
 
 int bbb_pruio_init_gpio_pin(int gpio_number, bbb_pruio_gpio_mode mode){
    // Check if pin already in use.
