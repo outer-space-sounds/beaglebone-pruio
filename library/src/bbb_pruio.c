@@ -42,31 +42,30 @@ static int map_device_registers(){
    // Get pointer to gpio0 registers (start at address 0x44e07000, length 0x1000 (4KB)).
    volatile void* gpio0 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, GPIO0);
    if(gpio0 == MAP_FAILED){ return 1; }
-   gpio0_output_enable = (unsigned int*)(gpio0 + GPIO_OE);
-   gpio0_data_out = (unsigned int*)(gpio0 + GPIO_DATAOUT);
+   gpio0_output_enable = (volatile unsigned int*)(gpio0 + GPIO_OE);
+   gpio0_data_out = (volatile unsigned int*)(gpio0 + GPIO_DATAOUT);
 
    // same for gpio1, 2 and 3.
-   volatile void* gpio1 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, GPIO2);
+   volatile void* gpio1 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, GPIO1);
    if(gpio1 == MAP_FAILED){
       return 1;
    }
-   gpio1_output_enable = (unsigned int*)(gpio1+GPIO_OE);
-   gpio1_data_out = (unsigned int*)(gpio1 + GPIO_DATAOUT);
-   printf("%p\n", gpio1_data_out);
+   gpio1_output_enable = (volatile unsigned int*)(gpio1+GPIO_OE);
+   gpio1_data_out = (volatile unsigned int*)(gpio1 + GPIO_DATAOUT);
 
    volatile void* gpio2 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, GPIO2);
    if(gpio2 == MAP_FAILED){
       return 1;
    }
-   gpio2_output_enable = (unsigned int*)(gpio2+GPIO_OE);
-   gpio2_data_out = (unsigned int*)(gpio2 + GPIO_DATAOUT);
+   gpio2_output_enable = (volatile unsigned int*)(gpio2+GPIO_OE);
+   gpio2_data_out = (volatile unsigned int*)(gpio2 + GPIO_DATAOUT);
 
    volatile void* gpio3 = mmap(0, 0x1000, PROT_READ|PROT_WRITE, MAP_SHARED, memdev, GPIO3);
    if(gpio3 == MAP_FAILED){
       return 1;
    }
-   gpio3_output_enable = (unsigned int*)(gpio3+GPIO_OE);
-   gpio3_data_out = (unsigned int*)(gpio3 + GPIO_DATAOUT);
+   gpio3_output_enable = (volatile unsigned int*)(gpio3+GPIO_OE);
+   gpio3_data_out = (volatile unsigned int*)(gpio3 + GPIO_DATAOUT);
 
    return 0;
 }
@@ -479,15 +478,12 @@ void bbb_pruio_set_pin_value(int gpio_number, int value){
       case 3: reg = gpio3_data_out; break;
    }
 
-   printf("P: %p\n", reg);
-   printf("A: %X\n", *reg);
    if(value==1){
       *reg |= (1<<gpio_bit);
    }
    else{
       *reg &= ~(1<<gpio_bit);
    }
-   printf("B: %X\n", *reg);
 }
 
 int bbb_pruio_stop(){
