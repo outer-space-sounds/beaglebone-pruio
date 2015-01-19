@@ -16,6 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef BBB_PRUIO_H
+#define BBB_PRUIO_H
+
 #include <string.h>
 
 /**
@@ -47,7 +50,7 @@ int bbb_pruio_stop();
 /**
  * Returns a gpio number from a string with the pin name "P9_11" for example
  */
-int bbb_pruio_get_gpio_number(char* pin_name);  
+// int bbb_pruio_get_gpio_number(char* pin_name);  
 
 /**
  * Configures how a GPIO channel is used
@@ -67,17 +70,12 @@ int bbb_pruio_init_adc_pin(int channel_number);
 /**
  * Returns 1 if there is data available from the PRU
  */
-inline int bbb_pruio_messages_are_available();
+static inline int bbb_pruio_messages_are_available();
 
 /**
  * Puts the next message available from the PRU in the message address.
  */
-inline void bbb_pruio_read_message(bbb_pruio_message *message);
-
-/**
- * Returns a structure for easy interpretation of the message.
- */
-inline void bbb_pruio_parse_message(unsigned int *message, bbb_pruio_message* parsed_message);
+static inline void bbb_pruio_read_message(bbb_pruio_message *message);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -99,16 +97,16 @@ inline void bbb_pruio_parse_message(unsigned int *message, bbb_pruio_message* pa
 // * http://en.wikipedia.org/wiki/Circular_buffer#Mirroring
 // * https://groups.google.com/forum/#!category-topic/beagleboard/F9JI8_vQ-mE
 
-volatile unsigned int *bbb_pruio_shared_ram = NULL;
+volatile unsigned int *bbb_pruio_shared_ram;
 unsigned int bbb_pruio_buffer_size;
 volatile unsigned int *bbb_pruio_buffer_start;
 volatile unsigned int *bbb_pruio_buffer_end;
 
-inline __attribute__ ((always_inline)) int bbb_pruio_messages_are_available(){
+static inline __attribute__ ((always_inline)) int bbb_pruio_messages_are_available(){
    return (*bbb_pruio_buffer_start != *bbb_pruio_buffer_end);
 }
 
-inline __attribute__ ((always_inline)) void bbb_pruio_read_message(bbb_pruio_message* message){
+static inline __attribute__ ((always_inline)) void bbb_pruio_read_message(bbb_pruio_message* message){
    unsigned int raw_message = bbb_pruio_shared_ram[*bbb_pruio_buffer_start & (bbb_pruio_buffer_size-1)];
 
    message->is_gpio = (raw_message&(1<<31))==0;
@@ -130,6 +128,4 @@ inline __attribute__ ((always_inline)) void bbb_pruio_read_message(bbb_pruio_mes
    *bbb_pruio_buffer_start = (*bbb_pruio_buffer_start+1) & (2*bbb_pruio_buffer_size - 1);
 }
 
-inline __attribute__ ((always_inline)) void bbb_pruio_parse_message(unsigned int *message, bbb_pruio_message* parsed_message){
-
-}
+#endif // BBB_PRUIO_H

@@ -60,6 +60,9 @@ flags = [
 '-I',
 './library/src',
 
+'-I',
+'/usr/include/pd',
+
 '-isystem',
 './vendors/am335x_pru_package/pru_sw/app_loader/include',
 

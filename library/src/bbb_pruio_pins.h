@@ -1,8 +1,15 @@
 #ifndef PINS_H
 #define PINS_H
 
-#define MAX_ADC_CHANNELS 14
-#define MAX_GPIO_CHANNELS 69
+#include <string.h>
+
+// #ifndef BBB_PRUIO_MAX_ADC_CHANNELS
+#define BBB_PRUIO_MAX_ADC_CHANNELS 14
+// #endif
+
+// #ifndef BBB_PRUIO_MAX_GPIO_CHANNELS
+#define BBB_PRUIO_MAX_GPIO_CHANNELS 69
+// #endif
 
 // These defines map the beagle bone's pin names to the AM335X's 
 // gpio numbers. GPIO numbers can be used like:
@@ -80,5 +87,66 @@
 #define P9_41B 116 // ?? usable     ??
 #define P9_42A 7   // mux_control
 #define P9_42B 114 // mcasp0
+
+static inline int bbb_pruio_get_gpio_number(char* pin_name){
+   if(strcmp(pin_name, "P9_11") == 0){
+      return P9_11;
+   }
+   else if(strcmp(pin_name, "P9_12") == 0){
+      return P9_12;
+   }
+   else if(strcmp(pin_name, "P9_13") == 0){
+      return P9_13;
+   }
+   else if(strcmp(pin_name, "P9_14") == 0){
+      return P9_14;
+   }
+   else if(strcmp(pin_name, "P9_15") == 0){
+      return P9_15;
+   }
+   else if(strcmp(pin_name, "P9_16") == 0){
+      return P9_16;
+   }
+   else if(strcmp(pin_name, "P9_17") == 0){
+      return P9_17;
+   }
+   else if(strcmp(pin_name, "P9_18") == 0){
+      return P9_18;
+   }
+   else if(strcmp(pin_name, "P9_21") == 0){
+      return P9_21;
+   }
+   else if(strcmp(pin_name, "P9_22") == 0){
+      return P9_22;
+   }
+   else if(strcmp(pin_name, "P9_23") == 0){
+      return P9_23;
+   }
+   else if(strcmp(pin_name, "P9_24") == 0){
+      return P9_24;
+   }
+   else if(strcmp(pin_name, "P9_26") == 0){
+      return P9_26;
+   }
+   else if(strcmp(pin_name, "P9_27") == 0){
+      return P9_27;
+   }
+   else if(strcmp(pin_name, "P9_30") == 0){
+      return P9_30;
+   }
+   else if(strcmp(pin_name, "P9_41A") == 0){
+      return P9_41A;
+   }
+   else if(strcmp(pin_name, "P9_41B") == 0){
+      return P9_41B;
+   }
+   else if(strcmp(pin_name, "P9_42A") == 0){
+      return P9_42A;
+   }
+   else if(strcmp(pin_name, "P9_42B") == 0){
+      return P9_42B;
+   }
+   return -1;
+}
 
 #endif //PINS_H
