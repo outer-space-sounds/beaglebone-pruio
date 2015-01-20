@@ -20,6 +20,7 @@
 
 #include <string.h>
 #include <m_pd.h>
+#include <bbb_pruio_pins.h>
 
 #include "beaglebone.h"
 
@@ -27,61 +28,78 @@
 // Data
 //
 
-typedef struct gpio_input {
+typedef struct gpio_output {
    t_object x_obj;
-   t_outlet *outlet_left;
    char channel[6];
-} t_gpio_input;
+   int gpio_number;
+} t_gpio_output;
 
 // A pointer to the class object.
-t_class *gpio_input_class;
+t_class *gpio_output_class;
 
 /////////////////////////////////////////////////////////////////////////
-// Callback from lib bbb_pruio
+// Float Message received
 //
 
-void gpio_input_callback(void* x, float value){
-   t_gpio_input* this = (t_gpio_input*)x;
-   outlet_float(this->outlet_left, (float)value);
+void gpio_output_float(t_gpio_output* x, t_floatarg f){
+   if(f!=0 && f!=1){
+      error("beaglebone/gpio_output: %f is not a valid output value, only 0 and 1 allowed.", f);
+      return;
+   }
+
+   #ifdef IS_BEAGLEBONE
+      //TODO
+   #else
+      (void)x;
+   #endif 
 }
 
 /////////////////////////////////////////////////////////////////////////
 // Constructor, destructor
 //
 
-static void *gpio_input_new(t_symbol *s) {
-   t_gpio_input *x = (t_gpio_input *)pd_new(gpio_input_class);
-   x->outlet_left = outlet_new(&x->x_obj, &s_float);
+static void *gpio_output_new(t_symbol *s) {
+   t_gpio_output *x = (t_gpio_output *)pd_new(gpio_output_class);
 
    strncpy(x->channel, s->s_name, 5);
    x->channel[5] = '\0';
 
-   char err[256];
-   if(beaglebone_clock_new(1, x->channel, x, gpio_input_callback, err)){
-      error("beaglebone/gpio_input: %s", err); 
-      return NULL;
-   }
+   x->gpio_number = bbb_pruio_get_gpio_number(x->channel);
+
+   #ifdef IS_BEAGLEBONE
+      /* char err[256]; */
+      /* if(beaglebone_clock_new(1, &x->channel[0], x, gpio_output_callback, &err[0])){ */
+      /*    error("beaglebone/gpio_output: %s", err);  */
+      /*    return NULL; */
+      /* } */
+   #else
+   #endif
 
    return (void *)x;
 }
 
-static void gpio_input_free(t_gpio_input *x) { 
-   beaglebone_clock_free(1, x->channel);
+static void gpio_output_free(t_gpio_output *x) { 
    (void)x;
+   #ifdef IS_BEAGLEBONE
+      //TODO
+   #endif 
 }
 
 /////////////////////////////////////////////////////////////////////////
 // Class definition
 // 
 
-void gpio_input_setup(void) {
-   gpio_input_class = class_new(
-      gensym("gpio_input"), 
-      (t_newmethod)gpio_input_new, 
-      (t_method)gpio_input_free, 
-      sizeof(t_gpio_input), 
-      CLASS_NOINLET, 
+void gpio_output_setup(void) {
+   gpio_output_class = class_new(
+      gensym("gpio_output"), 
+      (t_newmethod)gpio_output_new, 
+      (t_method)gpio_output_free, 
+      sizeof(t_gpio_output), 
+      CLASS_DEFAULT, 
       A_DEFSYMBOL,
       (t_atomtype)0
    );
+
+   // Trigger gpio_output_float when a float message is received
+   class_addfloat(gpio_output_class, gpio_output_float);
 }

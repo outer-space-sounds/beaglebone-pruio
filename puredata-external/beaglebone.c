@@ -10,9 +10,13 @@
 // PD library bootstrapping.
 //
 void gpio_input_setup(void);
+void gpio_output_setup(void);
+void adc_input_setup(void);
 
 void beaglebone_setup(void){
    gpio_input_setup();
+   gpio_output_setup();
+   adc_input_setup();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -32,12 +36,12 @@ void beaglebone_setup(void){
 #endif
 
 typedef struct callback{
-   void(*callback_function)(void*, int);
+   void(*callback_function)(void*, float);
    void* instance;
 } callback;
 
-callback digital_callbacks[BBB_PRUIO_MAX_GPIO_CHANNELS];
-callback analog_callbacks[BBB_PRUIO_MAX_ADC_CHANNELS];
+callback digital_callbacks[BBB_PRUIO_MAX_GPIO_CHANNELS+1];
+callback analog_callbacks[BBB_PRUIO_MAX_ADC_CHANNELS+1];
 
 static int beaglebone_number_of_instances = 0;
 static t_clock* beaglebone_clock = NULL;
@@ -51,10 +55,17 @@ void beaglebone_clock_tick(void* x){
       // TODO
    #else
       int i;
-      for(i=0; i<BBB_PRUIO_MAX_GPIO_CHANNELS; ++i){
+      for(i=0; i<=BBB_PRUIO_MAX_GPIO_CHANNELS; ++i){
          cbk = digital_callbacks[i];
          if(cbk.instance != NULL){
             cbk.callback_function(cbk.instance, rand()%2);
+         }
+      }
+
+      for(i=0; i<=BBB_PRUIO_MAX_ADC_CHANNELS; ++i){
+         cbk = analog_callbacks[i];
+         if(cbk.instance != NULL){
+            cbk.callback_function(cbk.instance, (float)rand()/(float)RAND_MAX);
          }
       }
    #endif 
@@ -68,7 +79,7 @@ void beaglebone_clock_tick(void* x){
 int beaglebone_clock_new(int is_digital, 
                          char* channel, 
                          void* instance, 
-                         void (*callback_function)(void*, int), 
+                         void (*callback_function)(void*, float), 
                          char* err){
    
    int gpio_number;
@@ -80,7 +91,11 @@ int beaglebone_clock_new(int is_digital,
       }
    }
    else{
-      gpio_number = 0; // TODO
+      gpio_number = strtol(channel, NULL, 10);
+      if(gpio_number==0 || gpio_number>BBB_PRUIO_MAX_ADC_CHANNELS){
+         sprintf(err, "%s is not a valid ADC channel.", channel);
+         return 1;
+      }
    }
 
    #ifdef IS_BEAGLEBONE
@@ -116,7 +131,7 @@ void beaglebone_clock_free(int is_digital, char* channel){
       cbk = &(digital_callbacks[gpio_number]);
    }
    else{
-      int adc_channel = 0; // TODO
+      int adc_channel = strtol(channel, NULL, 10);
       cbk = &(analog_callbacks[adc_channel]);
    }
    cbk->callback_function = NULL;

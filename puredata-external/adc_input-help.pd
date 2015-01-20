@@ -1,0 +1,34 @@
+#N canvas 764 161 505 287 10;
+#X declare -lib beaglebone;
+#N canvas 489 236 400 314 license 0;
+#X text 15 3 Copyright (c);
+#X text 15 210 See the GNU General Public License for more details.
+;
+#X text 17 236 You should have received a copy of the GNU General Public
+License along with the Outer Space Sounds Pd Library. If not \, see
+<http://www.gnu.org/licenses/>.;
+#X text 15 18 2014 Rafael Vega González <rvega@elsoftwarehamuerto.org>
+;
+#X text 14 45 This file is part of the Pd-BeagleBoneBlack-Io Library.
+;
+#X text 13 69 The Pd-BeagleBoneBlack-Io Library is free software: you
+can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation \, either
+version 3 of the License \, or (at your option) any later version.
+;
+#X text 14 145 The Pd-BeagleBoneBlack-Io Library is distributed in
+the hope that it will be useful \, but WITHOUT ANY WARRANTY \; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.;
+#X restore 428 261 pd license;
+#X obj 16 15 import beaglebone;
+#X floatatom 27 70 5 0 0 0 - - -, f 5;
+#X floatatom 134 72 5 0 0 0 - - -, f 5;
+#X obj 15 44 adc_input 1;
+#X obj 120 44 adc_input 14;
+#X obj 15 93 print ADC1;
+#X obj 120 96 print ADC2;
+#X connect 4 0 2 0;
+#X connect 4 0 6 0;
+#X connect 5 0 3 0;
+#X connect 5 0 7 0;

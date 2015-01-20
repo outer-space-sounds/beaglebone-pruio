@@ -1,5 +1,4 @@
 /////////////////////////////////////////////////////////////////////////
-// 
 //  Lib BBB Pruio
 //  Copyright (C) 2014 Rafael Vega <rvega@elsoftwarehamuerto.org>
 //
@@ -18,8 +17,9 @@
 //
 /////////////////////////////////////////////////////////////////////////
 
-#include <string.h>
+/* #include <string.h> */
 #include <m_pd.h>
+#include <stdio.h>
 
 #include "beaglebone.h"
 
@@ -27,21 +27,21 @@
 // Data
 //
 
-typedef struct gpio_input {
+typedef struct adc_input {
    t_object x_obj;
    t_outlet *outlet_left;
-   char channel[6];
-} t_gpio_input;
+   char channel[2];
+} t_adc_input;
 
 // A pointer to the class object.
-t_class *gpio_input_class;
+t_class *adc_input_class;
 
 /////////////////////////////////////////////////////////////////////////
 // Callback from lib bbb_pruio
 //
 
-void gpio_input_callback(void* x, float value){
-   t_gpio_input* this = (t_gpio_input*)x;
+void adc_input_callback(void* x, float value){
+   t_adc_input* this = (t_adc_input*)x;
    outlet_float(this->outlet_left, (float)value);
 }
 
@@ -49,24 +49,27 @@ void gpio_input_callback(void* x, float value){
 // Constructor, destructor
 //
 
-static void *gpio_input_new(t_symbol *s) {
-   t_gpio_input *x = (t_gpio_input *)pd_new(gpio_input_class);
+static void *adc_input_new(t_floatarg f){
+   if(f<1 || f>99 || (float)((int)f)!=(f)){
+      error("beaglebone/adc_input: %f is not a valid ADC channel.", f); 
+      return NULL;
+   }
+
+   t_adc_input *x = (t_adc_input *)pd_new(adc_input_class);
    x->outlet_left = outlet_new(&x->x_obj, &s_float);
 
-   strncpy(x->channel, s->s_name, 5);
-   x->channel[5] = '\0';
-
+   sprintf(x->channel, "%i", (int)f);
    char err[256];
-   if(beaglebone_clock_new(1, x->channel, x, gpio_input_callback, err)){
-      error("beaglebone/gpio_input: %s", err); 
+   if(beaglebone_clock_new(0, x->channel, x, adc_input_callback, err)){
+      error("beaglebone/adc_input: %s", err); 
       return NULL;
    }
 
    return (void *)x;
 }
 
-static void gpio_input_free(t_gpio_input *x) { 
-   beaglebone_clock_free(1, x->channel);
+static void adc_input_free(t_adc_input *x) { 
+   beaglebone_clock_free(0, x->channel);
    (void)x;
 }
 
@@ -74,14 +77,14 @@ static void gpio_input_free(t_gpio_input *x) {
 // Class definition
 // 
 
-void gpio_input_setup(void) {
-   gpio_input_class = class_new(
-      gensym("gpio_input"), 
-      (t_newmethod)gpio_input_new, 
-      (t_method)gpio_input_free, 
-      sizeof(t_gpio_input), 
+void adc_input_setup(void) {
+   adc_input_class = class_new(
+      gensym("adc_input"), 
+      (t_newmethod)adc_input_new, 
+      (t_method)adc_input_free, 
+      sizeof(t_adc_input), 
       CLASS_NOINLET, 
-      A_DEFSYMBOL,
+      A_DEFFLOAT,
       (t_atomtype)0
    );
 }
