@@ -1,10 +1,11 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include <bbb_pruio_pins.h>
 #include "m_pd.h"
 
 #ifdef IS_BEAGLEBONE
 #include <bbb_pruio.h>
 #endif 
-#include <bbb_pruio_pins.h>
 
 /////////////////////////////////////////////////////////////////////////
 // PD library bootstrapping.
@@ -14,6 +15,10 @@ void gpio_output_setup(void);
 void adc_input_setup(void);
 
 void beaglebone_setup(void){
+   printf("Setup\n");
+   #ifdef IS_BEAGLEBONE
+      bbb_pruio_start();
+   #endif 
    gpio_input_setup();
    gpio_output_setup();
    adc_input_setup();
@@ -50,22 +55,55 @@ void beaglebone_clock_tick(void* x){
    (void)x; // Do not use x, means nothing here, 
             // we're passing null to the "owner" in clock_new
    
-   callback cbk;
+   callback *cbk;
    #ifdef IS_BEAGLEBONE
-      // TODO
+      bbb_pruio_message message;
+      while(bbb_pruio_messages_are_available()){
+         bbb_pruio_read_message(&message);
+
+         // Message from gpio
+         if(message.is_gpio){
+            cbk = &digital_callbacks[message.gpio_number];
+
+            // Debug
+            /* if(message.gpio_number > BBB_PRUIO_MAX_GPIO_CHANNELS || cbk->instance == NULL || cbk->callback_function==NULL){ */
+            /*    printf("A! i:%p cbk:%p val:%i gpio_num:%i \n", cbk->instance, cbk->callback_function, message.value, message.gpio_number); */
+            /*    continue; //while */
+            /* } */
+
+            if(message.gpio_number<=BBB_PRUIO_MAX_GPIO_CHANNELS && cbk->instance!=NULL && cbk->callback_function!=NULL){
+               cbk->callback_function(cbk->instance, message.value);
+            }
+         }
+         else{ // adc
+            cbk = &analog_callbacks[message.adc_channel];
+
+            printf("adc %i\n", message.adc_channel);
+            
+            // Debug
+            /* if(message.adc_channel > BBB_PRUIO_MAX_ADC_CHANNELS || cbk->instance == NULL || cbk->callback_function==NULL){ */
+            /*    printf("A! i:%p cbk:%p val:%i chan:%i \n", cbk->instance, cbk->callback_function, message.value, message.adc_channel); */
+            /*    continue; //while */
+            /* } */
+
+            if(message.adc_channel<=BBB_PRUIO_MAX_ADC_CHANNELS && cbk->instance!=NULL && cbk->callback_function!=NULL){
+               cbk->callback_function(cbk->instance, message.value);
+            }
+         }
+      }
    #else
       int i;
       for(i=0; i<=BBB_PRUIO_MAX_GPIO_CHANNELS; ++i){
-         cbk = digital_callbacks[i];
-         if(cbk.instance != NULL){
-            cbk.callback_function(cbk.instance, rand()%2);
+         cbk = &digital_callbacks[i];
+         if(cbk->instance != NULL){
+            cbk->callback_function(cbk->instance, rand()%2);
          }
       }
 
       for(i=0; i<=BBB_PRUIO_MAX_ADC_CHANNELS; ++i){
-         cbk = analog_callbacks[i];
-         if(cbk.instance != NULL){
-            cbk.callback_function(cbk.instance, (float)rand()/(float)RAND_MAX);
+         cbk = &analog_callbacks[i];
+         if(cbk->instance != NULL){
+            cbk->callback_function(cbk->instance, (float)rand()/(float)RAND_MAX);
          }
       }
    #endif 
@@ -82,6 +120,23 @@ int beaglebone_clock_new(int is_digital,
                          void (*callback_function)(void*, float), 
                          char* err){
    
+   if(beaglebone_number_of_instances==0){
+      int i;
+      for(i=0; i<=BBB_PRUIO_MAX_GPIO_CHANNELS; ++i){
+         callback new_callback;
+         new_callback.callback_function = NULL;
+         new_callback.instance = NULL;
+         digital_callbacks[i] = new_callback;
+      }
+
+      for(i=0; i<=BBB_PRUIO_MAX_ADC_CHANNELS; ++i){
+         callback new_callback;
+         new_callback.callback_function = NULL;
+         new_callback.instance = NULL;
+         analog_callbacks[i] = new_callback;
+      }
+
+   }
    int gpio_number;
    if(is_digital==1){
       gpio_number = bbb_pruio_get_gpio_number(channel);
@@ -99,9 +154,18 @@ int beaglebone_clock_new(int is_digital,
    }
 
    #ifdef IS_BEAGLEBONE
-      // TODO: check with libpruio if pin was actually inited
-      /* err = "lalala"; */
-      // return 1;
+      if(is_digital==1){
+         if(bbb_pruio_init_gpio_pin(gpio_number, 1)){  // 1 for input
+            sprintf(err, "Could not init pin %s (%i), is it already in use?", channel, gpio_number);
+            return 1;
+         }
+      }
+      else{
+         if(bbb_pruio_init_adc_pin(gpio_number)){
+            sprintf(err, "Could not init adc channel %s (%i), is it already in use?", channel, gpio_number);
+            return 1;
+         }
+      }
    #endif 
    
    callback new_callback;
@@ -116,7 +180,7 @@ int beaglebone_clock_new(int is_digital,
 
 
    if(beaglebone_number_of_instances==0){
-      beaglebone_clock = clock_new(NULL, (t_method)beaglebone_clock_tick);
+      beaglebone_clock = clock_new(NULL,  (t_method)beaglebone_clock_tick); 
       clock_delay(beaglebone_clock, CLOCK_PERIOD);
    }
    beaglebone_number_of_instances++;
@@ -125,6 +189,8 @@ int beaglebone_clock_new(int is_digital,
 }
 
 void beaglebone_clock_free(int is_digital, char* channel){
+   // TODO uninit pin?
+   
    callback *cbk;
    if(is_digital==1){
       int gpio_number = bbb_pruio_get_gpio_number(channel);
@@ -139,6 +205,7 @@ void beaglebone_clock_free(int is_digital, char* channel){
 
    beaglebone_number_of_instances--;
    if(beaglebone_number_of_instances==0){
+      // TODO: stop lib pruio?
       clock_free(beaglebone_clock);
       beaglebone_clock = NULL;
    }

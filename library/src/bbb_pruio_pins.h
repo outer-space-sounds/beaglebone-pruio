@@ -8,7 +8,7 @@
 // #endif
 
 // #ifndef BBB_PRUIO_MAX_GPIO_CHANNELS
-#define BBB_PRUIO_MAX_GPIO_CHANNELS 69
+#define BBB_PRUIO_MAX_GPIO_CHANNELS 117
 // #endif
 
 // These defines map the beagle bone's pin names to the AM335X's 

@@ -22,6 +22,10 @@
 #include <m_pd.h>
 #include <bbb_pruio_pins.h>
 
+#ifdef IS_BEAGLEBONE
+#include <bbb_pruio.h>
+#endif
+
 #include "beaglebone.h"
 
 /////////////////////////////////////////////////////////////////////////
@@ -48,7 +52,7 @@ void gpio_output_float(t_gpio_output* x, t_floatarg f){
    }
 
    #ifdef IS_BEAGLEBONE
-      //TODO
+      bbb_pruio_set_pin_value(x->gpio_number, (int)f);
    #else
       (void)x;
    #endif 
@@ -67,12 +71,13 @@ static void *gpio_output_new(t_symbol *s) {
    x->gpio_number = bbb_pruio_get_gpio_number(x->channel);
 
    #ifdef IS_BEAGLEBONE
-      /* char err[256]; */
-      /* if(beaglebone_clock_new(1, &x->channel[0], x, gpio_output_callback, &err[0])){ */
-      /*    error("beaglebone/gpio_output: %s", err);  */
-      /*    return NULL; */
-      /* } */
-   #else
+      if(bbb_pruio_init_gpio_pin(x->gpio_number, 0)){   // 0 for output
+         error("beaglebone/gpio_output: Could not init pin %s (%i).", 
+               x->channel, 
+               x->gpio_number
+         );
+         return NULL;
+      }
    #endif
 
    return (void *)x;
@@ -80,9 +85,7 @@ static void *gpio_output_new(t_symbol *s) {
 
 static void gpio_output_free(t_gpio_output *x) { 
    (void)x;
-   #ifdef IS_BEAGLEBONE
-      //TODO
-   #endif 
+   // TODO: Uninit pin?
 }
 
 /////////////////////////////////////////////////////////////////////////

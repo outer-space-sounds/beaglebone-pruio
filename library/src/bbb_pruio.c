@@ -192,6 +192,7 @@ static int get_gpio_config_file(int gpio_number, char* path){
 
          DIR *dir2 = opendir(tmp);
          if(dir2==NULL){
+            printf("DD");
             return 1;
          }
          while(dir2){
@@ -199,6 +200,7 @@ static int get_gpio_config_file(int gpio_number, char* path){
             if(dir_info==NULL){
                closedir(dir2);
                closedir(dir);
+               printf("EE");
                return 1;
             }
             // Substring pin name
@@ -300,6 +302,14 @@ static int start_pru0_program(){
 //
 
 static void buffer_init(){
+   // These shared ram positions control which adc and gpio channels
+   // we want to receive data from, see other comments in this file.
+   bbb_pruio_shared_ram[1026] = 0;
+   bbb_pruio_shared_ram[1027] = 0;
+   bbb_pruio_shared_ram[1028] = 0;
+   bbb_pruio_shared_ram[1029] = 0;
+   bbb_pruio_shared_ram[1030] = 0;
+
    bbb_pruio_buffer_size = 1024;
    bbb_pruio_buffer_start = &(bbb_pruio_shared_ram[1024]); // value inited to 0 in pru
    bbb_pruio_buffer_end = &(bbb_pruio_shared_ram[1025]); // value inited to 0 in pru

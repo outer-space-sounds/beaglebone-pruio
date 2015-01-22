@@ -494,7 +494,7 @@ typedef struct gpio_channel{
 } gpio_channel;
 
 gpio_channel gpio_channels[BBB_PRUIO_MAX_GPIO_CHANNELS];
-int gpio_channel_count;
+int gpio_channel_count=0;
 
 inline void process_gpio_values(){
    int i, module_number, pin;
