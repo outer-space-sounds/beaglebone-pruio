@@ -50,7 +50,7 @@ void adc_input_callback(void* x, float value){
 //
 
 static void *adc_input_new(t_floatarg f){
-   if(f<1 || f>99 || (float)((int)f)!=(f)){
+   if(f<0 || f>99 || (float)((int)f)!=(f)){
       error("beaglebone/adc_input: %f is not a valid ADC channel.", f); 
       return NULL;
    }

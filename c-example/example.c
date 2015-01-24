@@ -49,11 +49,11 @@ static void* monitor_inputs(void* param){
          }
 
          // Messages from adc
-         else if(!message.is_gpio && message.adc_channel==1){
-            printf("1: %i\n", message.value);
+         else if(!message.is_gpio && message.adc_channel==0){
+            printf("0: %i\n", message.value);
          }
-         else if(!message.is_gpio && message.adc_channel==7){
-            printf("\t7: %i\n", message.value);
+         else if(!message.is_gpio && message.adc_channel==6){
+            printf("\t6: %i\n", message.value);
          }
       }
       usleep(10000);
@@ -107,11 +107,11 @@ int main(int argc, const char *argv[]){
    }
 
    // Init 2 analog inputs
-   if(bbb_pruio_init_adc_pin(1)){
-      fprintf(stderr, "%s\n", "Could not initialize adc pin 1");
+   if(bbb_pruio_init_adc_pin(0)){
+      fprintf(stderr, "%s\n", "Could not initialize adc pin 0");
    }
-   if(bbb_pruio_init_adc_pin(7)){
-      fprintf(stderr, "%s\n", "Could not initialize adc pin 7");
+   if(bbb_pruio_init_adc_pin(6)){
+      fprintf(stderr, "%s\n", "Could not initialize adc pin 6");
    }
 
 

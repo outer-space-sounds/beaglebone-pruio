@@ -45,8 +45,8 @@ typedef struct callback{
    void* instance;
 } callback;
 
-callback digital_callbacks[BBB_PRUIO_MAX_GPIO_CHANNELS+1];
-callback analog_callbacks[BBB_PRUIO_MAX_ADC_CHANNELS+1];
+callback digital_callbacks[BBB_PRUIO_MAX_GPIO_CHANNELS];
+callback analog_callbacks[BBB_PRUIO_MAX_ADC_CHANNELS];
 
 static int beaglebone_number_of_instances = 0;
 static t_clock* beaglebone_clock = NULL;
@@ -66,41 +66,39 @@ void beaglebone_clock_tick(void* x){
             cbk = &digital_callbacks[message.gpio_number];
 
             // Debug
-            /* if(message.gpio_number > BBB_PRUIO_MAX_GPIO_CHANNELS || cbk->instance == NULL || cbk->callback_function==NULL){ */
+            /* if(message.gpio_number >= BBB_PRUIO_MAX_GPIO_CHANNELS || cbk->instance == NULL || cbk->callback_function==NULL){ */
             /*    printf("A! i:%p cbk:%p val:%i gpio_num:%i \n", cbk->instance, cbk->callback_function, message.value, message.gpio_number); */
             /*    continue; //while */
             /* } */
 
-            if(message.gpio_number<=BBB_PRUIO_MAX_GPIO_CHANNELS && cbk->instance!=NULL && cbk->callback_function!=NULL){
+            /* if(message.gpio_number<BBB_PRUIO_MAX_GPIO_CHANNELS && cbk->instance!=NULL && cbk->callback_function!=NULL){ */
                cbk->callback_function(cbk->instance, message.value);
-            }
+            /* } */
          }
          else{ // adc
             cbk = &analog_callbacks[message.adc_channel];
 
-            printf("adc %i\n", message.adc_channel);
-            
             // Debug
-            /* if(message.adc_channel > BBB_PRUIO_MAX_ADC_CHANNELS || cbk->instance == NULL || cbk->callback_function==NULL){ */
+            /* if(message.adc_channel >= BBB_PRUIO_MAX_ADC_CHANNELS || cbk->instance == NULL || cbk->callback_function==NULL){ */
             /*    printf("A! i:%p cbk:%p val:%i chan:%i \n", cbk->instance, cbk->callback_function, message.value, message.adc_channel); */
             /*    continue; //while */
             /* } */
 
-            if(message.adc_channel<=BBB_PRUIO_MAX_ADC_CHANNELS && cbk->instance!=NULL && cbk->callback_function!=NULL){
+            /* if(message.adc_channel<BBB_PRUIO_MAX_ADC_CHANNELS && cbk->instance!=NULL && cbk->callback_function!=NULL){ */
                cbk->callback_function(cbk->instance, message.value);
-            }
+            /* } */
          }
       }
    #else
       int i;
-      for(i=0; i<=BBB_PRUIO_MAX_GPIO_CHANNELS; ++i){
+      for(i=0; i<BBB_PRUIO_MAX_GPIO_CHANNELS; ++i){
          cbk = &digital_callbacks[i];
          if(cbk->instance != NULL){
             cbk->callback_function(cbk->instance, rand()%2);
          }
       }
 
-      for(i=0; i<=BBB_PRUIO_MAX_ADC_CHANNELS; ++i){
+      for(i=0; i<BBB_PRUIO_MAX_ADC_CHANNELS; ++i){
          cbk = &analog_callbacks[i];
          if(cbk->instance != NULL){
             cbk->callback_function(cbk->instance, (float)rand()/(float)RAND_MAX);
@@ -122,14 +120,14 @@ int beaglebone_clock_new(int is_digital,
    
    if(beaglebone_number_of_instances==0){
       int i;
-      for(i=0; i<=BBB_PRUIO_MAX_GPIO_CHANNELS; ++i){
+      for(i=0; i<BBB_PRUIO_MAX_GPIO_CHANNELS; ++i){
          callback new_callback;
          new_callback.callback_function = NULL;
          new_callback.instance = NULL;
          digital_callbacks[i] = new_callback;
       }
 
-      for(i=0; i<=BBB_PRUIO_MAX_ADC_CHANNELS; ++i){
+      for(i=0; i<BBB_PRUIO_MAX_ADC_CHANNELS; ++i){
          callback new_callback;
          new_callback.callback_function = NULL;
          new_callback.instance = NULL;
@@ -137,7 +135,8 @@ int beaglebone_clock_new(int is_digital,
       }
 
    }
-   int gpio_number;
+   int gpio_number = -1;
+   int adc_number = -1;
    if(is_digital==1){
       gpio_number = bbb_pruio_get_gpio_number(channel);
       if(gpio_number==-1){
@@ -146,8 +145,8 @@ int beaglebone_clock_new(int is_digital,
       }
    }
    else{
-      gpio_number = strtol(channel, NULL, 10);
-      if(gpio_number==0 || gpio_number>BBB_PRUIO_MAX_ADC_CHANNELS){
+      adc_number = strtol(channel, NULL, 10);
+      if(adc_number<0 || adc_number>BBB_PRUIO_MAX_ADC_CHANNELS){
          sprintf(err, "%s is not a valid ADC channel.", channel);
          return 1;
       }
@@ -161,8 +160,8 @@ int beaglebone_clock_new(int is_digital,
          }
       }
       else{
-         if(bbb_pruio_init_adc_pin(gpio_number)){
-            sprintf(err, "Could not init adc channel %s (%i), is it already in use?", channel, gpio_number);
+         if(bbb_pruio_init_adc_pin(adc_number)){
+            sprintf(err, "Could not init adc channel %s (%i), is it already in use?", channel, adc_number);
             return 1;
          }
       }
@@ -175,7 +174,7 @@ int beaglebone_clock_new(int is_digital,
       digital_callbacks[gpio_number] = new_callback;
    }
    else{
-      analog_callbacks[gpio_number] = new_callback;
+      analog_callbacks[adc_number] = new_callback;
    }
 
 

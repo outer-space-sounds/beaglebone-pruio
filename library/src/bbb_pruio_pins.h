@@ -3,17 +3,12 @@
 
 #include <string.h>
 
-// #ifndef BBB_PRUIO_MAX_ADC_CHANNELS
 #define BBB_PRUIO_MAX_ADC_CHANNELS 14
-// #endif
-
-// #ifndef BBB_PRUIO_MAX_GPIO_CHANNELS
-#define BBB_PRUIO_MAX_GPIO_CHANNELS 117
-// #endif
+#define BBB_PRUIO_MAX_GPIO_CHANNELS 118
 
 // These defines map the beagle bone's pin names to the AM335X's 
 // gpio numbers. GPIO numbers can be used like:
-// 
+//    
 //    int gpioModule = P9_11 >> 5;
 //    int gpioPin = P9_11 % 32;
 

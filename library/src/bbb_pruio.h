@@ -63,7 +63,7 @@ int bbb_pruio_init_gpio_pin(int gpio_number, bbb_pruio_gpio_mode mode);
 void bbb_pruio_set_pin_value(int gpio_number, int value);
 
 /**
- * Starts reading from an ADC pin
+ * Starts reading from an ADC pin.
  */
 int bbb_pruio_init_adc_pin(int channel_number); 
 
