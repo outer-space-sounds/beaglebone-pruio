@@ -1,4 +1,4 @@
-#N canvas 764 161 505 287 10;
+#N canvas 544 205 439 335 10;
 #X declare -lib beaglebone;
 #N canvas 489 236 400 314 license 0;
 #X text 15 3 Copyright (c);
@@ -20,15 +20,25 @@ version 3 of the License \, or (at your option) any later version.
 the hope that it will be useful \, but WITHOUT ANY WARRANTY \; without
 even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.;
-#X restore 428 261 pd license;
+#X restore 364 302 pd license;
 #X obj 16 15 import beaglebone;
-#X floatatom 27 70 5 0 0 0 - - -, f 5;
-#X floatatom 134 72 5 0 0 0 - - -, f 5;
-#X obj 16 93 print ADC0;
-#X obj 120 96 print ADC13;
-#X obj 120 44 adc_input 13;
-#X obj 16 43 adc_input 0;
-#X connect 6 0 3 0;
-#X connect 6 0 5 0;
-#X connect 7 0 2 0;
-#X connect 7 0 4 0;
+#X obj 16 69 adc_input~ 1;
+#X obj 122 70 adc_input~ 12;
+#N canvas 0 0 450 300 (subpatch) 0;
+#X array array1 1024 float 2 black black;
+#X coords 0 1.2 1023 -0.2 200 140 1;
+#X restore 14 150 graph;
+#N canvas 0 0 450 300 (subpatch) 0;
+#X array array2 1024 float 2 black black;
+#X coords 0 1.2 1023 -0.2 200 140 1;
+#X restore 229 149 graph;
+#X obj 16 113 tabsend~ array1;
+#X obj 122 113 tabsend~ array2;
+#X obj 330 8 block~ 1024 1 1;
+#X obj 329 33 loadbang;
+#X obj 329 61 delay 200;
+#X msg 329 89 \; pd dsp 1;
+#X connect 2 0 6 0;
+#X connect 3 0 7 0;
+#X connect 9 0 10 0;
+#X connect 10 0 11 0;

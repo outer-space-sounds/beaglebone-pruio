@@ -17,9 +17,9 @@
 //
 /////////////////////////////////////////////////////////////////////////
 
-/* #include <string.h> */
 #include <m_pd.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "beaglebone.h"
 
@@ -49,7 +49,23 @@ void adc_input_callback(void* x, float value){
 // Constructor, destructor
 //
 
-static void *adc_input_new(t_floatarg f){
+static void *adc_input_new(t_symbol *s, int argc, t_atom *argv) {
+   (void)s;
+
+   // Parse creation parameters
+   if(argc < 1){
+      error("beaglebone/adc_input: You need to specify the channel number");
+      return NULL;
+   }
+
+   float f = atom_getfloat(argv);
+   
+   // Invalid floats will be parsed as zero so let's check if that zero is actually valid
+   if( f==0 && strcmp("float", atom_getsymbol(argv)->s_name)!=0 ){
+      error("beaglebone/adc_input: %s is not a valid ADC channel.", atom_getsymbol(argv)->s_name);
+      return NULL;
+   }
+
    if(f<0 || f>99 || (float)((int)f)!=(f)){
       error("beaglebone/adc_input: %f is not a valid ADC channel.", f); 
       return NULL;
@@ -84,7 +100,7 @@ void adc_input_setup(void) {
       (t_method)adc_input_free, 
       sizeof(t_adc_input), 
       CLASS_NOINLET, 
-      A_DEFFLOAT,
+      A_GIMME,
       (t_atomtype)0
    );
 }

@@ -1,4 +1,4 @@
-#N canvas 538 178 505 287 10;
+#N canvas 364 174 604 339 10;
 #X declare -lib beaglebone;
 #N canvas 489 236 400 314 license 0;
 #X text 15 3 Copyright (c);
@@ -20,22 +20,49 @@ version 3 of the License \, or (at your option) any later version.
 the hope that it will be useful \, but WITHOUT ANY WARRANTY \; without
 even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.;
-#X restore 428 261 pd license;
+#X restore 520 293 pd license;
 #X obj 15 74 print P9_11;
 #X obj 16 15 import beaglebone;
 #X obj 15 44 gpio_input P9_11;
 #X obj 151 68 metro 1000;
 #X obj 151 43 loadbang;
-#X obj 151 96 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 151 96 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
 #X obj 151 123 gpio_output P9_12;
-#X obj 288 87 print ADC_0;
 #X obj 374 44 adc_input 13;
-#X obj 374 88 print ADC_13;
 #X obj 288 45 adc_input 0;
+#X obj 288 226 f;
+#X obj 439 196 metro 1000;
+#X obj 439 174 delay 200;
+#X obj 439 148 loadbang;
+#X obj 377 226 f;
+#X obj 288 255 print ADC_1;
+#X obj 288 87 _print ADC_0;
+#X obj 374 88 _print ADC_13;
+#X obj 288 151 env~;
+#X obj 374 150 env~;
+#X obj 374 170 / 100;
+#X obj 378 256 print ADC_12;
+#X obj 288 127 adc_input~ 1;
+#X obj 374 128 adc_input~ 12;
+#X obj 287 172 / 100;
+#X msg 529 197 \; pd dsp 1;
 #X connect 3 0 1 0;
 #X connect 4 0 6 0;
 #X connect 5 0 4 0;
 #X connect 6 0 7 0;
-#X connect 9 0 10 0;
-#X connect 11 0 8 0;
+#X connect 8 0 17 0;
+#X connect 9 0 16 0;
+#X connect 10 0 15 0;
+#X connect 11 0 14 0;
+#X connect 11 0 10 0;
+#X connect 12 0 11 0;
+#X connect 12 0 25 0;
+#X connect 13 0 12 0;
+#X connect 14 0 21 0;
+#X connect 18 0 24 0;
+#X connect 19 0 20 0;
+#X connect 20 0 14 1;
+#X connect 22 0 18 0;
+#X connect 23 0 19 0;
+#X connect 24 0 10 1;

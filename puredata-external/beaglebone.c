@@ -13,15 +13,16 @@
 void gpio_input_setup(void);
 void gpio_output_setup(void);
 void adc_input_setup(void);
+void adc_input_tilde_setup(void);
 
 void beaglebone_setup(void){
-   printf("Setup\n");
    #ifdef IS_BEAGLEBONE
       bbb_pruio_start();
    #endif 
    gpio_input_setup();
    gpio_output_setup();
    adc_input_setup();
+   adc_input_tilde_setup();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -161,6 +162,19 @@ int beaglebone_clock_new(int is_digital,
       }
       else{
          if(bbb_pruio_init_adc_pin(adc_number)){
+            sprintf(err, "Could not init adc channel %s (%i), is it already in use?", channel, adc_number);
+            return 1;
+         }
+      }
+   #else
+      if(is_digital==1){
+         if(digital_callbacks[gpio_number].instance!=NULL){
+            sprintf(err, "Could not init pin %s (%i), is it already in use?", channel, gpio_number);
+            return 1;
+         }
+      }
+      else{
+         if(analog_callbacks[adc_number].instance!=NULL){
             sprintf(err, "Could not init adc channel %s (%i), is it already in use?", channel, adc_number);
             return 1;
          }
