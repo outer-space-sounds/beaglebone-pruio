@@ -46,12 +46,6 @@ int bbb_pruio_start();
  */
 int bbb_pruio_stop();
 
-
-/**
- * Returns a gpio number from a string with the pin name "P9_11" for example
- */
-// int bbb_pruio_get_gpio_number(char* pin_name);  
-
 /**
  * Configures how a GPIO channel is used
  */

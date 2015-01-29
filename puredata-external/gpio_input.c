@@ -30,7 +30,7 @@
 typedef struct gpio_input {
    t_object x_obj;
    t_outlet *outlet_left;
-   char channel[6];
+   char channel[7];
 } t_gpio_input;
 
 // A pointer to the class object.
@@ -53,8 +53,8 @@ static void *gpio_input_new(t_symbol *s) {
    t_gpio_input *x = (t_gpio_input *)pd_new(gpio_input_class);
    x->outlet_left = outlet_new(&x->x_obj, &s_float);
 
-   strncpy(x->channel, s->s_name, 5);
-   x->channel[5] = '\0';
+   strncpy(x->channel, s->s_name, 6);
+   x->channel[6] = '\0';
 
    char err[256];
    if(beaglebone_clock_new(1, x->channel, x, gpio_input_callback, err)){

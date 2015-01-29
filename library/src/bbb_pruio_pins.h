@@ -16,46 +16,46 @@
 // #define P8_04 39 // emmc2
 // #define P8_05 34 // emmc2
 // #define P8_06 35 // emmc2
-// #define P8_07 66 
-// #define P8_08 67 
-// #define P8_09 69 
-// #define P8_10 68 
-// #define P8_11 45 
-// #define P8_12 44 
-// #define P8_13 23 
-// #define P8_14 26 
-// #define P8_15 47 
-// #define P8_16 46 
-// #define P8_17 27 
-// #define P8_18 65 
-// #define P8_19 22 
+#define P8_07 66 
+#define P8_08 67 
+#define P8_09 69 
+#define P8_10 68 
+#define P8_11 45 
+#define P8_12 44 
+#define P8_13 23 
+#define P8_14 26 
+#define P8_15 47 
+#define P8_16 46 
+#define P8_17 27 
+#define P8_18 65 
+#define P8_19 22 
 // #define P8_20 63 // emmc2
 // #define P8_21 62 // emmc2
 // #define P8_22 37 // emmc2
 // #define P8_23 36 // emmc2
 // #define P8_24 33 // emmc2
 // #define P8_25 32 // emmc2
-// #define P8_26 61 
-// #define P8_27 86 // hdmi
-// #define P8_28 88 // hdmi
-// #define P8_29 87 // hdmi
-// #define P8_30 89 // hdmi
-// #define P8_31 10 // hdmi
-// #define P8_32 11 // hdmi
-// #define P8_33 9  // hdmi
-// #define P8_34 81 // hdmi
-// #define P8_35 8  // hdmi
-// #define P8_36 80 // hdmi
-// #define P8_37 78 // hdmi
-// #define P8_38 79 // hdmi
-// #define P8_39 76 // hdmi
-// #define P8_40 77 // hdmi
-// #define P8_41 74 // hdmi
-// #define P8_42 75 // hdmi
-// #define P8_43 72 // hdmi
-// #define P8_44 73 // hdmi
-// #define P8_45 70 // hdmi
-// #define P8_46 71 // hdmi
+#define P8_26 61 
+#define P8_27 86 // hdmi
+#define P8_28 88 // hdmi
+#define P8_29 87 // hdmi
+#define P8_30 89 // hdmi
+#define P8_31 10 // hdmi
+#define P8_32 11 // hdmi
+#define P8_33 9  // hdmi
+#define P8_34 81 // hdmi
+#define P8_35 8  // hdmi
+#define P8_36 80 // hdmi
+#define P8_37 78 // hdmi
+#define P8_38 79 // hdmi
+#define P8_39 76 // hdmi
+#define P8_40 77 // hdmi
+#define P8_41 74 // hdmi
+#define P8_42 75 // hdmi
+#define P8_43 72 // hdmi
+#define P8_44 73 // hdmi
+#define P8_45 70 // hdmi
+#define P8_46 71 // hdmi
 
 #define P9_11  30 
 #define P9_12  60 
@@ -78,13 +78,116 @@
 // #define P9_29  111 // mcasp0
 #define P9_30  112 // mux_control
 // #define P9_31  110 // mcasp0
-#define P9_41A 20  // ?? usable     ??
-#define P9_41B 116 // ?? usable     ??
+#define P9_41A 20 
+// #define P9_41B 116 // low levels on output, ok input
 #define P9_42A 7   // mux_control
-#define P9_42B 114 // mcasp0
+// #define P9_42B 114 // mcasp0
 
 static inline int bbb_pruio_get_gpio_number(char* pin_name){
-   if(strcmp(pin_name, "P9_11") == 0){
+   if(strcmp(pin_name, "P8_07") == 0){
+      return P8_07;
+   }
+   else if(strcmp(pin_name, "P8_08") == 0){
+      return P8_08;
+   }
+   else if(strcmp(pin_name, "P8_09") == 0){
+      return P8_09;
+   }
+   else if(strcmp(pin_name, "P8_10") == 0){
+      return P8_10;
+   }
+   else if(strcmp(pin_name, "P8_11") == 0){
+      return P8_11;
+   }
+   else if(strcmp(pin_name, "P8_12") == 0){
+      return P8_12;
+   }
+   else if(strcmp(pin_name, "P8_13") == 0){
+      return P8_13;
+   }
+   else if(strcmp(pin_name, "P8_14") == 0){
+      return P8_14;
+   }
+   else if(strcmp(pin_name, "P8_15") == 0){
+      return P8_15;
+   }
+   else if(strcmp(pin_name, "P8_16") == 0){
+      return P8_16;
+   }
+   else if(strcmp(pin_name, "P8_17") == 0){
+      return P8_17;
+   }
+   else if(strcmp(pin_name, "P8_18") == 0){
+      return P8_18;
+   }
+   else if(strcmp(pin_name, "P8_19") == 0){
+      return P8_19;
+   }
+   else if(strcmp(pin_name, "P8_26") == 0){
+      return P8_26;
+   }
+   else if(strcmp(pin_name, "P8_27") == 0){
+      return P8_27;
+   }
+   else if(strcmp(pin_name, "P8_28") == 0){
+      return P8_28;
+   }
+   else if(strcmp(pin_name, "P8_29") == 0){
+      return P8_29;
+   }
+   else if(strcmp(pin_name, "P8_30") == 0){
+      return P8_30;
+   }
+   else if(strcmp(pin_name, "P8_31") == 0){
+      return P8_31;
+   }
+   else if(strcmp(pin_name, "P8_32") == 0){
+      return P8_32;
+   }
+   else if(strcmp(pin_name, "P8_33") == 0){
+      return P8_33;
+   }
+   else if(strcmp(pin_name, "P8_34") == 0){
+      return P8_34;
+   }
+   else if(strcmp(pin_name, "P8_35") == 0){
+      return P8_35;
+   }
+   else if(strcmp(pin_name, "P8_36") == 0){
+      return P8_36;
+   }
+   else if(strcmp(pin_name, "P8_37") == 0){
+      return P8_37;
+   }
+   else if(strcmp(pin_name, "P8_38") == 0){
+      return P8_38;
+   }
+   else if(strcmp(pin_name, "P8_39") == 0){
+      return P8_39;
+   }
+   else if(strcmp(pin_name, "P8_40") == 0){
+      return P8_40;
+   }
+   else if(strcmp(pin_name, "P8_41") == 0){
+      return P8_41;
+   }
+   else if(strcmp(pin_name, "P8_42") == 0){
+      return P8_42;
+   }
+   else if(strcmp(pin_name, "P8_43") == 0){
+      return P8_43;
+   }
+   else if(strcmp(pin_name, "P8_44") == 0){
+      return P8_44;
+   }
+   else if(strcmp(pin_name, "P8_45") == 0){
+      return P8_45;
+   }
+   else if(strcmp(pin_name, "P8_46") == 0){
+      return P8_46;
+   }
+
+   else if(strcmp(pin_name, "P9_11") == 0){
       return P9_11;
    }
    else if(strcmp(pin_name, "P9_12") == 0){
@@ -137,9 +240,6 @@ static inline int bbb_pruio_get_gpio_number(char* pin_name){
    }
    else if(strcmp(pin_name, "P9_42A") == 0){
       return P9_42A;
-   }
-   else if(strcmp(pin_name, "P9_42B") == 0){
-      return P9_42B;
    }
    return -1;
 }

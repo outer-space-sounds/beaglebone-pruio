@@ -34,7 +34,7 @@
 
 typedef struct gpio_output {
    t_object x_obj;
-   char channel[6];
+   char channel[7];
    int gpio_number;
 } t_gpio_output;
 
@@ -65,8 +65,8 @@ void gpio_output_float(t_gpio_output* x, t_floatarg f){
 static void *gpio_output_new(t_symbol *s) {
    t_gpio_output *x = (t_gpio_output *)pd_new(gpio_output_class);
 
-   strncpy(x->channel, s->s_name, 5);
-   x->channel[5] = '\0';
+   strncpy(x->channel, s->s_name, 6);
+   x->channel[6] = '\0';
 
    x->gpio_number = bbb_pruio_get_gpio_number(x->channel);
 

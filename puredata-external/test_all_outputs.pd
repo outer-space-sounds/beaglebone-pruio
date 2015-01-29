@@ -1,0 +1,131 @@
+#N canvas 332 -8 677 747 10;
+#X declare -lib beaglebone;
+#N canvas 489 236 400 314 license 0;
+#X text 15 3 Copyright (c);
+#X text 15 210 See the GNU General Public License for more details.
+;
+#X text 17 236 You should have received a copy of the GNU General Public
+License along with the Outer Space Sounds Pd Library. If not \, see
+<http://www.gnu.org/licenses/>.;
+#X text 15 18 2014 Rafael Vega González <rvega@elsoftwarehamuerto.org>
+;
+#X text 14 45 This file is part of the Pd-BeagleBoneBlack-Io Library.
+;
+#X text 13 69 The Pd-BeagleBoneBlack-Io Library is free software: you
+can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation \, either
+version 3 of the License \, or (at your option) any later version.
+;
+#X text 14 145 The Pd-BeagleBoneBlack-Io Library is distributed in
+the hope that it will be useful \, but WITHOUT ANY WARRANTY \; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.;
+#X restore 590 678 pd license;
+#X obj 235 8 import beaglebone;
+#X obj 345 33 metro 1000;
+#X obj 345 8 loadbang;
+#X obj 113 62 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+1;
+#X obj 74 670 gpio_output P8_10;
+#X obj 81 651 gpio_output P8_11;
+#X obj 87 632 gpio_output P8_12;
+#X obj 92 613 gpio_output P8_13;
+#X obj 97 594 gpio_output P8_14;
+#X obj 102 575 gpio_output P8_15;
+#X obj 107 556 gpio_output P8_16;
+#X obj 113 538 gpio_output P8_17;
+#X obj 118 519 gpio_output P8_18;
+#X obj 123 500 gpio_output P8_19;
+#X obj 141 417 gpio_output P8_29;
+#X obj 155 397 gpio_output P8_30;
+#X obj 162 376 gpio_output P8_31;
+#X obj 171 356 gpio_output P8_32;
+#X obj 187 338 gpio_output P8_33;
+#X obj 196 318 gpio_output P8_34;
+#X obj 208 297 gpio_output P8_35;
+#X obj 216 276 gpio_output P8_36;
+#X obj 233 255 gpio_output P8_37;
+#X obj 237 235 gpio_output P8_38;
+#X obj 246 215 gpio_output P8_39;
+#X obj 265 195 gpio_output P8_40;
+#X obj 277 174 gpio_output P8_41;
+#X obj 281 154 gpio_output P8_42;
+#X obj 292 136 gpio_output P8_43;
+#X obj 301 116 gpio_output P8_44;
+#X obj 313 69 gpio_output P8_45;
+#X obj 313 69 gpio_output P8_46;
+#X obj 467 69 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+1;
+#X obj 428 364 gpio_output P9_11;
+#X obj 434 345 gpio_output P9_12;
+#X obj 439 326 gpio_output P9_13;
+#X obj 444 307 gpio_output P9_14;
+#X obj 449 288 gpio_output P9_15;
+#X obj 454 269 gpio_output P9_16;
+#X obj 460 251 gpio_output P9_17;
+#X obj 465 232 gpio_output P9_18;
+#X obj 472 212 gpio_output P9_21;
+#X obj 480 192 gpio_output P9_22;
+#X obj 487 171 gpio_output P9_23;
+#X obj 499 149 gpio_output P9_24;
+#X obj 507 127 gpio_output P9_26;
+#X obj 514 106 gpio_output P9_41A;
+#X obj 52 728 gpio_output P8_07;
+#X obj 59 709 gpio_output P8_08;
+#X obj 67 689 gpio_output P8_09;
+#X obj 128 478 gpio_output P8_26;
+#X obj 129 460 gpio_output P8_27;
+#X obj 136 439 gpio_output P8_28;
+#X obj 305 92 gpio_output P8_45;
+#X connect 2 0 4 0;
+#X connect 2 0 33 0;
+#X connect 3 0 2 0;
+#X connect 4 0 5 0;
+#X connect 4 0 6 0;
+#X connect 4 0 7 0;
+#X connect 4 0 8 0;
+#X connect 4 0 9 0;
+#X connect 4 0 10 0;
+#X connect 4 0 11 0;
+#X connect 4 0 12 0;
+#X connect 4 0 13 0;
+#X connect 4 0 14 0;
+#X connect 4 0 15 0;
+#X connect 4 0 16 0;
+#X connect 4 0 17 0;
+#X connect 4 0 18 0;
+#X connect 4 0 19 0;
+#X connect 4 0 20 0;
+#X connect 4 0 21 0;
+#X connect 4 0 22 0;
+#X connect 4 0 23 0;
+#X connect 4 0 24 0;
+#X connect 4 0 25 0;
+#X connect 4 0 26 0;
+#X connect 4 0 27 0;
+#X connect 4 0 28 0;
+#X connect 4 0 29 0;
+#X connect 4 0 30 0;
+#X connect 4 0 31 0;
+#X connect 4 0 32 0;
+#X connect 4 0 48 0;
+#X connect 4 0 49 0;
+#X connect 4 0 50 0;
+#X connect 4 0 51 0;
+#X connect 4 0 52 0;
+#X connect 4 0 53 0;
+#X connect 4 0 54 0;
+#X connect 33 0 34 0;
+#X connect 33 0 35 0;
+#X connect 33 0 36 0;
+#X connect 33 0 37 0;
+#X connect 33 0 38 0;
+#X connect 33 0 39 0;
+#X connect 33 0 40 0;
+#X connect 33 0 41 0;
+#X connect 33 0 42 0;
+#X connect 33 0 43 0;
+#X connect 33 0 44 0;
+#X connect 33 0 45 0;
+#X connect 33 0 46 0;
+#X connect 33 0 47 0;

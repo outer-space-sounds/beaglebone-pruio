@@ -38,11 +38,12 @@ void beaglebone_setup(void){
 #ifdef IS_BEAGLEBONE
 #define CLOCK_PERIOD 0.6666 // milliseconds
 #else
-#define CLOCK_PERIOD 1000 // milliseconds
+/* #define CLOCK_PERIOD 1000 // milliseconds */
+#define CLOCK_PERIOD 0.6666 // milliseconds
 #endif
 
 typedef struct callback{
-   void(*callback_function)(void*, float);
+   void(*callback_function)(void*, t_float);
    void* instance;
 } callback;
 
@@ -86,7 +87,7 @@ void beaglebone_clock_tick(void* x){
             /* } */
 
             /* if(message.adc_channel<BBB_PRUIO_MAX_ADC_CHANNELS && cbk->instance!=NULL && cbk->callback_function!=NULL){ */
-               cbk->callback_function(cbk->instance, message.value);
+               cbk->callback_function(cbk->instance, (t_float)message.value/127.0);
             /* } */
          }
       }
@@ -102,7 +103,7 @@ void beaglebone_clock_tick(void* x){
       for(i=0; i<BBB_PRUIO_MAX_ADC_CHANNELS; ++i){
          cbk = &analog_callbacks[i];
          if(cbk->instance != NULL){
-            cbk->callback_function(cbk->instance, (float)rand()/(float)RAND_MAX);
+            cbk->callback_function(cbk->instance, (t_float)rand()/(t_float)RAND_MAX);
          }
       }
    #endif 
@@ -116,7 +117,7 @@ void beaglebone_clock_tick(void* x){
 int beaglebone_clock_new(int is_digital, 
                          char* channel, 
                          void* instance, 
-                         void (*callback_function)(void*, float), 
+                         void (*callback_function)(void*, t_float), 
                          char* err){
    
    if(beaglebone_number_of_instances==0){
