@@ -1,5 +1,5 @@
 #include "registers.h"
-#include "bbb_pruio_pins.h"
+#include "beaglebone_pruio_pins.h"
 
 /////////////////////////////////////////////////////////////////////
 // UTIL
@@ -375,7 +375,7 @@ typedef struct adc_channel{
    unsigned int past_values[8]; 
 } adc_channel;
 
-adc_channel adc_channels[BBB_PRUIO_MAX_ADC_CHANNELS];
+adc_channel adc_channels[BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS];
 
 unsigned int mux_control;
 
@@ -459,7 +459,7 @@ void init_adc_values(){
       new_channel.past_values[i] = 0xFFFF;
    }
 
-   for(i=0; i<BBB_PRUIO_MAX_ADC_CHANNELS; i++){
+   for(i=0; i<BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS; i++){
       adc_channels[i] = new_channel; 
    }
 }
@@ -476,7 +476,7 @@ inline void init_adc_channels(){
     */
    unsigned int config = shared_ram[1030];
    int bit;
-   for(bit=0; bit<BBB_PRUIO_MAX_ADC_CHANNELS; ++bit){
+   for(bit=0; bit<BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS; ++bit){
       // If bit is set
       if((config&(1<<bit)) != 0){
          adc_channels[bit].mode = 1; // 1 is on
@@ -493,7 +493,7 @@ typedef struct gpio_channel{
    unsigned int value; 
 } gpio_channel;
 
-gpio_channel gpio_channels[BBB_PRUIO_MAX_GPIO_CHANNELS];
+gpio_channel gpio_channels[BEAGLEBONE_PRUIO_MAX_GPIO_CHANNELS];
 int gpio_channel_count=0;
 
 inline void process_gpio_values(){

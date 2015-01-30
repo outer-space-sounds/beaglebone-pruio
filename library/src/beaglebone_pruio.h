@@ -1,5 +1,5 @@
 /*
- * Lib BBB Pruio
+ * Lib BEAGLEBONE Pruio
  * Copyright (C) 2014 Rafael Vega <rvega@elsoftwarehamuerto.org>
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -16,60 +16,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BBB_PRUIO_H
-#define BBB_PRUIO_H
+#ifndef BEAGLEBONE_PRUIO_H
+#define BEAGLEBONE_PRUIO_H
 
 #include <string.h>
 
 /**
  * A structure for easy reading of incoming messages.
  */
-typedef struct bbb_pruio_message{
+typedef struct beaglebone_pruio_message{
    int is_gpio; // 1 if gpio, 0 if adc
    int value;
    int adc_channel;
    int gpio_number;
-} bbb_pruio_message;
+} beaglebone_pruio_message;
 
 typedef enum{  
-   BBB_PRUIO_OUTPUT_MODE = 0,
-   BBB_PRUIO_INPUT_MODE = 1
-} bbb_pruio_gpio_mode;
+   BEAGLEBONE_PRUIO_OUTPUT_MODE = 0,
+   BEAGLEBONE_PRUIO_INPUT_MODE = 1
+} beaglebone_pruio_gpio_mode;
 
 /**
  * Initializes PRU, GPIO and ADC hardware and starts sampling ADC channels.
  */
-int bbb_pruio_start();
+int beaglebone_pruio_start();
 
 /**
  * Stops PRU and ADC hardware, no more samples are aquired.
  */
-int bbb_pruio_stop();
+int beaglebone_pruio_stop();
 
 /**
  * Configures how a GPIO channel is used
  */
-int bbb_pruio_init_gpio_pin(int gpio_number, bbb_pruio_gpio_mode mode);  
+int beaglebone_pruio_init_gpio_pin(int gpio_number, beaglebone_pruio_gpio_mode mode);  
 
 /**
  * Sets the value of an output pin (0 or 1)
  */
-void bbb_pruio_set_pin_value(int gpio_number, int value);
+void beaglebone_pruio_set_pin_value(int gpio_number, int value);
 
 /**
  * Starts reading from an ADC pin.
  */
-int bbb_pruio_init_adc_pin(int channel_number); 
+int beaglebone_pruio_init_adc_pin(int channel_number); 
 
 /**
  * Returns 1 if there is data available from the PRU
  */
-static inline int bbb_pruio_messages_are_available();
+static inline int beaglebone_pruio_messages_are_available();
 
 /**
  * Puts the next message available from the PRU in the message address.
  */
-static inline void bbb_pruio_read_message(bbb_pruio_message *message);
+static inline void beaglebone_pruio_read_message(beaglebone_pruio_message *message);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,17 +91,17 @@ static inline void bbb_pruio_read_message(bbb_pruio_message *message);
 // * http://en.wikipedia.org/wiki/Circular_buffer#Mirroring
 // * https://groups.google.com/forum/#!category-topic/beagleboard/F9JI8_vQ-mE
 
-volatile unsigned int *bbb_pruio_shared_ram;
-unsigned int bbb_pruio_buffer_size;
-volatile unsigned int *bbb_pruio_buffer_start;
-volatile unsigned int *bbb_pruio_buffer_end;
+volatile unsigned int *beaglebone_pruio_shared_ram;
+unsigned int beaglebone_pruio_buffer_size;
+volatile unsigned int *beaglebone_pruio_buffer_start;
+volatile unsigned int *beaglebone_pruio_buffer_end;
 
-static inline __attribute__ ((always_inline)) int bbb_pruio_messages_are_available(){
-   return (*bbb_pruio_buffer_start != *bbb_pruio_buffer_end);
+static inline __attribute__ ((always_inline)) int beaglebone_pruio_messages_are_available(){
+   return (*beaglebone_pruio_buffer_start != *beaglebone_pruio_buffer_end);
 }
 
-static inline __attribute__ ((always_inline)) void bbb_pruio_read_message(bbb_pruio_message* message){
-   unsigned int raw_message = bbb_pruio_shared_ram[*bbb_pruio_buffer_start & (bbb_pruio_buffer_size-1)];
+static inline __attribute__ ((always_inline)) void beaglebone_pruio_read_message(beaglebone_pruio_message* message){
+   unsigned int raw_message = beaglebone_pruio_shared_ram[*beaglebone_pruio_buffer_start & (beaglebone_pruio_buffer_size-1)];
 
    message->is_gpio = (raw_message&(1<<31))==0;
    if(message->is_gpio){
@@ -119,7 +119,7 @@ static inline __attribute__ ((always_inline)) void bbb_pruio_read_message(bbb_pr
    __sync_synchronize();
 
    // Increment buffer start, wrap around 2*size
-   *bbb_pruio_buffer_start = (*bbb_pruio_buffer_start+1) & (2*bbb_pruio_buffer_size - 1);
+   *beaglebone_pruio_buffer_start = (*beaglebone_pruio_buffer_start+1) & (2*beaglebone_pruio_buffer_size - 1);
 }
 
-#endif // BBB_PRUIO_H
+#endif // BEAGLEBONE_PRUIO_H

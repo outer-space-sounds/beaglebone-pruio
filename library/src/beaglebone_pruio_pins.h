@@ -3,8 +3,8 @@
 
 #include <string.h>
 
-#define BBB_PRUIO_MAX_ADC_CHANNELS 14
-#define BBB_PRUIO_MAX_GPIO_CHANNELS 118
+#define BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS 14
+#define BEAGLEBONE_PRUIO_MAX_GPIO_CHANNELS 118
 
 // These defines map the beagle bone's pin names to the AM335X's 
 // gpio numbers. GPIO numbers can be used like:
@@ -83,7 +83,7 @@
 #define P9_42A 7   // mux_control
 // #define P9_42B 114 // mcasp0
 
-static inline int bbb_pruio_get_gpio_number(char* pin_name){
+static inline int beaglebone_pruio_get_gpio_number(char* pin_name){
    if(strcmp(pin_name, "P8_07") == 0){
       return P8_07;
    }

@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////
 // 
-//  Lib BBB Pruio
+//  Lib BEAGLEBONE Pruio
 //  Copyright (C) 2014 Rafael Vega <rvega@elsoftwarehamuerto.org>
 //
 //  This program is free software: you can redistribute it and/or modify
@@ -37,7 +37,7 @@ typedef struct gpio_input {
 t_class *gpio_input_class;
 
 /////////////////////////////////////////////////////////////////////////
-// Callback from lib bbb_pruio
+// Callback from lib beaglebone_pruio
 //
 
 void gpio_input_callback(void* x, float value){

@@ -26,7 +26,7 @@ static t_class *adc_input_tilde_class;
 
 
 /////////////////////////////////////////////////////////////////////////
-// Callback from lib bbb_pruio
+// Callback from lib beaglebone_pruio
 //
 
 void adc_input_tilde_callback(void* this, t_float value){

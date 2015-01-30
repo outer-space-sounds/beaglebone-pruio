@@ -7,16 +7,16 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 
-#include "bbb_pruio.h"
+#include "beaglebone_pruio.h"
 #include "registers.h"
-#include "bbb_pruio_pins.h"
+#include "beaglebone_pruio_pins.h"
 
-#ifndef BBB_PRUIO_START_ADDR_0
-   #error "BBB_PRUIO_START_ADDR_0 must be defined."
+#ifndef BEAGLEBONE_PRUIO_START_ADDR_0
+   #error "BEAGLEBONE_PRUIO_START_ADDR_0 must be defined."
 #endif
 
-#ifndef BBB_PRUIO_PREFIX
-   #error "BBB_PRUIO_PREFIX must be defined."
+#ifndef BEAGLEBONE_PRUIO_PREFIX
+   #error "BEAGLEBONE_PRUIO_PREFIX must be defined."
 #endif
 
 /* #define DEBUG */
@@ -75,10 +75,10 @@ static int map_device_registers(){
 // GPIO PINS
 
 typedef struct gpio_pin{ 
-   bbb_pruio_gpio_mode mode;
+   beaglebone_pruio_gpio_mode mode;
    int gpio_number;
 } gpio_pin;
-static gpio_pin used_pins[BBB_PRUIO_MAX_GPIO_CHANNELS];
+static gpio_pin used_pins[BEAGLEBONE_PRUIO_MAX_GPIO_CHANNELS];
 static int used_pins_count = 0;
 
 static int init_gpio(){
@@ -86,9 +86,9 @@ static int init_gpio(){
    // clocks, debounce, etc. is set on the PRU side.
    
    // Pins used to control analog mux:
-   int e1 = bbb_pruio_init_gpio_pin(P9_27, BBB_PRUIO_OUTPUT_MODE);
-   int e2 = bbb_pruio_init_gpio_pin(P9_30, BBB_PRUIO_OUTPUT_MODE);
-   int e3 = bbb_pruio_init_gpio_pin(P9_42A, BBB_PRUIO_OUTPUT_MODE);
+   int e1 = beaglebone_pruio_init_gpio_pin(P9_27, BEAGLEBONE_PRUIO_OUTPUT_MODE);
+   int e2 = beaglebone_pruio_init_gpio_pin(P9_30, BEAGLEBONE_PRUIO_OUTPUT_MODE);
+   int e3 = beaglebone_pruio_init_gpio_pin(P9_42A, BEAGLEBONE_PRUIO_OUTPUT_MODE);
 
    if(e1 || e2 || e3){
       return 1;
@@ -322,7 +322,7 @@ typedef struct adc_channel{
    int channel_number;
 } adc_channel;
 
-static adc_channel used_adc_channels[BBB_PRUIO_MAX_ADC_CHANNELS];
+static adc_channel used_adc_channels[BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS];
 static int used_adc_channels_count = 0;
 
 
@@ -375,20 +375,20 @@ static int init_pru_system(){
    // Get pointer to shared ram
    void* p;
    if(prussdrv_map_prumem(PRUSS0_SHARED_DATARAM, &p)) return 1;
-   bbb_pruio_shared_ram = (volatile unsigned int*)p;
+   beaglebone_pruio_shared_ram = (volatile unsigned int*)p;
 
    return 0;
 }
 
 static int start_pru0_program(){
    char path[512] = "";
-   strcat(path, BBB_PRUIO_PREFIX); 
-   strcat(path, "/lib/libbbb_pruio_data0.bin");
+   strcat(path, BEAGLEBONE_PRUIO_PREFIX); 
+   strcat(path, "/lib/libbeaglebone_pruio_data0.bin");
    if(prussdrv_load_datafile(0, path)) return 1;
 
-   strcpy(path, BBB_PRUIO_PREFIX); 
-   strcat(path, "/lib/libbbb_pruio_text0.bin");
-   if(prussdrv_exec_program_at(0, path, BBB_PRUIO_START_ADDR_0)) return 1;
+   strcpy(path, BEAGLEBONE_PRUIO_PREFIX); 
+   strcat(path, "/lib/libbeaglebone_pruio_text0.bin");
+   if(prussdrv_exec_program_at(0, path, BEAGLEBONE_PRUIO_START_ADDR_0)) return 1;
 
    return 0;
 }
@@ -400,46 +400,46 @@ static int start_pru0_program(){
 static void buffer_init(){
    // These shared ram positions control which adc and gpio channels
    // we want to receive data from, see other comments in this file.
-   bbb_pruio_shared_ram[1026] = 0;
-   bbb_pruio_shared_ram[1027] = 0;
-   bbb_pruio_shared_ram[1028] = 0;
-   bbb_pruio_shared_ram[1029] = 0;
-   bbb_pruio_shared_ram[1030] = 0;
+   beaglebone_pruio_shared_ram[1026] = 0;
+   beaglebone_pruio_shared_ram[1027] = 0;
+   beaglebone_pruio_shared_ram[1028] = 0;
+   beaglebone_pruio_shared_ram[1029] = 0;
+   beaglebone_pruio_shared_ram[1030] = 0;
 
-   bbb_pruio_buffer_size = 1024;
-   bbb_pruio_buffer_start = &(bbb_pruio_shared_ram[1024]); // value inited to 0 in pru
-   bbb_pruio_buffer_end = &(bbb_pruio_shared_ram[1025]); // value inited to 0 in pru
+   beaglebone_pruio_buffer_size = 1024;
+   beaglebone_pruio_buffer_start = &(beaglebone_pruio_shared_ram[1024]); // value inited to 0 in pru
+   beaglebone_pruio_buffer_end = &(beaglebone_pruio_shared_ram[1025]); // value inited to 0 in pru
 }
 
 /////////////////////////////////////////////////////////////////////
 // "Public" functions.
 //
 
-int bbb_pruio_start(){
+int beaglebone_pruio_start(){
    if(load_device_tree_overlays()){
-      fprintf(stderr, "libbbb_pruio: Could not load device tree overlays.\n");
+      fprintf(stderr, "libbeaglebone_pruio: Could not load device tree overlays.\n");
       return 1;
    }
 
    if(map_device_registers()){
-      fprintf(stderr, "libbbb_pruio: Could not map device's registers to memory.\n");
+      fprintf(stderr, "libbeaglebone_pruio: Could not map device's registers to memory.\n");
       return 1;
    }
 
    if(init_pru_system()){
-      fprintf(stderr, "libbbb_pruio: Could not init PRU system.\n");
+      fprintf(stderr, "libbeaglebone_pruio: Could not init PRU system.\n");
       return 1;
    }
 
    buffer_init();
 
    if(start_pru0_program()){
-      fprintf(stderr, "libbbb_pruio: Could not load PRU0 program.\n");
+      fprintf(stderr, "libbeaglebone_pruio: Could not load PRU0 program.\n");
       return 1;
    }
 
    if(init_gpio()){
-      fprintf(stderr, "libbbb_pruio: Could not init GPIO.\n");
+      fprintf(stderr, "libbeaglebone_pruio: Could not init GPIO.\n");
       return 1;
    }
 
@@ -447,7 +447,7 @@ int bbb_pruio_start(){
    return 0;
 }
 
-int bbb_pruio_init_adc_pin(int channel_number){
+int beaglebone_pruio_init_adc_pin(int channel_number){
    // Check if channel already in use.
    int i;
    for(i=0; i<used_adc_channels_count; ++i){
@@ -471,11 +471,11 @@ int bbb_pruio_init_adc_pin(int channel_number){
     * shared_ram[1030]
     *
     */
-   bbb_pruio_shared_ram[1030] |= (1<<channel_number);
+   beaglebone_pruio_shared_ram[1030] |= (1<<channel_number);
    return 0;
 }
 
-int bbb_pruio_init_gpio_pin(int gpio_number, bbb_pruio_gpio_mode mode){
+int beaglebone_pruio_init_gpio_pin(int gpio_number, beaglebone_pruio_gpio_mode mode){
    // Check if pin already in use.
    int i;
    for(i=0; i<used_pins_count; ++i){
@@ -506,7 +506,7 @@ int bbb_pruio_init_gpio_pin(int gpio_number, bbb_pruio_gpio_mode mode){
    }
    int gpio_module = gpio_number >> 5;
    int gpio_bit = gpio_number % 32;
-   if(mode == BBB_PRUIO_OUTPUT_MODE){
+   if(mode == BEAGLEBONE_PRUIO_OUTPUT_MODE){
       fprintf(f, "%s", "output"); 
       // Clear the output enable bit in the gpio config register to actually enable output.
       switch(gpio_module){
@@ -540,14 +540,14 @@ int bbb_pruio_init_gpio_pin(int gpio_number, bbb_pruio_gpio_mode mode){
        * shared_ram[1029] -> GPIO3
        *
        */
-      bbb_pruio_shared_ram[gpio_module+1026] |= (1<<gpio_bit);
+      beaglebone_pruio_shared_ram[gpio_module+1026] |= (1<<gpio_bit);
  
    }
    fclose(f);
    return 0;
 }
 
-void bbb_pruio_set_pin_value(int gpio_number, int value){
+void beaglebone_pruio_set_pin_value(int gpio_number, int value){
    int gpio_module = gpio_number >> 5;
    int gpio_bit = gpio_number % 32;
    volatile unsigned int* reg=NULL;
@@ -566,7 +566,7 @@ void bbb_pruio_set_pin_value(int gpio_number, int value){
    }
 }
 
-int bbb_pruio_stop(){
+int beaglebone_pruio_stop(){
    // TODO: send terminate message to PRU
 
    prussdrv_pru_disable(0);

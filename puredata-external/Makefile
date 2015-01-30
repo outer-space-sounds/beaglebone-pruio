@@ -37,7 +37,7 @@ LIBS =
 BONE := $(shell uname -r | cut -d- -f2 | cut -c1-4)
 ifeq ($(BONE),bone)
 	CFLAGS += -DIS_BEAGLEBONE
-	LIBS += -lbbb_pruio
+	LIBS += -lbeaglebone_pruio
 endif
 
 #------------------------------------------------------------------------------#
