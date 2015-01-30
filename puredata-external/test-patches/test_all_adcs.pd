@@ -1,0 +1,99 @@
+#N canvas 0 120 1276 495 10;
+#X declare -lib ../beaglebone;
+#N canvas 489 236 400 314 license 0;
+#X text 15 3 Copyright (c);
+#X text 15 210 See the GNU General Public License for more details.
+;
+#X text 17 236 You should have received a copy of the GNU General Public
+License along with the Outer Space Sounds Pd Library. If not \, see
+<http://www.gnu.org/licenses/>.;
+#X text 15 18 2014 Rafael Vega González <rvega@elsoftwarehamuerto.org>
+;
+#X text 14 45 This file is part of the Pd-BeagleBoneBlack-Io Library.
+;
+#X text 13 69 The Pd-BeagleBoneBlack-Io Library is free software: you
+can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation \, either
+version 3 of the License \, or (at your option) any later version.
+;
+#X text 14 145 The Pd-BeagleBoneBlack-Io Library is distributed in
+the hope that it will be useful \, but WITHOUT ANY WARRANTY \; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.;
+#X restore 520 293 pd license;
+#X obj 90 96 t b f;
+#X obj 131 96 t b f;
+#X obj 216 198 print;
+#X obj 240 95 t b f;
+#X obj 280 94 t b f;
+#X obj 387 94 t b f;
+#X obj 427 93 t b f;
+#X obj 535 91 t b f;
+#X obj 576 90 t b f;
+#X obj 685 88 t b f;
+#X obj 736 88 t b f;
+#X obj 857 86 t b f;
+#X obj 908 86 t b f;
+#X obj 998 85 t b f;
+#X obj 213 158 pack f f f f f f f f f f f f f f f;
+#X obj 16 63 adc_input 0;
+#X obj 90 62 adc_input 1;
+#X obj 165 62 adc_input 2;
+#X obj 240 61 adc_input 3;
+#X obj 314 60 adc_input 4;
+#X obj 387 60 adc_input 5;
+#X obj 461 59 adc_input 6;
+#X obj 535 57 adc_input 7;
+#X obj 610 56 adc_input 8;
+#X obj 685 54 adc_input 9;
+#X obj 770 54 adc_input 10;
+#X obj 856 52 adc_input 11;
+#X obj 942 52 adc_input 12;
+#X obj 1032 51 adc_input 13;
+#X obj 1121 84 t b f;
+#X obj 1120 50 adc_input 14;
+#X obj 16 15 declare -lib ../beaglebone;
+#X connect 1 0 15 0;
+#X connect 1 1 15 1;
+#X connect 2 0 15 0;
+#X connect 2 1 15 2;
+#X connect 4 0 15 0;
+#X connect 4 1 15 3;
+#X connect 5 0 15 0;
+#X connect 5 1 15 4;
+#X connect 6 0 15 0;
+#X connect 6 1 15 5;
+#X connect 7 0 15 0;
+#X connect 7 1 15 6;
+#X connect 8 0 15 0;
+#X connect 8 1 15 7;
+#X connect 9 0 15 0;
+#X connect 9 1 15 8;
+#X connect 10 0 15 0;
+#X connect 10 1 15 9;
+#X connect 11 0 15 0;
+#X connect 11 1 15 10;
+#X connect 12 0 15 0;
+#X connect 12 1 15 11;
+#X connect 13 0 15 0;
+#X connect 13 1 15 12;
+#X connect 14 0 15 0;
+#X connect 14 1 15 13;
+#X connect 15 0 3 0;
+#X connect 16 0 15 0;
+#X connect 17 0 1 0;
+#X connect 18 0 2 0;
+#X connect 19 0 4 0;
+#X connect 20 0 5 0;
+#X connect 21 0 6 0;
+#X connect 22 0 7 0;
+#X connect 23 0 8 0;
+#X connect 24 0 9 0;
+#X connect 25 0 10 0;
+#X connect 26 0 11 0;
+#X connect 27 0 12 0;
+#X connect 28 0 13 0;
+#X connect 29 0 14 0;
+#X connect 30 0 15 0;
+#X connect 30 1 15 14;
+#X connect 31 0 30 0;

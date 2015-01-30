@@ -1,5 +1,4 @@
-#N canvas 221 347 293 312 10;
-#X declare -lib beaglebone;
+#N canvas 134 203 257 184 10;
 #N canvas 489 236 400 314 license 0;
 #X text 15 3 Copyright (c);
 #X text 15 210 See the GNU General Public License for more details.
@@ -20,7 +19,16 @@ version 3 of the License \, or (at your option) any later version.
 the hope that it will be useful \, but WITHOUT ANY WARRANTY \; without
 even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.;
-#X restore 15 203 pd license;
-#X obj 16 15 import beaglebone;
-#X obj 16 95 print;
-#X obj 17 63 adc_input 12;
+#X restore 120 109 pd license;
+#X obj 145 200 simple_synth;
+#X obj 145 252 dac~;
+#X obj 214 163 hsl 128 15 0 1 0 0 empty empty Frequency 1 -6 0 10 -262144
+-1 -1 0 1;
+#X obj 145 162 tgl 29 0 empty empty Note\ on 1 -6 0 10 -262144 -1 -1
+0 1;
+#X floatatom 223 181 8 0 0 0 - - -, f 8;
+#X connect 1 0 2 0;
+#X connect 1 0 2 1;
+#X connect 3 0 1 1;
+#X connect 3 0 5 0;
+#X connect 4 0 1 0;

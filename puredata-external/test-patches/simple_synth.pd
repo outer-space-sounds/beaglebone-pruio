@@ -1,0 +1,55 @@
+#N canvas 401 203 398 306 10;
+#N canvas 489 236 400 314 license 0;
+#X text 15 3 Copyright (c);
+#X text 15 210 See the GNU General Public License for more details.
+;
+#X text 17 236 You should have received a copy of the GNU General Public
+License along with the Outer Space Sounds Pd Library. If not \, see
+<http://www.gnu.org/licenses/>.;
+#X text 15 18 2014 Rafael Vega González <rvega@elsoftwarehamuerto.org>
+;
+#X text 14 45 This file is part of the Pd-BeagleBoneBlack-Io Library.
+;
+#X text 13 69 The Pd-BeagleBoneBlack-Io Library is free software: you
+can redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation \, either
+version 3 of the License \, or (at your option) any later version.
+;
+#X text 14 145 The Pd-BeagleBoneBlack-Io Library is distributed in
+the hope that it will be useful \, but WITHOUT ANY WARRANTY \; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.;
+#X restore 11 34 pd license;
+#X obj 330 85 delay 200;
+#X msg 330 116 \; pd dsp 1;
+#X obj 165 63 inlet frequency;
+#X obj 11 62 inlet note-on;
+#X obj 330 60 loadbang;
+#X obj 165 309 outlet~;
+#X obj 165 234 osc~;
+#X obj 165 274 *~;
+#X obj 55 218 line~;
+#X obj 11 92 sel 0 1;
+#X msg 11 127 0 10;
+#X msg 54 128 1 1, f 4;
+#X obj 165 149 pow 3;
+#X obj 165 175 * 600;
+#X msg 177 109 0;
+#X obj 165 202 + 440;
+#X connect 1 0 2 0;
+#X connect 1 0 15 0;
+#X connect 3 0 13 0;
+#X connect 4 0 10 0;
+#X connect 5 0 1 0;
+#X connect 7 0 8 0;
+#X connect 8 0 6 0;
+#X connect 9 0 8 1;
+#X connect 10 0 11 0;
+#X connect 10 1 12 0;
+#X connect 11 0 9 0;
+#X connect 12 0 9 0;
+#X connect 13 0 14 0;
+#X connect 14 0 16 0;
+#X connect 15 0 13 0;
+#X connect 15 0 9 0;
+#X connect 16 0 7 0;
