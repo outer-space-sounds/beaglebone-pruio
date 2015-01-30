@@ -235,9 +235,6 @@ static inline int bbb_pruio_get_gpio_number(char* pin_name){
    else if(strcmp(pin_name, "P9_41A") == 0){
       return P9_41A;
    }
-   else if(strcmp(pin_name, "P9_41B") == 0){
-      return P9_41B;
-   }
    else if(strcmp(pin_name, "P9_42A") == 0){
       return P9_42A;
    }
