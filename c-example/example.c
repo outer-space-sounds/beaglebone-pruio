@@ -1,7 +1,6 @@
-/* Lib BEAGLEBONE Pruio 
+/* Beaglebone Pru IO 
  * 
- * Copyright (C) 2014 Rafael Vega <rvega@elsoftwarehamuerto.org> 
- * Copyright (C) 2014 Miguel Vargas <miguelito.vargasf@gmail.com> 
+ * Copyright (C) 2015 Rafael Vega <rvega@elsoftwarehamuerto.org> 
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

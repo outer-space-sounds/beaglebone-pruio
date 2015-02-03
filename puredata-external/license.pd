@@ -1,0 +1,17 @@
+#N canvas 486 219 385 301 10;
+#X text 9 -105 Copyright (c);
+#X text 9 102 See the GNU General Public License for more details.
+;
+#X text 11 128 You should have received a copy of the GNU General Public
+License along with the Outer Space Sounds Pd Library. If not \, see
+<http://www.gnu.org/licenses/>.;
+#X text 9 -90 2015 Rafael Vega González <rvega@elsoftwarehamuerto.org>
+;
+#X text 8 -63 This file is part of Beaglebone PRUI IO.;
+#X text 7 -39 Beaglebone PRU IO is free software: you can redistribute
+it and/or modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation \, either version 3 of
+the License \, or (at your option) any later version.;
+#X text 8 37 Beaglebone PRU IO is distributed in the hope that it will
+be useful \, but WITHOUT ANY WARRANTY \; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.;

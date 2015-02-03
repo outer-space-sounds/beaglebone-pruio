@@ -4,7 +4,7 @@ Setting a pin to input sets its pinmux register to 0x37 (input with pullup resis
 
 To use:
 
-    cd libbeaglebone_pruio/device-tree-overlay
+    cd beaglebone-pruio/device-tree-overlay
     make load
     cd /sys/devices/ocp.3/P9_11_mux.12   # Each pin has it's directory
     echo input > state                   # input or output are valid options

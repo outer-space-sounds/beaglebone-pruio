@@ -1,26 +1,5 @@
 #N canvas 172 220 396 244 10;
 #X declare -lib ../beaglebone;
-#N canvas 489 236 400 314 license 0;
-#X text 15 3 Copyright (c);
-#X text 15 210 See the GNU General Public License for more details.
-;
-#X text 17 236 You should have received a copy of the GNU General Public
-License along with the Outer Space Sounds Pd Library. If not \, see
-<http://www.gnu.org/licenses/>.;
-#X text 15 18 2014 Rafael Vega González <rvega@elsoftwarehamuerto.org>
-;
-#X text 14 45 This file is part of the Pd-BeagleBoneBlack-Io Library.
-;
-#X text 13 69 The Pd-BeagleBoneBlack-Io Library is free software: you
-can redistribute it and/or modify it under the terms of the GNU General
-Public License as published by the Free Software Foundation \, either
-version 3 of the License \, or (at your option) any later version.
-;
-#X text 14 145 The Pd-BeagleBoneBlack-Io Library is distributed in
-the hope that it will be useful \, but WITHOUT ANY WARRANTY \; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.;
-#X restore 306 213 pd license;
 #X obj 14 71 gpio_input P9_11;
 #X obj 140 70 adc_input 0;
 #X obj 6 6 declare -lib ../beaglebone;
@@ -34,11 +13,12 @@ PURPOSE.;
 #X text 14 52 Note On Button;
 #X text 126 212 Note On LED;
 #X text 139 52 Frequency Potentiometer;
-#X connect 1 0 5 0;
-#X connect 1 0 7 0;
-#X connect 2 0 5 1;
-#X connect 5 0 6 0;
-#X connect 5 0 6 1;
-#X connect 7 0 4 0;
-#X connect 9 0 10 0;
-#X connect 10 0 8 0;
+#X obj 306 213 ../license;
+#X connect 0 0 4 0;
+#X connect 0 0 6 0;
+#X connect 1 0 4 1;
+#X connect 4 0 5 0;
+#X connect 4 0 5 1;
+#X connect 6 0 3 0;
+#X connect 8 0 9 0;
+#X connect 9 0 7 0;

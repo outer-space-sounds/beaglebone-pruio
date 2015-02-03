@@ -1,3 +1,22 @@
+### 
+# Beaglebone Pru IO 
+# 
+# Copyright (C) 2015 Rafael Vega <rvega@elsoftwarehamuerto.org> 
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+###
+
 
 #####################################################################
 # Constants
@@ -33,7 +52,7 @@ FIND_ADDRESS_0_COMMAND=`$(PRU_COMPILER_DIR)/bin/dispru src/pru0.elf \
 all: lib/libbeaglebone_pruio.a
 
 # 0. Compile and install device tree overlay
-device-tree-overlay/PRUIO-DTO-00A0.dtb:
+../device-tree-overlay/PRUIO-DTO-00A0.dtbo:
 	cd ../device-tree-overlay && make && make install
 
 # 1. Compile pru0_main.c into pru0_main.obj
@@ -63,7 +82,7 @@ src/beaglebone_pruio.o: src/beaglebone_pruio.c src/pru0.elf lib/libbeaglebone_pr
 		-c -o src/beaglebone_pruio.o src/beaglebone_pruio.c
 
 # 5. Link library
-lib/libbeaglebone_pruio.a: src/beaglebone_pruio.o device-tree-overlay/LIB-BEAGLEBONE-PRUIO-DTO-00A0.dtb
+lib/libbeaglebone_pruio.a: src/beaglebone_pruio.o ../device-tree-overlay/PRUIO-DTO-00A0.dtbo
 	ar rcs lib/libbeaglebone_pruio.a src/beaglebone_pruio.o
 	cp src/beaglebone_pruio.h include/
 	cp src/beaglebone_pruio_pins.h include/

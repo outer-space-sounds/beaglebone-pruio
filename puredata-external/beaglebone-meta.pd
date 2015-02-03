@@ -2,4 +2,4 @@
 #X text 14 32 LICENSE GPL v3;
 #X text 13 73 VERSION 0.1;
 #X text 13 54 AUTHOR Rafael Vega <rvega@elsoftwarehamuerto.org>;
-#X text 13 10 KEYWORDS control beaglebone black;
+#X text 13 10 KEYWORDS control beaglebone black PRU IO ADC;
