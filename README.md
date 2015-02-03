@@ -77,7 +77,7 @@ int main(int argc, const char *argv[]){
 Make sure your BeagleBone has internet access, download the library and run the [install.sh script](scripts/install.sh). __Read the script before running it!__ You might not want to run some of the commands in there.
 
 ```Bash
-git clone https://github.com/TODO.com beaglebone-pruio
+git clone https://github.com/outer-space-sounds/beaglebone-pruio.git beaglebone-pruio
 cd beaglebone-pruio/scripts
 ./install.sh
 ```
@@ -98,7 +98,7 @@ This is only needed if you want to somehow change the library (fix a bug, contri
 
 There are two main components of the library: the ARM part that runs on the main processor in the BeagleBone and the PRU part that runs on one of the PRU units. Communication between both processors is done through a ring buffer in shared memory space. 
 
-Compilation is done on the BeagleBone itself (I never bothered to set up a cross-compilation thing) so you'll need to install two compilers on your board. First one, for the ARM part is gcc, which can be installed by doing `apt-get install build-essential`. The second one, for the PRU part, is Texas Instrument's PRU compiler, which can be downloaded [here](http://software-dl.ti.com/codegen/non-esd/downloads/beta.html). It's free as in beer and you'll need to sign up with TI before downloading. Uncompress it and put it in the `vendors/pru_2.0.0B2` directory so that our makefile finds it and uses it. Your `vendors` directory should end up looking like this:
+Compilation is done on the BeagleBone itself (I never bothered to set up a cross-compilation thing) so you'll need to install two compilers on your board. First one, for the ARM part is gcc, which can be installed by doing `apt-get install build-essential`. The second one, for the PRU part, is Texas Instrument's PRU compiler, which can be downloaded [here](http://software-dl.ti.com/codegen/non-esd/downloads/beta.htm). It's free as in beer and you'll need to sign up with TI before downloading. Uncompress it and put it in the `vendors/pru_2.0.0B2` directory so that our makefile finds it and uses it. Your `vendors` directory should end up looking like this:
 
 ```
 vendors
