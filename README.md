@@ -16,7 +16,7 @@ You'll need to figure out yourself how to get internet access on your Beaglebone
  
 ### From a PD patch
 
-Here's an example patch that uses the library to get input from a potentiometer and a pushbutton and drives an LED. See the [test-patches](https://TODO.com) directory and the help files in [puredata-external](https://TODO.com) for more info.
+Here's an example patch that uses the library to get input from a potentiometer and a pushbutton and drives an LED. See the [test-patches](puredata-external/test-patches) directory and the help files in [puredata-external](puredata-external) for more info.
 
 You're probably using a headless BeagleBone (no screen, keyboard or mouse) so you'll need to create your PD patches on a different computer and then copy them to your BeagleBone. I have included a 64 bit Linux version of the PD library in the puredata-external directory. You'll need to rename the `beaglebone.pd_linux_x86_64` file to `beaglebone.pd_linux` and put it somewhere in your PD path if you want to use it while creating patches in your computer. Binaries for other platforms are welcome.
 
@@ -24,7 +24,7 @@ You're probably using a headless BeagleBone (no screen, keyboard or mouse) so yo
 
 ### From a C program
 
-Here's a possible way of using the library from a C program. For a full example and it's makefile, check the [c-example directory](http://TODO.com)
+Here's a possible way of using the library from a C program. For a full example and it's makefile, check the [c-example directory](c-example)
 
 ```C
 #include <beaglebone_pruio.h>
@@ -74,7 +74,7 @@ int main(int argc, const char *argv[]){
 
 ## Installation
 
-Make sure your BeagleBone has internet access, download the library and run the [install.sh script](http://TODO.com). __Read the script before running it!__ You might not want to run some of the commands in there.
+Make sure your BeagleBone has internet access, download the library and run the [install.sh script](scripts/install.sh). __Read the script before running it!__ You might not want to run some of the commands in there.
 
 ```Bash
 git clone https://github.com/TODO.com beaglebone-pruio
@@ -90,7 +90,7 @@ The library assumes there is an [analog multiplexer](http://www.ti.com/lit/ds/sy
 
 ## Bugs, Feature Requests, Roadmap, Questions
 
-Use the [issue tracker](https://TODO.com) in this github repository.
+Use the [issue tracker](issues) in this github repository.
 
 ## Compiling the Library
 
@@ -98,7 +98,7 @@ This is only needed if you want to somehow change the library (fix a bug, contri
 
 There are two main components of the library: the ARM part that runs on the main processor in the BeagleBone and the PRU part that runs on one of the PRU units. Communication between both processors is done through a ring buffer in shared memory space. 
 
-Compilation is done on the BeagleBone itself (I never bothered to set up a cross-compilation thing) so you'll need to install two compilers on your board. First one, for the ARM part is gcc, which can be installed by doing `apt-get install build-essential`. The second one, for the PRU part, is Texas Instrument's XXX TODO compiler, which can be downloaded [here](http://software-dl.ti.com/codegen/non-esd/downloads/beta.html). It's free as in beer and you'll need to sign up with TI before downloading. Uncompress it and put it in the `vendors/pru_2.0.0B2` directory so that our makefile finds it and uses it. Your `vendors` directory should end up looking like this:
+Compilation is done on the BeagleBone itself (I never bothered to set up a cross-compilation thing) so you'll need to install two compilers on your board. First one, for the ARM part is gcc, which can be installed by doing `apt-get install build-essential`. The second one, for the PRU part, is Texas Instrument's PRU compiler, which can be downloaded [here](http://software-dl.ti.com/codegen/non-esd/downloads/beta.html). It's free as in beer and you'll need to sign up with TI before downloading. Uncompress it and put it in the `vendors/pru_2.0.0B2` directory so that our makefile finds it and uses it. Your `vendors` directory should end up looking like this:
 
 ```
 vendors
