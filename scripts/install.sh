@@ -1,5 +1,6 @@
 #! /bin/bash
 
+
 echo ""
 echo ""
 echo "1. Fetching dependencies"
@@ -7,9 +8,8 @@ cd ..
 git submodule update --init --recursive > /dev/null
 
 
-
 echo ""
-echo "2. Installing patced version of am335x-pru-package."
+echo "2. Installing patched version of am335x-pru-package."
 mv /usr/lib/libprussdrvd.so /usr/lib/libprussdrvd.so.bkp &> /dev/null
 mv /usr/lib/libprussdrvd.a /usr/lib/libprussdrvd.a.bkp &> /dev/null
 mv /usr/lib/libprussdrv.so /usr/lib/libprussdrv.so.bkp &> /dev/null
@@ -37,4 +37,19 @@ cd ../puredata-external
 make install > /dev/null
 
 echo ""
-echo "Done!"
+echo "5.Disabling HDMI virtual cape."
+mount /dev/mmcblk0p1 /mnt/card
+cd /mnt/card
+sed -i.bak '/^##Disable HDMI$/{N; s/^##Disable HDMI\n#/##Disable HDMI\n/}' uEnv.txt
+cd
+umount /mnt/card
+
+echo ""
+echo "6.Assigning index zero to USB sound card in ALSA."
+cd /etc/modprobe.d
+sed -i.bak 's/options snd-usb-audio index=-2/options snd-usb-audio index=0/' alsa-base.conf
+
+echo ""
+echo "Done. Rebooting now."
+
+reboot
