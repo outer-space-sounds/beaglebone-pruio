@@ -102,25 +102,18 @@ static int used_pins_count = 0;
 static int init_gpio(){
    // Only pinmux is set here, enabling GPIO modules, 
    // clocks, debounce, etc. is set on the PRU side.
-   
 
-         printf("D\n");
-
-   
    // Pins used to control analog mux:
-   /* int e1 = beaglebone_pruio_init_gpio_pin(P9_27, BEAGLEBONE_PRUIO_OUTPUT_MODE); */
-   /*       printf("E\n"); */
-   /* int e2 = beaglebone_pruio_init_gpio_pin(P9_30, BEAGLEBONE_PRUIO_OUTPUT_MODE); */
-   /*       printf("F\n"); */
-   /* int e3 = beaglebone_pruio_init_gpio_pin(P9_42A, BEAGLEBONE_PRUIO_OUTPUT_MODE); */
-   /*       printf("G\n"); */
-   /*  */
-   /* if(e1 || e2 || e3){ */
-   /*    return 1; */
-   /* }  */
-   /* else{ */
+   int e1 = beaglebone_pruio_init_gpio_pin(P9_27, BEAGLEBONE_PRUIO_OUTPUT_MODE);
+   int e2 = beaglebone_pruio_init_gpio_pin(P9_30, BEAGLEBONE_PRUIO_OUTPUT_MODE);
+   int e3 = beaglebone_pruio_init_gpio_pin(P9_42A, BEAGLEBONE_PRUIO_OUTPUT_MODE);
+
+   if(e1 || e2 || e3){
+      return 1;
+   } 
+   else{
       return 0;
-   /* } */
+   }
 }
 
 static int get_gpio_pin_name(int gpio_number, char* pin_name){
@@ -313,7 +306,6 @@ static int get_gpio_config_file(int gpio_number, char* path){
 
          DIR *dir2 = opendir(tmp);
          if(dir2==NULL){
-            printf("DD");
             return 1;
          }
          while(dir2){
@@ -321,7 +313,6 @@ static int get_gpio_config_file(int gpio_number, char* path){
             if(dir_info==NULL){
                closedir(dir2);
                closedir(dir);
-               printf("EE");
                return 1;
             }
             // Substring pin name
@@ -530,7 +521,6 @@ int beaglebone_pruio_init_adc_pin_with_ranges(int channel_number, int ranges){
 }
 
 int beaglebone_pruio_init_gpio_pin(int gpio_number, beaglebone_pruio_gpio_mode mode){
-   printf("D1\n");
    // Check if pin already in use.
    int i;
    for(i=0; i<used_pins_count; ++i){
@@ -542,7 +532,6 @@ int beaglebone_pruio_init_gpio_pin(int gpio_number, beaglebone_pruio_gpio_mode m
          return 1;
       }
    }
-   printf("D2\n");
 
    // Save new pin info;
    gpio_pin new_pin;
@@ -551,24 +540,19 @@ int beaglebone_pruio_init_gpio_pin(int gpio_number, beaglebone_pruio_gpio_mode m
    used_pins[used_pins_count] = new_pin;
    used_pins_count++;
 
-   printf("D3\n");
-   
    // Set the pinmux of the pin by writing to the appropriate config file
    char path[256] = "";
    if(get_gpio_config_file(gpio_number, path)){
       return 1;
    }
-   printf("D4\n");
    FILE *f = fopen(path, "w");
    if(f==NULL){
       return 1;
    }
-   printf("D5\n");
    int gpio_module = gpio_number >> 5;
    int gpio_bit = gpio_number % 32;
    if(mode == BEAGLEBONE_PRUIO_OUTPUT_MODE){
       fprintf(f, "%s", "output"); 
-   printf("D6 %i %p %X\n", gpio_module, gpio3_output_enable, *gpio3_output_enable);
       // Clear the output enable bit in the gpio config register to actually enable output.
       switch(gpio_module){
          case 0: *gpio0_output_enable &= ~(1<<gpio_bit); break;
@@ -576,7 +560,6 @@ int beaglebone_pruio_init_gpio_pin(int gpio_number, beaglebone_pruio_gpio_mode m
          case 2: *gpio2_output_enable &= ~(1<<gpio_bit); break;
          case 3: *gpio3_output_enable &= ~(1<<gpio_bit); break;
       }
-   printf("D7\n");
    }
    else{
       fprintf(f, "%s", "input"); 
@@ -605,10 +588,7 @@ int beaglebone_pruio_init_gpio_pin(int gpio_number, beaglebone_pruio_gpio_mode m
       beaglebone_pruio_shared_ram[gpio_module+1026] |= (1<<gpio_bit);
    }
  
- 
-   printf("D8\n");
    fclose(f);
-   printf("D9\n");
    return 0;
 }
 

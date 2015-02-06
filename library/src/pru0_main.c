@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "registers.h"
 #include "beaglebone_pruio_pins.h"
 
@@ -418,12 +417,24 @@ inline void process_adc_value_with_ranges(unsigned int channel_number, unsigned 
       if(channel->value != value){
          if(value<channel->left_bound || value>channel->right_bound){
             unsigned int max_val = (1<<ADC_BITS) - 1;  // 8 bits is 255
-            unsigned int increment = max_val / ranges;
-            unsigned int delta = 4;  // ¿¿ increment/8 better ??
+            unsigned int increment = (max_val / ranges) + 1;
+            unsigned int delta = 1;
 
             channel->current_range = value/increment;
-            channel->left_bound = channel->current_range*increment - delta;
-            channel->right_bound = channel->current_range*increment + delta;
+            if(channel->current_range <= 0){
+               channel->current_range = 0;
+               channel->left_bound = 0;
+            }
+            else{
+               channel->left_bound = channel->current_range*increment - delta;
+            }
+            if(channel->current_range >= ranges){
+               channel->current_range = ranges;
+               channel->right_bound = max_val;
+            }
+            else{
+               channel->right_bound = (channel->current_range+1)*increment + delta;
+            }
 
             unsigned int message = ((unsigned int)1<<31) | (channel->current_range<<4) | (channel_number);
             buffer_write(&message);
