@@ -62,6 +62,13 @@ void beaglebone_pruio_set_pin_value(int gpio_number, int value);
 int beaglebone_pruio_init_adc_pin(int channel_number); 
 
 /**
+ * Starts reading from an ADC pin. The analog input range is broken
+ * into n ranges. Useful, for example, for selecting one of n numbers
+ * with a potentiometer.
+ */
+int beaglebone_pruio_init_adc_pin_with_ranges(int channel_number, int ranges); 
+
+/**
  * Returns 1 if there is data available from the PRU
  */
 static inline int beaglebone_pruio_messages_are_available();

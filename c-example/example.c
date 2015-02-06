@@ -90,23 +90,23 @@ int main(int argc, const char *argv[]){
    start_monitor_thread();
 
    // Initialize 2 pins as outputs
-   if(beaglebone_pruio_init_gpio_pin(P9_16, BEAGLEBONE_PRUIO_OUTPUT_MODE)){
-      fprintf(stderr, "%s\n", "Could not initialize pin P9_12");
-   }
-   if(beaglebone_pruio_init_gpio_pin(P9_18, BEAGLEBONE_PRUIO_OUTPUT_MODE)){
-      fprintf(stderr, "%s\n", "Could not initialize pin P9_14");
-   }
-   
-   // Init 2 pins as inputs
-   if(beaglebone_pruio_init_gpio_pin(P9_13, BEAGLEBONE_PRUIO_INPUT_MODE)){
-      fprintf(stderr, "%s\n", "Could not initialize pin P9_13");
-   }
-   if(beaglebone_pruio_init_gpio_pin(P9_11, BEAGLEBONE_PRUIO_INPUT_MODE)){
-      fprintf(stderr, "%s\n", "Could not initialize pin P9_11");
-   }
+   /* if(beaglebone_pruio_init_gpio_pin(P9_16, BEAGLEBONE_PRUIO_OUTPUT_MODE)){ */
+   /*    fprintf(stderr, "%s\n", "Could not initialize pin P9_12"); */
+   /* } */
+   /* if(beaglebone_pruio_init_gpio_pin(P9_18, BEAGLEBONE_PRUIO_OUTPUT_MODE)){ */
+   /*    fprintf(stderr, "%s\n", "Could not initialize pin P9_14"); */
+   /* } */
+   /*  */
+   /* // Init 2 pins as inputs */
+   /* if(beaglebone_pruio_init_gpio_pin(P9_13, BEAGLEBONE_PRUIO_INPUT_MODE)){ */
+   /*    fprintf(stderr, "%s\n", "Could not initialize pin P9_13"); */
+   /* } */
+   /* if(beaglebone_pruio_init_gpio_pin(P9_11, BEAGLEBONE_PRUIO_INPUT_MODE)){ */
+   /*    fprintf(stderr, "%s\n", "Could not initialize pin P9_11"); */
+   /* } */
 
    // Init 2 analog inputs
-   if(beaglebone_pruio_init_adc_pin(0)){
+   if(beaglebone_pruio_init_adc_pin_with_ranges(0, 12)){
       fprintf(stderr, "%s\n", "Could not initialize adc pin 0");
    }
    if(beaglebone_pruio_init_adc_pin(6)){
@@ -116,22 +116,22 @@ int main(int argc, const char *argv[]){
 
    // Check if library is returning adequately when trying to 
    // re-initialize a pin.
-   if(!beaglebone_pruio_init_gpio_pin(P9_16, BEAGLEBONE_PRUIO_INPUT_MODE)){
-      fprintf(stderr, "%s\n", "P9_16 was already initialized, should have returned error");
-      exit(1);
-   }
-   if(beaglebone_pruio_init_gpio_pin(P9_18, BEAGLEBONE_PRUIO_OUTPUT_MODE)){
-      fprintf(stderr, "%s\n", "P9_18 was already initialized as output, should have not returned error");
-      exit(1);
-   }
+   /* if(!beaglebone_pruio_init_gpio_pin(P9_16, BEAGLEBONE_PRUIO_INPUT_MODE)){ */
+   /*    fprintf(stderr, "%s\n", "P9_16 was already initialized, should have returned error"); */
+   /*    exit(1); */
+   /* } */
+   /* if(beaglebone_pruio_init_gpio_pin(P9_18, BEAGLEBONE_PRUIO_OUTPUT_MODE)){ */
+   /*    fprintf(stderr, "%s\n", "P9_18 was already initialized as output, should have not returned error"); */
+   /*    exit(1); */
+   /* } */
 
    // Blink 2 outputs
    while(!finished){
-      beaglebone_pruio_set_pin_value(P9_16, 0);
-      beaglebone_pruio_set_pin_value(P9_18, 1);
-      sleep(3);
-      beaglebone_pruio_set_pin_value(P9_16, 1);
-      beaglebone_pruio_set_pin_value(P9_18, 0);
+      /* beaglebone_pruio_set_pin_value(P9_16, 0); */
+      /* beaglebone_pruio_set_pin_value(P9_18, 1); */
+      /* sleep(3); */
+      /* beaglebone_pruio_set_pin_value(P9_16, 1); */
+      /* beaglebone_pruio_set_pin_value(P9_18, 0); */
       sleep(3);
    }
 
