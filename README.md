@@ -24,7 +24,7 @@ You're probably using a headless BeagleBone (no screen, keyboard or mouse) so yo
 
 ### From a C program
 
-Here's a possible way of using the library from a C program. For a full example and it's makefile, check the [c-example directory](c-example)
+Here's a possible way of using the library from a C program. For a full example and it's makefile, check the [c-example directory](c-example), for the full API, see [beaglebone_pruio.h](library/src/beaglebone_pruio.h).
 
 ```C
 #include <beaglebone_pruio.h>

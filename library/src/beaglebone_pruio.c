@@ -26,7 +26,7 @@
 #include <sys/mman.h>
 
 #include "beaglebone_pruio.h"
-#include "registers.h"
+#include "definitions.h"
 #include "beaglebone_pruio_pins.h"
 
 #ifndef BEAGLEBONE_PRUIO_START_ADDR_0
@@ -104,9 +104,9 @@ static int init_gpio(){
    // clocks, debounce, etc. is set on the PRU side.
 
    // Pins used to control analog mux:
-   int e1 = beaglebone_pruio_init_gpio_pin(P9_27, BEAGLEBONE_PRUIO_OUTPUT_MODE);
-   int e2 = beaglebone_pruio_init_gpio_pin(P9_30, BEAGLEBONE_PRUIO_OUTPUT_MODE);
-   int e3 = beaglebone_pruio_init_gpio_pin(P9_42A, BEAGLEBONE_PRUIO_OUTPUT_MODE);
+   int e1 = beaglebone_pruio_init_gpio_pin(P9_27, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT);
+   int e2 = beaglebone_pruio_init_gpio_pin(P9_30, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT);
+   int e3 = beaglebone_pruio_init_gpio_pin(P9_42A, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT); 
 
    if(e1 || e2 || e3){
       return 1;
@@ -335,13 +335,50 @@ static int get_gpio_config_file(int gpio_number, char* path){
 // ADC CHANNELS
 
 typedef struct adc_channel{ 
-   int channel_number;
-   int ranges;
+   unsigned char channel_number;
+   beaglebone_pruio_adc_mode mode;
+   unsigned char parameter1;
+   unsigned char parameter2;
+   unsigned char parameter3;
 } adc_channel;
 
 static adc_channel used_adc_channels[BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS];
 static int used_adc_channels_count = 0;
 
+static int init_adc_channel(unsigned char channel_number, beaglebone_pruio_adc_mode mode, unsigned char parameter1, unsigned char parameter2, unsigned char parameter3){
+   // Check if channel already in use.
+   int i;
+   for(i=0; i<used_adc_channels_count; ++i){
+      adc_channel channel = used_adc_channels[i];
+      if(channel.channel_number==channel_number){
+         if(channel.mode==mode && channel.parameter1==parameter1 && channel.parameter2==parameter2 && channel.parameter3==parameter3){
+            return 0;
+         }
+         else{
+            return 1;
+         }
+      }
+   }
+
+   // Save new channel info;
+   adc_channel new_channel;
+   new_channel.channel_number = channel_number;
+   new_channel.mode = mode;
+   new_channel.parameter1 = parameter1;
+   new_channel.parameter2 = parameter2;
+   new_channel.parameter3 = parameter3;
+   used_adc_channels[used_adc_channels_count] = new_channel;
+   used_adc_channels_count++;
+
+   /** 
+    * Tell the PRU unit that we are interested in input from this channel.
+    * See comments in definitions.h
+    */
+   unsigned int config = (mode << 28) | (parameter3 << 16) | (parameter2 << 8) | (parameter1);
+   beaglebone_pruio_shared_ram[ADC0_CONFIG+channel_number] = config;
+
+   return 0;
+}
 
 /////////////////////////////////////////////////////////////////////
 // PRU Initialization
@@ -410,40 +447,39 @@ static int start_pru0_program(){
    return 0;
 }
 
-/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 // Ring buffer (see header file for more)
 //
 
 static void buffer_init(){
    // These shared ram positions control which adc and gpio channels
-   // we want to receive data from, see other comments in this file.
-   beaglebone_pruio_shared_ram[1026] = 0;
-   beaglebone_pruio_shared_ram[1027] = 0;
-   beaglebone_pruio_shared_ram[1028] = 0;
-   beaglebone_pruio_shared_ram[1029] = 0;
-   beaglebone_pruio_shared_ram[1030] = 0;
+   // we want to receive data from, see comments in definitions.h
+   beaglebone_pruio_shared_ram[GPIO0_CONFIG] = 0;
+   beaglebone_pruio_shared_ram[GPIO1_CONFIG] = 0;
+   beaglebone_pruio_shared_ram[GPIO2_CONFIG] = 0;
+   beaglebone_pruio_shared_ram[GPIO3_CONFIG] = 0;
 
    // These positions hold the options/parameters for each of the 14
    // adc channels
-   beaglebone_pruio_shared_ram[1031] = 0;
-   beaglebone_pruio_shared_ram[1032] = 0;
-   beaglebone_pruio_shared_ram[1033] = 0;
-   beaglebone_pruio_shared_ram[1034] = 0;
-   beaglebone_pruio_shared_ram[1035] = 0;
-   beaglebone_pruio_shared_ram[1036] = 0;
-   beaglebone_pruio_shared_ram[1037] = 0;
-   beaglebone_pruio_shared_ram[1038] = 0;
-   beaglebone_pruio_shared_ram[1039] = 0;
-   beaglebone_pruio_shared_ram[1040] = 0;
-   beaglebone_pruio_shared_ram[1041] = 0;
-   beaglebone_pruio_shared_ram[1042] = 0;
-   beaglebone_pruio_shared_ram[1043] = 0;
-   beaglebone_pruio_shared_ram[1044] = 0;
+   beaglebone_pruio_shared_ram[ADC0_CONFIG] = 0;
+   beaglebone_pruio_shared_ram[ADC1_CONFIG] = 0;
+   beaglebone_pruio_shared_ram[ADC2_CONFIG] = 0;
+   beaglebone_pruio_shared_ram[ADC3_CONFIG] = 0;
+   beaglebone_pruio_shared_ram[ADC4_CONFIG] = 0;
+   beaglebone_pruio_shared_ram[ADC5_CONFIG] = 0;
+   beaglebone_pruio_shared_ram[ADC6_CONFIG] = 0;
+   beaglebone_pruio_shared_ram[ADC7_CONFIG] = 0;
+   beaglebone_pruio_shared_ram[ADC8_CONFIG] = 0;
+   beaglebone_pruio_shared_ram[ADC9_CONFIG] = 0;
+   beaglebone_pruio_shared_ram[ADC10_CONFIG] = 0;
+   beaglebone_pruio_shared_ram[ADC11_CONFIG] = 0;
+   beaglebone_pruio_shared_ram[ADC12_CONFIG] = 0;
+   beaglebone_pruio_shared_ram[ADC13_CONFIG] = 0;
 
 
-   beaglebone_pruio_buffer_size = 1024;
-   beaglebone_pruio_buffer_start = &(beaglebone_pruio_shared_ram[1024]); // value inited to 0 in pru
-   beaglebone_pruio_buffer_end = &(beaglebone_pruio_shared_ram[1025]); // value inited to 0 in pru
+   beaglebone_pruio_buffer_size = RING_BUFFER_SIZE;
+   beaglebone_pruio_buffer_start = &(beaglebone_pruio_shared_ram[RING_BUFFER_START]); // value inited to 0 in pru
+   beaglebone_pruio_buffer_end = &(beaglebone_pruio_shared_ram[RING_BUFFER_END]); // value inited to 0 in pru
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -481,43 +517,12 @@ int beaglebone_pruio_start(){
    return 0;
 }
 
-int beaglebone_pruio_init_adc_pin(int channel_number){
-   return beaglebone_pruio_init_adc_pin_with_ranges(channel_number, 0);
+int beaglebone_pruio_init_adc_pin(int channel_number, int bits){
+   return init_adc_channel(channel_number, BEAGLEBONE_PRUIO_ADC_MODE_NORMAL, bits, 0, 0);
 }
 
 int beaglebone_pruio_init_adc_pin_with_ranges(int channel_number, int ranges){
-   // Check if channel already in use.
-   int i;
-   for(i=0; i<used_adc_channels_count; ++i){
-      adc_channel channel = used_adc_channels[i];
-      if(channel.channel_number==channel_number){
-         if(channel.ranges==ranges){
-            return 0;
-         }
-         else{
-            return 1;
-         }
-      }
-   }
-
-   // Save new channel info;
-   adc_channel new_channel;
-   new_channel.channel_number = channel_number;
-   new_channel.ranges = ranges;
-   used_adc_channels[used_adc_channels_count] = new_channel;
-   used_adc_channels_count++;
-
-   /** 
-    * Tell the PRU unit that we are interested in input from this channel.
-    * If a bit is set in shared_ram[1030], it means that we need input 
-    * for that ADC channel. shared_ram[1031] to shared_ram[1044] are options for each adc channel (14 of them).
-    *
-    * shared_ram[1030], shared_ram[1031] to shared_ram[1044]
-    *
-    */
-   beaglebone_pruio_shared_ram[1030] |= (1<<channel_number);
-   beaglebone_pruio_shared_ram[1031+channel_number] = ranges;
-   return 0;
+   return init_adc_channel(channel_number, BEAGLEBONE_PRUIO_ADC_MODE_RANGES, ranges, 0, 0);
 }
 
 int beaglebone_pruio_init_gpio_pin(int gpio_number, beaglebone_pruio_gpio_mode mode){
@@ -551,7 +556,7 @@ int beaglebone_pruio_init_gpio_pin(int gpio_number, beaglebone_pruio_gpio_mode m
    }
    int gpio_module = gpio_number >> 5;
    int gpio_bit = gpio_number % 32;
-   if(mode == BEAGLEBONE_PRUIO_OUTPUT_MODE){
+   if(mode == BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT){
       fprintf(f, "%s", "output"); 
       // Clear the output enable bit in the gpio config register to actually enable output.
       switch(gpio_module){
@@ -573,19 +578,9 @@ int beaglebone_pruio_init_gpio_pin(int gpio_number, beaglebone_pruio_gpio_mode m
 
       /** 
        * Tell the PRU unit that we are interested in input from this pin.
-       *
-       * Each one of the 32 bits in shared_ram[1026] represent the 32 pins for
-       * the GPIO0 module. If a bit is set, it means that we need
-       * input for that GPIO channel. Same mechanism is used for GPIO1, 2 and 3
-       * using the following shared ram positions:
-       *
-       * shared_ram[1026] -> GPIO0
-       * shared_ram[1027] -> GPIO1
-       * shared_ram[1028] -> GPIO2
-       * shared_ram[1029] -> GPIO3
-       *
+       * See comments in definitions.h
        */
-      beaglebone_pruio_shared_ram[gpio_module+1026] |= (1<<gpio_bit);
+      beaglebone_pruio_shared_ram[gpio_module+GPIO0_CONFIG] |= (1<<gpio_bit);
    }
  
    fclose(f);

@@ -32,8 +32,8 @@ typedef struct beaglebone_pruio_message{
 } beaglebone_pruio_message;
 
 typedef enum{  
-   BEAGLEBONE_PRUIO_OUTPUT_MODE = 0,
-   BEAGLEBONE_PRUIO_INPUT_MODE = 1
+   BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT = 0,
+   BEAGLEBONE_PRUIO_GPIO_MODE_INPUT = 1
 } beaglebone_pruio_gpio_mode;
 
 /**
@@ -59,7 +59,7 @@ void beaglebone_pruio_set_pin_value(int gpio_number, int value);
 /**
  * Starts reading from an ADC pin.
  */
-int beaglebone_pruio_init_adc_pin(int channel_number); 
+int beaglebone_pruio_init_adc_pin(int channel_number, int bits); 
 
 /**
  * Starts reading from an ADC pin. The analog input range is broken

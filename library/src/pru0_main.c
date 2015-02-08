@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "registers.h"
+#include "definitions.h"
 #include "beaglebone_pruio_pins.h"
 
 /////////////////////////////////////////////////////////////////////
@@ -37,51 +37,17 @@ volatile register unsigned int __R31;
 /////////////////////////////////////////////////////////////////////
 // RING BUFFER
 //
-   // Communication with ARM processor is througn a ring buffer in the
-   // PRU shared memory area.
-   // shared_ram[0] to shared_ram[1023] is the buffer data.
-   // shared_ram[1024] is the start (read) pointer.
-   // shared_ram[1025] is the end (write) pointer.
-   //
-   // Messages are 32 bit unsigned integers:
-   //
-   // A GPIO Message:
-   // 0XXX XXXX XXXX XXXX XXXX XXXV NNNN NNNN
-   // |             |             |      |
-   // |             |             |      |-- 7-0: GPIO number
-   // |             |             |
-   // |             |             |-- 8: Value
-   // |             |         
-   // |             |-- 30-9: Unused
-   // |
-   // |-- 31: Always 0, indicates this is a gpio message
-   //
-   //
-   //
-   // An ADC Message:
-   // 1XXX XXXX XXXX XXXX VVVV VVVV VVVV NNNN
-   // |             |             |       |
-   // |             |             |       |-- 3-0: ADC Channel
-   // |             |             |
-   // |             |             |-- 4-15: Value
-   // |             |         
-   // |             |-- 30-16: Unused
-   // |
-   // |-- 31: Always 1, indicates this is an adc message
-   //
-   // Read these to understand the ring buffer:
-   // * http://en.wikipedia.org/wiki/Circular_buffer#Use_a_Fill_Count
-   // * https://groups.google.com/forum/#!category-topic/beagleboard/F9JI8_vQ-mE
+
+// Read the comments in definitions.h
 
 unsigned int buffer_size;
 volatile unsigned int *buffer_start;
 volatile unsigned int *buffer_end;
 
 void init_buffer(){
-   // data in shared_ram[0] to shared_ram[127]
-   buffer_size = 1024; 
-   buffer_start = &(shared_ram[1024]);
-   buffer_end = &(shared_ram[1025]);
+   buffer_size = RING_BUFFER_SIZE; 
+   buffer_start = &(shared_ram[RING_BUFFER_START]);
+   buffer_end = &(shared_ram[RING_BUFFER_END]);
    *buffer_start = 0;
    *buffer_end = 0;
 }
@@ -389,105 +355,114 @@ void init_adc(){
 // ANALYZE ADC VALUES 
 //
 
+// See comments for adc config in definitions.h
 typedef struct adc_channel{
    // OFF or ON
-   int mode; 
+   beaglebone_pruio_adc_mode mode; 
    
-   // Used for no ranges mode 
    unsigned int value; 
    unsigned int past_values[8]; 
 
-   // used for ranges mode
-   unsigned int ranges;
-   unsigned int current_range;
-   unsigned int left_bound;
-   unsigned int right_bound;
+   unsigned char parameter1;
+   unsigned char parameter2;
+   unsigned char parameter3;
 } adc_channel;
 
 adc_channel adc_channels[BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS];
 
 unsigned int mux_control;
 
-inline void process_adc_value_with_ranges(unsigned int channel_number, unsigned int value, unsigned int ranges){
-   // Channel is in ON mode.
-   if(adc_channels[channel_number].mode == 1){
-      value = value >> (12 - ADC_BITS); // Truncate to 8 bits
+inline void process_adc_value_with_ranges(unsigned int channel_number, unsigned int value){
+   adc_channel* channel = &(adc_channels[channel_number]);
 
-      adc_channel* channel = &(adc_channels[channel_number]);
-      if(channel->value != value){
-         if(value<channel->left_bound || value>channel->right_bound){
-            unsigned int max_val = (1<<ADC_BITS) - 1;  // 8 bits is 255
-            unsigned int increment = (max_val / ranges) + 1;
-            unsigned int delta = 1;
+   unsigned int ranges = channel->parameter1;
 
-            channel->current_range = value/increment;
-            if(channel->current_range <= 0){
-               channel->current_range = 0;
-               channel->left_bound = 0;
-            }
-            else{
-               channel->left_bound = channel->current_range*increment - delta;
-            }
-            if(channel->current_range >= ranges){
-               channel->current_range = ranges;
-               channel->right_bound = max_val;
-            }
-            else{
-               channel->right_bound = (channel->current_range+1)*increment + delta;
-            }
+   // Reuse past_values[0], 1, 2 variables, they are not in use.
+   unsigned int left_bound = (unsigned int) channel->past_values[2];
+   unsigned int right_bound = (unsigned int) channel->past_values[1];
+   unsigned int current_range = (unsigned int) channel->past_values[0];
 
-            unsigned int message = ((unsigned int)1<<31) | (channel->current_range<<4) | (channel_number);
-            buffer_write(&message);
+   unsigned int message = 0;
+
+   value = value >> (12 - 8); // Truncate to 8 bits
+
+   if(channel->value != value){
+      if((left_bound > value) || (right_bound < value)){
+         unsigned int max_val = 255;  // 8 bits
+         unsigned int increment = (max_val / ranges) + 1;
+         unsigned int delta = 1;
+
+         current_range = value/increment;
+         if(current_range <= 0){
+            current_range = 0;
+            left_bound = 0;
          }
-         channel->value = value;
+         else{
+            left_bound = current_range*increment - delta;
+         }
+         if(current_range >= ranges){
+            current_range = ranges;
+            right_bound = max_val;
+         }
+         else{
+            right_bound = (current_range+1)*increment + delta;
+         }
+
+         message = ((unsigned int)1<<31) | (current_range<<4) | (channel_number);
+         buffer_write(&message);
+
+         channel->past_values[2] = left_bound;
+         channel->past_values[1] = right_bound;
+         channel->past_values[0] = current_range;
       }
+      channel->value = value;
    }
 }
 
 inline void process_adc_value(unsigned int channel_number, unsigned int value){
-   // Channel is in ON mode. Send new value if it's different to the old one.
-   if(adc_channels[channel_number].mode == 1){
-      unsigned int i, average;
-      unsigned int message;
+   unsigned int i, average;
+   unsigned int message;
+   
+   adc_channel* channel = &(adc_channels[channel_number]);
+   
+   unsigned int bits = channel->parameter1;
+   value = value >> (12 - bits); // Truncate to n bits
 
-      value = value >> (12 - ADC_BITS); // Truncate to 8 bits
-
-      // Channels 0 to 5 are sampled 8 times faster than channels 6 to 13.
-      // Calculate 8 times average. mux_control counter is re-used to count 
-      // the 8 samples.
-      if(channel_number < 6){
-         adc_channels[channel_number].past_values[mux_control] = value;
-         if(mux_control==7){
-            average = 0;
-            for(i=0; i<8; i++) {
-               average += adc_channels[channel_number].past_values[i];
-            }
-            average = average >> 3;  // Integer division by 8.
-
-            // Send the value to ARM. See message format in comments 
-            // in ring buffer section below
-            if(adc_channels[channel_number].value != average){
-               adc_channels[channel_number].value = average;
-               message = ((unsigned int)1<<31) | (average<<4) | (channel_number);
-               buffer_write(&message);
-            }
+   // Channels 0 to 5 are sampled 8 times faster than channels 6 to 13.
+   // Calculate 8 times average. mux_control counter is re-used to count 
+   // the 8 samples.
+   if(channel_number < 6){
+      channel->past_values[mux_control] = value;
+      if(mux_control==7){
+         average = 0;
+         for(i=0; i<8; i++) {
+            average += channel->past_values[i];
          }
-      }
-      else{ // channels 6 to 13
+         average = average >> 3;  // Integer division by 8.
+
          // Send the value to ARM. See message format in comments 
          // in ring buffer section below
-         if(adc_channels[channel_number].value != value){
-            adc_channels[channel_number].value = value;
-            message = ((unsigned int)1<<31) | (value<<4) | (channel_number);
+         if(channel->value != average){
+            channel->value = average;
+            message = ((unsigned int)1<<31) | (average<<4) | (channel_number);
             buffer_write(&message);
          }
+      }
+   }
+   else{ // channels 6 to 13
+      // Send the value to ARM. See message format in comments 
+      // in ring buffer section below
+      if(channel->value != value){
+         channel->value = value;
+         message = ((unsigned int)1<<31) | (value<<4) | (channel_number);
+         buffer_write(&message);
       }
    }
 }
 
 // Read available samples from fifo0 in blocks of seven, figure out
 // which channel they belong to (using step id and mux control) and
-// send them to process_adc_value (singular) function.
+// send them to process_adc_value (singular) functions.
 inline void process_adc_values(){
    unsigned int data, i, step_id, value, channel_number;
    unsigned int count = HWREG(ADC_TSC + ADC_TSC_FIFO0COUNT);
@@ -509,18 +484,13 @@ inline void process_adc_values(){
             channel_number = step_id;
          }
 
-         if(adc_channels[channel_number].ranges > 0){
-            process_adc_value_with_ranges(
-               channel_number, 
-               value, 
-               adc_channels[channel_number].ranges
-            );
-         }
-         else{
+         beaglebone_pruio_adc_mode mode = adc_channels[channel_number].mode;
+         if(mode == BEAGLEBONE_PRUIO_ADC_MODE_NORMAL){
             process_adc_value(channel_number, value);
          }
-
-
+         else if(mode == BEAGLEBONE_PRUIO_ADC_MODE_RANGES){
+            process_adc_value_with_ranges(channel_number, value);
+         }
       }
       count = HWREG(ADC_TSC + ADC_TSC_FIFO0COUNT);
    }
@@ -530,15 +500,17 @@ void init_adc_values(){
    int i;
 
    adc_channel new_channel;
-   new_channel.mode = 0;
+   new_channel.mode = BEAGLEBONE_PRUIO_ADC_MODE_OFF;
    new_channel.value = 0xFFFF;
    for(i=0; i<8; i++) {
       new_channel.past_values[i] = 0xFFFF;
    }
-   new_channel.ranges = 0;
-   new_channel.current_range = 0xFFFF;
-   new_channel.left_bound = 0xFFFF;
-   new_channel.right_bound = 0;
+   new_channel.parameter1 = 0;
+   new_channel.parameter2 = 0;
+   new_channel.parameter3 = 0;
+
+   // TODO generic names?
+   /* new_channel.right_bound = 0; */
 
    for(i=0; i<BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS; i++){
       adc_channels[i] = new_channel; 
@@ -548,22 +520,28 @@ void init_adc_values(){
 inline void init_adc_channels(){
    /**
     * Checks if ARM code has requested input from new adc pins (channels)
-    * and adds them to the adc_channels array.
-    * Each one of bit in shared_ram[1030] represent the ADC channels. 
-    * If a bit is set, it means that the ARM code needs input for that 
-    * ADC channel.
-    * Shared_ram[1031] to shared_ram[1044]
-    *
-    * shared_ram[1030], shared_ram[1031] to shared_ram[1044]
-    *
+    * and adds them to the adc_channels array. See comments in 
+    * definitions.h
     */
-   unsigned int config = shared_ram[1030];
-   int bit;
-   for(bit=0; bit<BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS; ++bit){
-      // If bit is set
-      if((config&(1<<bit)) != 0){
-         adc_channels[bit].mode = 1; // 1 is on
-         adc_channels[bit].ranges = shared_ram[1031+bit]; 
+   int i;
+   unsigned int config = 0;
+   beaglebone_pruio_adc_mode mode = BEAGLEBONE_PRUIO_ADC_MODE_OFF;
+   for(i=0; i<BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS; i++){
+      //not inited?
+      if(adc_channels[i].mode == BEAGLEBONE_PRUIO_ADC_MODE_OFF){
+         config = shared_ram[ADC0_CONFIG+i];
+         mode = (beaglebone_pruio_adc_mode) ((config >> 28) & 0xF);
+         if(mode != BEAGLEBONE_PRUIO_ADC_MODE_OFF){
+            adc_channels[i].mode = mode;
+            adc_channels[i].parameter1 = config & 0xFF;
+            adc_channels[i].parameter2 = (config >> 8) & 0xFF;
+            adc_channels[i].parameter3 = (config >> 16) & 0xFF;
+         }
+         if(mode == BEAGLEBONE_PRUIO_ADC_MODE_RANGES){
+            adc_channels[i].past_values[2] = 0xFFFF; //left_bound
+            adc_channels[i].past_values[1] = 0; //right_bound
+            adc_channels[i].past_values[0] = 0xFFFF; //current_range
+         }
       }
    }
 }
@@ -628,23 +606,13 @@ inline void init_gpio_channel(int gpio_module, int bit){
 
 inline void init_gpio_channels(){
    /**
-    * Checks if ARM code has requested input from new gpio pins (channels) and 
-    * adds them to the gpio_channels array.
-    *
-    * Each one of the 32 bits in shared_ram[1026] represent the 32 pins for
-    * the GPIO0 module. If a bit is set, it means that the ARM code needs
-    * input for that GPIO channel. Same mechanism is used for GPIO1, 2 and 3
-    * using the following shared ram positions:
-    *
-    * shared_ram[1026] -> GPIO0
-    * shared_ram[1027] -> GPIO1
-    * shared_ram[1028] -> GPIO2
-    * shared_ram[1029] -> GPIO3
-    *
+    * Checks if ARM code has requested input from new gpio pins 
+    * (channels) and adds them to the gpio_channels array. See
+    * commens in definitions.h
     */
    int gpio_module;
    for(gpio_module=0; gpio_module<4; ++gpio_module){
-      unsigned int config = shared_ram[1026+gpio_module];
+      unsigned int config = shared_ram[GPIO0_CONFIG+gpio_module];
       int bit;
       for(bit=0; bit<32; ++bit){
          // If bit is set
