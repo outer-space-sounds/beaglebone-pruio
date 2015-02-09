@@ -72,9 +72,9 @@ flags = [
 '-isystem',
 '/usr/local/include',
 
-'-DBBB_PRUIO_START_ADDR_0=0',
+'-DBEAGLEBONE_PRUIO_START_ADDR_0=0',
 
-'-DBBB_PRUIO_PREFIX=\"foobar\"'
+'-DBEAGLEBONE_PRUIO_PREFIX=\"foobar\"'
 
 '-DIS_BEAGLEBONE'
 ]

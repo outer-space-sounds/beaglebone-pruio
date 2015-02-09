@@ -18,7 +18,6 @@
 ###
 
 
-
 # Make makefile silent, you can do `VERBOSE=1 make whatever` to get messages
 ifndef VERBOSE
 .SILENT:
@@ -37,11 +36,12 @@ example.o: example.c
 	gcc $(CFLAGS) -c -o example.o example.c
 
 library:
-	cd ../library && make clean && make
+	cd ../library && make clean && make && make install
 
 .PHONY:run
 run:
-	LD_LIBRARY_PATH=../library/lib ./example
+	# LD_LIBRARY_PATH=../library/lib ./example
+	./example
 
 .PHONY:debugger
 debugger:

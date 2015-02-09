@@ -32,9 +32,15 @@ typedef struct beaglebone_pruio_message{
 } beaglebone_pruio_message;
 
 typedef enum{  
-   BEAGLEBONE_PRUIO_OUTPUT_MODE = 0,
-   BEAGLEBONE_PRUIO_INPUT_MODE = 1
+   BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT = 0,
+   BEAGLEBONE_PRUIO_GPIO_MODE_INPUT = 1
 } beaglebone_pruio_gpio_mode;
+
+typedef enum{  
+   BEAGLEBONE_PRUIO_ADC_MODE_OFF = 0,
+   BEAGLEBONE_PRUIO_ADC_MODE_NORMAL = 1,
+   BEAGLEBONE_PRUIO_ADC_MODE_RANGES = 2,
+} beaglebone_pruio_adc_mode;
 
 /**
  * Initializes PRU, GPIO and ADC hardware and starts sampling ADC channels.
@@ -59,7 +65,14 @@ void beaglebone_pruio_set_pin_value(int gpio_number, int value);
 /**
  * Starts reading from an ADC pin.
  */
-int beaglebone_pruio_init_adc_pin(int channel_number); 
+int beaglebone_pruio_init_adc_pin(int channel_number, int bits); 
+
+/**
+ * Starts reading from an ADC pin. The analog input range is broken
+ * into n ranges. Useful, for example, for selecting one of n numbers
+ * with a potentiometer.
+ */
+int beaglebone_pruio_init_adc_pin_with_ranges(int channel_number, int ranges); 
 
 /**
  * Returns 1 if there is data available from the PRU

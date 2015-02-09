@@ -20,6 +20,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <beaglebone_pruio_pins.h>
+
+#ifdef IS_BEAGLEBONE
+#include <beaglebone_pruio.h>
+#endif 
 
 #include "beaglebone.h"
 
@@ -30,9 +35,10 @@
 typedef struct _adc_input_tilde {
    t_object x_obj;
    t_outlet *outlet_left;
-   char channel[3];
+   int channel;
 
    int line_output;
+   int bits;
 
    t_float increment;
    t_float target_value;
@@ -49,6 +55,11 @@ static t_class *adc_input_tilde_class;
 
 void adc_input_tilde_callback(void* this, t_float value){
    t_adc_input_tilde* x = (t_adc_input_tilde*)this;
+
+   #ifndef IS_BEAGLEBONE
+      value = (int)(value * (1<<x->bits));
+   #endif 
+
    if(x->line_output){
       x->target_value = value;
       
@@ -106,37 +117,62 @@ static void *adc_input_tilde_new(t_symbol *s, int argc, t_atom *argv) {
       error("beaglebone/adc_input~: You need to specify the channel number");
       return NULL;
    }
+   
+   // Invalid floats will be parsed as zero so let's check if that 
+   // zero is actually valid
    t_float f = atom_getfloat(argv);
-   if( f==0 && strcmp("float", atom_getsymbol(argv)->s_name)!=0 ){ // Invalid floats will be parsed as zero so let's check if that zero is actually valid
+   if( f==0 && strcmp("float", atom_getsymbol(argv)->s_name)!=0 ){ 
       error("beaglebone/adc_input~: %s is not a valid ADC channel.", atom_getsymbol(argv)->s_name);
       return NULL;
    }
-   if(f<0 || f>99 || (t_float)((int)f)!=(f)){
+   if(f<0 || f>BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS || (t_float)((int)f)!=(f)){
       error("beaglebone/adc_input~: %f is not a valid ADC channel.", f); 
       return NULL;
    }
+
+   // other parameters? 
+   int i;
+   int bits = 7;
+   int line_output = 0;
+   for(i=1; i<argc; ++i){
+      char* param = atom_getsymbol(argv+i)->s_name;
+      // Bits
+      if(strcmp(param, "bits") == 0){
+         bits = atom_getfloat(argv+i+1);
+         if(bits<=0){
+            bits = 7;
+         }
+         if(bits>12){
+            bits = 12;
+         }
+      }
+      // Line
+      else if(strcmp(param, "line") == 0){
+         line_output = 1;
+      }
+   }
+
+   // Debug
+   /* error("c:%i, b:%i, l:%i", (int)f, bits, line_output); */
+
+   #ifdef IS_BEAGLEBONE
+      if(beaglebone_pruio_init_adc_pin((int)f, bits)){
+         error("beaglebone/adc_input: Could not init adc channel %s (%f), is it already in use?", atom_getsymbol(argv)->s_name, f);
+         return NULL;
+      }
+   #endif 
    
    t_adc_input_tilde *x = (t_adc_input_tilde *)pd_new(adc_input_tilde_class);
    x->outlet_left = outlet_new(&x->x_obj, gensym("signal"));
-   /* x->timeout_clock = clock_new(x,  (t_method)adc_input_tilde_timeout);  */
-
+   x->channel = f;
+   x->bits = bits;
+   x->line_output = line_output;
    x->current_value = 0;
    x->target_value = 0;
    x->increment = 0;
 
-   // Parse creation parameter 2 (line)
-   x->line_output = 0;
-   if(argc >=2){
-      t_symbol* param = atom_getsymbolarg(1, argc, argv);   
-      if(strcmp(param->s_name, "line")==0){
-         x->line_output = 1;
-      }
-   }
-
-   sprintf(x->channel, "%i", (int)f);
-   char err[256];
-   if(beaglebone_clock_new(0, x->channel, x, adc_input_tilde_callback, err)){
-      error("beaglebone/adc_input~: %s", err); 
+   if(beaglebone_register_callback(0, (int)f, x, adc_input_tilde_callback)){
+      error("beaglebone/adc_input: Could not init adc channel %s (%f), is it already in use?", atom_getsymbol(argv)->s_name, f);
       return NULL;
    }
 
@@ -144,8 +180,7 @@ static void *adc_input_tilde_new(t_symbol *s, int argc, t_atom *argv) {
 }
 
 static void adc_input_tilde_free(t_adc_input_tilde *x) { 
-   outlet_free(x->outlet_left);
-   /* clock_free(x->timeout_clock); */
+   beaglebone_unregister_callback(0, x->channel);
 }
 
 /////////////////////////////////////////////////////////////////////////

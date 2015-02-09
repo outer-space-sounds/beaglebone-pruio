@@ -19,11 +19,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <beaglebone_pruio_pins.h>
-#include "m_pd.h"
 
 #ifdef IS_BEAGLEBONE
 #include <beaglebone_pruio.h>
 #endif 
+
+#include "beaglebone.h"
 
 /////////////////////////////////////////////////////////////////////////
 // PD library bootstrapping.
@@ -56,8 +57,8 @@ void beaglebone_setup(void){
 #ifdef IS_BEAGLEBONE
 #define CLOCK_PERIOD 0.6666 // milliseconds
 #else
-/* #define CLOCK_PERIOD 1000 // milliseconds */
-#define CLOCK_PERIOD 0.6666 // milliseconds
+#define CLOCK_PERIOD 1000 // milliseconds
+/* #define CLOCK_PERIOD 0.6666 // milliseconds */
 #endif
 
 typedef struct callback{
@@ -105,7 +106,7 @@ void beaglebone_clock_tick(void* x){
             /* } */
 
             /* if(message.adc_channel<BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS && cbk->instance!=NULL && cbk->callback_function!=NULL){ */
-               cbk->callback_function(cbk->instance, (t_float)message.value/127.0);
+               cbk->callback_function(cbk->instance, (t_float)message.value);
             /* } */
          }
       }
@@ -129,15 +130,14 @@ void beaglebone_clock_tick(void* x){
    clock_delay(beaglebone_clock, CLOCK_PERIOD);
 }
 
-/**
- * set is_digital to 1 if digital pin, 0 if analog
- */
-int beaglebone_clock_new(int is_digital, 
-                         char* channel, 
-                         void* instance, 
-                         void (*callback_function)(void*, t_float), 
-                         char* err){
+int beaglebone_register_callback(
+      int is_digital, 
+      int channel, 
+      void* instance, 
+      void (*callback_function)(void*, t_float) 
+){
    
+   // First time here. Init arrays.
    if(beaglebone_number_of_instances==0){
       int i;
       for(i=0; i<BEAGLEBONE_PRUIO_MAX_GPIO_CHANNELS; ++i){
@@ -153,93 +153,61 @@ int beaglebone_clock_new(int is_digital,
          new_callback.instance = NULL;
          analog_callbacks[i] = new_callback;
       }
-
    }
-   int gpio_number = -1;
-   int adc_number = -1;
-   if(is_digital==1){
-      gpio_number = beaglebone_pruio_get_gpio_number(channel);
-      if(gpio_number==-1){
-         sprintf(err, "%s is not a valid GPIO pin.", channel);
-         return 1;
+   
+   // If there's already a callback for this channel, bail out.
+   if(is_digital){
+      if(digital_callbacks[channel].instance!=NULL){
+         return 1;    
       }
    }
    else{
-      adc_number = strtol(channel, NULL, 10);
-      if(adc_number<0 || adc_number>BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS){
-         sprintf(err, "%s is not a valid ADC channel.", channel);
-         return 1;
+      if(analog_callbacks[channel].instance!=NULL){
+         return 1;    
       }
    }
 
-   #ifdef IS_BEAGLEBONE
-      if(is_digital==1){
-         if(beaglebone_pruio_init_gpio_pin(gpio_number, 1)){  // 1 for input
-            sprintf(err, "Could not init pin %s (%i), is it already in use?", channel, gpio_number);
-            return 1;
-         }
-      }
-      else{
-         if(beaglebone_pruio_init_adc_pin(adc_number)){
-            sprintf(err, "Could not init adc channel %s (%i), is it already in use?", channel, adc_number);
-            return 1;
-         }
-      }
-   #else
-      if(is_digital==1){
-         if(digital_callbacks[gpio_number].instance!=NULL){
-            sprintf(err, "Could not init pin %s (%i), is it already in use?", channel, gpio_number);
-            return 1;
-         }
-      }
-      else{
-         if(analog_callbacks[adc_number].instance!=NULL){
-            sprintf(err, "Could not init adc channel %s (%i), is it already in use?", channel, adc_number);
-            return 1;
-         }
-      }
-   #endif 
-   
+   // All good, register the callback
    callback new_callback;
    new_callback.callback_function = callback_function;
    new_callback.instance = instance;
    if(is_digital==1){
-      digital_callbacks[gpio_number] = new_callback;
+      digital_callbacks[channel] = new_callback;
    }
    else{
-      analog_callbacks[adc_number] = new_callback;
+      analog_callbacks[channel] = new_callback;
    }
 
-
+   // First time here. Start the clock.
    if(beaglebone_number_of_instances==0){
       beaglebone_clock = clock_new(NULL,  (t_method)beaglebone_clock_tick); 
       clock_delay(beaglebone_clock, CLOCK_PERIOD);
    }
+
    beaglebone_number_of_instances++;
 
    return 0;
 }
 
-void beaglebone_clock_free(int is_digital, char* channel){
+void beaglebone_unregister_callback(int is_digital, int channel){
    // TODO uninit pin?
    
    callback *cbk;
    if(is_digital==1){
-      int gpio_number = beaglebone_pruio_get_gpio_number(channel);
-      cbk = &(digital_callbacks[gpio_number]);
+      cbk = &(digital_callbacks[channel]);
    }
    else{
-      int adc_channel = strtol(channel, NULL, 10);
-      cbk = &(analog_callbacks[adc_channel]);
+      cbk = &(analog_callbacks[channel]);
    }
    cbk->callback_function = NULL;
    cbk->instance = NULL;
 
    beaglebone_number_of_instances--;
    if(beaglebone_number_of_instances==0){
-      // TODO: stop lib pruio?
       clock_free(beaglebone_clock);
       beaglebone_clock = NULL;
+      #ifdef IS_BEAGLEBONE
+         beaglebone_pruio_stop();
+      #endif
    }
 }
-

@@ -1,20 +1,21 @@
-/* Beaglebone Pru IO 
- * 
- * Copyright (C) 2015 Rafael Vega <rvega@elsoftwarehamuerto.org> 
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+   /* 
+    * Beaglebone Pru IO 
+    * 
+    * Copyright (C) 2015 Rafael Vega <rvega@elsoftwarehamuerto.org> 
+    * 
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    * 
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    * 
+    * You should have received a copy of the GNU General Public License
+    * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,10 +50,10 @@ static void* monitor_inputs(void* param){
 
          // Messages from adc
          else if(!message.is_gpio && message.adc_channel==0){
-            printf("0: %i\n", message.value);
+            printf("ADC 0: %i\n", message.value);
          }
          else if(!message.is_gpio && message.adc_channel==6){
-            printf("\t6: %i\n", message.value);
+            printf("ADC 6: %i\n", message.value);
          }
       }
       usleep(10000);
@@ -90,37 +91,37 @@ int main(int argc, const char *argv[]){
    start_monitor_thread();
 
    // Initialize 2 pins as outputs
-   if(beaglebone_pruio_init_gpio_pin(P9_16, BEAGLEBONE_PRUIO_OUTPUT_MODE)){
+   if(beaglebone_pruio_init_gpio_pin(P9_16, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT)){
       fprintf(stderr, "%s\n", "Could not initialize pin P9_12");
    }
-   if(beaglebone_pruio_init_gpio_pin(P9_18, BEAGLEBONE_PRUIO_OUTPUT_MODE)){
+   if(beaglebone_pruio_init_gpio_pin(P9_18, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT)){
       fprintf(stderr, "%s\n", "Could not initialize pin P9_14");
    }
-   
+
    // Init 2 pins as inputs
-   if(beaglebone_pruio_init_gpio_pin(P9_13, BEAGLEBONE_PRUIO_INPUT_MODE)){
+   if(beaglebone_pruio_init_gpio_pin(P9_13, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT)){
       fprintf(stderr, "%s\n", "Could not initialize pin P9_13");
    }
-   if(beaglebone_pruio_init_gpio_pin(P9_11, BEAGLEBONE_PRUIO_INPUT_MODE)){
+   if(beaglebone_pruio_init_gpio_pin(P9_11, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT)){
       fprintf(stderr, "%s\n", "Could not initialize pin P9_11");
    }
 
    // Init 2 analog inputs
-   if(beaglebone_pruio_init_adc_pin(0)){
+   if(beaglebone_pruio_init_adc_pin_with_ranges(0, 12)){
       fprintf(stderr, "%s\n", "Could not initialize adc pin 0");
    }
-   if(beaglebone_pruio_init_adc_pin(6)){
+   if(beaglebone_pruio_init_adc_pin(6, 7)){
       fprintf(stderr, "%s\n", "Could not initialize adc pin 6");
    }
 
 
    // Check if library is returning adequately when trying to 
    // re-initialize a pin.
-   if(!beaglebone_pruio_init_gpio_pin(P9_16, BEAGLEBONE_PRUIO_INPUT_MODE)){
+   if(!beaglebone_pruio_init_gpio_pin(P9_16, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT)){
       fprintf(stderr, "%s\n", "P9_16 was already initialized, should have returned error");
       exit(1);
    }
-   if(beaglebone_pruio_init_gpio_pin(P9_18, BEAGLEBONE_PRUIO_OUTPUT_MODE)){
+   if(beaglebone_pruio_init_gpio_pin(P9_18, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT)){
       fprintf(stderr, "%s\n", "P9_18 was already initialized as output, should have not returned error");
       exit(1);
    }

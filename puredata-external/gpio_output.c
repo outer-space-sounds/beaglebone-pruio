@@ -32,7 +32,6 @@
 
 typedef struct gpio_output {
    t_object x_obj;
-   char channel[7];
    int gpio_number;
 } t_gpio_output;
 
@@ -61,29 +60,35 @@ void gpio_output_float(t_gpio_output* x, t_floatarg f){
 //
 
 static void *gpio_output_new(t_symbol *s) {
-   t_gpio_output *x = (t_gpio_output *)pd_new(gpio_output_class);
 
-   strncpy(x->channel, s->s_name, 6);
-   x->channel[6] = '\0';
-
-   x->gpio_number = beaglebone_pruio_get_gpio_number(x->channel);
+   int gpio_number = beaglebone_pruio_get_gpio_number(s->s_name);
+   if(gpio_number == -1){
+      error("beaglebone/gpio_output: Could not init pin %s (%i).", 
+            s->s_name, 
+            gpio_number
+           );
+      return NULL;
+   }
 
    #ifdef IS_BEAGLEBONE
-      if(beaglebone_pruio_init_gpio_pin(x->gpio_number, 0)){   // 0 for output
+      if(beaglebone_pruio_init_gpio_pin(gpio_number, 0)){   // 0 for output
          error("beaglebone/gpio_output: Could not init pin %s (%i).", 
-               x->channel, 
-               x->gpio_number
+               s->s_name, 
+               gpio_number
          );
          return NULL;
       }
    #endif
 
+   t_gpio_output *x = (t_gpio_output *)pd_new(gpio_output_class);
+   x->gpio_number = gpio_number;
+
    return (void *)x;
 }
 
 static void gpio_output_free(t_gpio_output *x) { 
-   (void)x;
    // TODO: Uninit pin?
+   (void)x;
 }
 
 /////////////////////////////////////////////////////////////////////////
