@@ -1,14 +1,18 @@
-#N canvas 387 157 265 212 10;
+#N canvas 273 322 750 182 10;
 #X declare -lib beaglebone;
-#X obj 16 15 import beaglebone;
 #X floatatom 27 70 5 0 0 0 - - -, f 5;
-#X floatatom 134 72 5 0 0 0 - - -, f 5;
+#X floatatom 191 71 5 0 0 0 - - -, f 5;
 #X obj 16 93 print ADC0;
-#X obj 120 96 print ADC13;
-#X obj 120 44 adc_input 13;
-#X obj 16 43 adc_input 0;
+#X obj 177 95 print ADC13;
 #X obj 15 119 license;
-#X connect 5 0 2 0;
-#X connect 5 0 4 0;
-#X connect 6 0 1 0;
-#X connect 6 0 3 0;
+#X obj 19 -2 declare -lib beaglebone;
+#X text 315 42 Creation parameters are \; channel: Must be the first
+parameter. Which adc channel \; <ranges n>: Divides the output range
+in n sections. Sets bits to 8 \; <bits n>: Resolution in bits of
+the output. Default is 7, f 68;
+#X obj 177 43 adc_input 13 bits 8;
+#X obj 16 43 adc_input 0 ranges 12;
+#X connect 7 0 1 0;
+#X connect 7 0 3 0;
+#X connect 8 0 0 0;
+#X connect 8 0 2 0;

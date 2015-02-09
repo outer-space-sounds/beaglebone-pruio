@@ -129,12 +129,6 @@
 #define ADC12_CONFIG 1042
 #define ADC13_CONFIG 1043
 
-typedef enum{  
-   BEAGLEBONE_PRUIO_ADC_MODE_OFF = 0,
-   BEAGLEBONE_PRUIO_ADC_MODE_NORMAL = 1,
-   BEAGLEBONE_PRUIO_ADC_MODE_RANGES = 2,
-} beaglebone_pruio_adc_mode;
-
 
 /////////////////////////////////////////////////////////////////////
 // Register addresses

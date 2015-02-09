@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-int beaglebone_clock_new(int is_digital, char* channel, void* instance, void (*callback_function)(void*, t_float), char* err);
-void beaglebone_clock_free(int is_digital, char* channel);
+#include <m_pd.h>
+
+int beaglebone_register_callback(int is_digital, int channel, void* instance, void (*callback_function)(void*, t_float));
+void beaglebone_unregister_callback(int is_digital, int channel);
 void beaglebone_tick(void* x);

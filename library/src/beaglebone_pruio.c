@@ -518,11 +518,11 @@ int beaglebone_pruio_start(){
 }
 
 int beaglebone_pruio_init_adc_pin(int channel_number, int bits){
-   return init_adc_channel(channel_number, BEAGLEBONE_PRUIO_ADC_MODE_NORMAL, bits, 0, 0);
+   return init_adc_channel((unsigned char)channel_number, BEAGLEBONE_PRUIO_ADC_MODE_NORMAL, bits, 0, 0);
 }
 
 int beaglebone_pruio_init_adc_pin_with_ranges(int channel_number, int ranges){
-   return init_adc_channel(channel_number, BEAGLEBONE_PRUIO_ADC_MODE_RANGES, ranges, 0, 0);
+   return init_adc_channel((unsigned char)channel_number, BEAGLEBONE_PRUIO_ADC_MODE_RANGES, ranges, 0, 0);
 }
 
 int beaglebone_pruio_init_gpio_pin(int gpio_number, beaglebone_pruio_gpio_mode mode){

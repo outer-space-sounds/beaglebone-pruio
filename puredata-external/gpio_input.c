@@ -18,6 +18,11 @@
 
 #include <string.h>
 #include <m_pd.h>
+#include <beaglebone_pruio_pins.h>
+
+#ifdef IS_BEAGLEBONE
+#include <beaglebone_pruio.h>
+#endif 
 
 #include "beaglebone.h"
 
@@ -28,7 +33,7 @@
 typedef struct gpio_input {
    t_object x_obj;
    t_outlet *outlet_left;
-   char channel[7];
+   int gpio_number;
 } t_gpio_input;
 
 // A pointer to the class object.
@@ -48,15 +53,25 @@ void gpio_input_callback(void* x, float value){
 //
 
 static void *gpio_input_new(t_symbol *s) {
+   int gpio_number = beaglebone_pruio_get_gpio_number(s->s_name);
+   if(gpio_number==-1){
+      error("beaglebone/gpio_input: %s is not a valid GPIO pin.", s->s_name);
+      return NULL;
+   }
+
+   #ifdef IS_BEAGLEBONE
+      if(beaglebone_pruio_init_gpio_pin(gpio_number, 1)){  // 1 for input
+         error("beaglebone/gpio_input: Could not init pin %s (%i), is it already in use?", s->s_name, gpio_number); 
+         return NULL;
+      }
+   #endif 
+
    t_gpio_input *x = (t_gpio_input *)pd_new(gpio_input_class);
    x->outlet_left = outlet_new(&x->x_obj, &s_float);
+   x->gpio_number = gpio_number;
 
-   strncpy(x->channel, s->s_name, 6);
-   x->channel[6] = '\0';
-
-   char err[256];
-   if(beaglebone_clock_new(1, x->channel, x, gpio_input_callback, err)){
-      error("beaglebone/gpio_input: %s", err); 
+   if(beaglebone_register_callback(1, gpio_number, x, gpio_input_callback)){
+      error("beaglebone/gpio_input: Could not init pin %s (%i), is it already in use?", s->s_name, gpio_number); 
       return NULL;
    }
 
@@ -64,8 +79,7 @@ static void *gpio_input_new(t_symbol *s) {
 }
 
 static void gpio_input_free(t_gpio_input *x) { 
-   beaglebone_clock_free(1, x->channel);
-   (void)x;
+   beaglebone_unregister_callback(1, x->gpio_number);
 }
 
 /////////////////////////////////////////////////////////////////////////

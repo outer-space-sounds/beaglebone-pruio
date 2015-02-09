@@ -36,6 +36,12 @@ typedef enum{
    BEAGLEBONE_PRUIO_GPIO_MODE_INPUT = 1
 } beaglebone_pruio_gpio_mode;
 
+typedef enum{  
+   BEAGLEBONE_PRUIO_ADC_MODE_OFF = 0,
+   BEAGLEBONE_PRUIO_ADC_MODE_NORMAL = 1,
+   BEAGLEBONE_PRUIO_ADC_MODE_RANGES = 2,
+} beaglebone_pruio_adc_mode;
+
 /**
  * Initializes PRU, GPIO and ADC hardware and starts sampling ADC channels.
  */

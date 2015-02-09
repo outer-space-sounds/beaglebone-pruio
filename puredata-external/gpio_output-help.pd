@@ -1,12 +1,13 @@
-#N canvas 695 161 274 223 10;
+#N canvas 695 161 430 223 10;
 #X declare -lib beaglebone;
 #X obj 16 15 import beaglebone;
 #X obj 21 151 gpio_output P9_14;
 #X obj 21 68 loadbang;
 #X obj 21 97 metro 1000;
-#X obj 21 124 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 21 124 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
 #X obj 20 184 license;
+#X text 147 68 Creation parameter is the name of the pin.;
 #X connect 2 0 3 0;
 #X connect 3 0 4 0;
 #X connect 4 0 1 0;

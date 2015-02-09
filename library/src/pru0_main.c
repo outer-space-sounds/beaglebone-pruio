@@ -32,7 +32,6 @@
 volatile unsigned int* shared_ram;
 volatile register unsigned int __R31;
 
-#define ADC_BITS 8
 
 /////////////////////////////////////////////////////////////////////
 // RING BUFFER
@@ -357,8 +356,7 @@ void init_adc(){
 
 // See comments for adc config in definitions.h
 typedef struct adc_channel{
-   // OFF or ON
-   beaglebone_pruio_adc_mode mode; 
+   int mode; 
    
    unsigned int value; 
    unsigned int past_values[8]; 
@@ -484,11 +482,11 @@ inline void process_adc_values(){
             channel_number = step_id;
          }
 
-         beaglebone_pruio_adc_mode mode = adc_channels[channel_number].mode;
-         if(mode == BEAGLEBONE_PRUIO_ADC_MODE_NORMAL){
+         int mode = adc_channels[channel_number].mode;
+         if(mode == 1){
             process_adc_value(channel_number, value);
          }
-         else if(mode == BEAGLEBONE_PRUIO_ADC_MODE_RANGES){
+         else if(mode == 2){
             process_adc_value_with_ranges(channel_number, value);
          }
       }
@@ -500,7 +498,7 @@ void init_adc_values(){
    int i;
 
    adc_channel new_channel;
-   new_channel.mode = BEAGLEBONE_PRUIO_ADC_MODE_OFF;
+   new_channel.mode = 0;
    new_channel.value = 0xFFFF;
    for(i=0; i<8; i++) {
       new_channel.past_values[i] = 0xFFFF;
@@ -525,19 +523,19 @@ inline void init_adc_channels(){
     */
    int i;
    unsigned int config = 0;
-   beaglebone_pruio_adc_mode mode = BEAGLEBONE_PRUIO_ADC_MODE_OFF;
+   int mode = 0;
    for(i=0; i<BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS; i++){
       //not inited?
-      if(adc_channels[i].mode == BEAGLEBONE_PRUIO_ADC_MODE_OFF){
+      if(adc_channels[i].mode == 0){
          config = shared_ram[ADC0_CONFIG+i];
-         mode = (beaglebone_pruio_adc_mode) ((config >> 28) & 0xF);
-         if(mode != BEAGLEBONE_PRUIO_ADC_MODE_OFF){
+         mode = ((config >> 28) & 0xF);
+         if(mode != 0){
             adc_channels[i].mode = mode;
             adc_channels[i].parameter1 = config & 0xFF;
             adc_channels[i].parameter2 = (config >> 8) & 0xFF;
             adc_channels[i].parameter3 = (config >> 16) & 0xFF;
          }
-         if(mode == BEAGLEBONE_PRUIO_ADC_MODE_RANGES){
+         if(mode == 2){
             adc_channels[i].past_values[2] = 0xFFFF; //left_bound
             adc_channels[i].past_values[1] = 0; //right_bound
             adc_channels[i].past_values[0] = 0xFFFF; //current_range
