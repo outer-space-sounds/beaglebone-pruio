@@ -1,11 +1,8 @@
 c-example/example
-*.so
 *.o
 *.obj
-*.a
 *.elf
 *.map
-*.bin
 
 # Vim
 tags
