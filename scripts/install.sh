@@ -57,6 +57,7 @@ make install > /dev/null
 
 echo ""
 echo "5.Disabling HDMI virtual cape."
+mkdir -p /mnt/card
 mount /dev/mmcblk0p1 /mnt/card
 cd /mnt/card
 sed -i.bak '/^##Disable HDMI$/{N; s/^##Disable HDMI\n#/##Disable HDMI\n/}' uEnv.txt
