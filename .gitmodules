@@ -1,3 +1,3 @@
 [submodule "vendors/am335x_pru_package"]
 	path = vendors/am335x_pru_package
-	url = https://github.com/beagleboard/am335x_pru_package.git
+	url = https://github.com/outer-space-sounds/am335x_pru_package.git

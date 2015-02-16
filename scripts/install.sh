@@ -37,12 +37,7 @@ mv /usr/include/prussdrv.h /usr/include/prussdrv.h.bkp &> /dev/null
 mv /usr/include/pruss_intc_mapping.h /usr/include/pruss_intc_mapping.h.bkp &> /dev/null
 mv /usr/bin/pasm /usr/bin/pasm.bkp &> /dev/null
 
-cd vendors/am335x_pru_package/pru_sw/utils/pasm_source 
-./linuxbuild
-install -m 0755 ../pasm /usr/bin
-
-cd ../../app_loader/interface
-PREFIX=/usr make > /dev/null
+cd vendors/am335x_pru_package
 PREFIX=/usr make install > /dev/null
 
 echo ""
