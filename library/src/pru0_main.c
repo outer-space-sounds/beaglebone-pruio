@@ -106,54 +106,54 @@ void init_gpio(){
 
 inline void set_mux_control(unsigned int ctl){
    // 3 bits for mux control: 
-   // [P9_27 GPIO3[19], P9_30 GPIO3[16], P9_42A GPIO0[7]]
+   // [P9_42A GPIO0[7], P9_30 GPIO3[16], P9_27 GPIO3[19]]
    switch(ctl){
       case 0:
+         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<7);
          HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<19);
          HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<16);
-         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<7);
          break;
 
       case 1:
-         HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<19);
+         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<7);
          HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<16);
-         HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<7);
+         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<19);
          break;
 
       case 2:
-         HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<19);
-         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<16);
          HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<7);
+         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<16);
+         HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<19);
          break;
 
       case 3:
-         HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<19);
+         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<7);
          HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<16);
-         HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<7);
+         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<19);
          break;
 
       case 4:
-         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<19);
+         HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<7);
          HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<16);
-         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<7);
+         HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<19);
          break;
 
       case 5:
-         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<19);
-         HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<16);
          HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<7);
+         HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<16);
+         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<19);
          break;
 
       case 6:
-         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<19);
+         HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<7);
          HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<16);
-         HWREG(GPIO0 + GPIO_DATAOUT) &= ~(1<<7);
+         HWREG(GPIO3 + GPIO_DATAOUT) &= ~(1<<19);
          break;
 
       default: //7
-         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<19);
-         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<16);
          HWREG(GPIO0 + GPIO_DATAOUT) |= (1<<7);
+         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<16);
+         HWREG(GPIO3 + GPIO_DATAOUT) |= (1<<19);
          break;
    }
 }
