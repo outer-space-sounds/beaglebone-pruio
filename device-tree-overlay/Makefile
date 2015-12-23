@@ -30,7 +30,7 @@ clean:
 
 .PHONY: install
 install: $(NAME)-$(VERSION).dtbo
-	cp $(NAME)-$(VERSION).dtbo /lib/firmware
+	cp -f $(NAME)-$(VERSION).dtbo /lib/firmware
 
 .PHONY: uninstall
 uninstall: 

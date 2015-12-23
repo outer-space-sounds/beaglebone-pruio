@@ -29,7 +29,7 @@ LDFLAGS = -L../library/lib -lbeaglebone_pruio -lpthread
 all: example
 
 example: example.o
-	cd ../library && make
+	# cd ../library && make
 	gcc $(CFLAGS) -o example example.o $(LDFLAGS)
 
 example.o: example.c
@@ -40,7 +40,7 @@ library:
 
 .PHONY:run
 run:
-	# LD_LIBRARY_PATH=../library/lib ./example
+	# LD_LIBRARY_PATH=../library/lib ./example 
 	./example
 
 .PHONY:debugger

@@ -88,9 +88,9 @@
 #define P9_21  3 
 #define P9_22  2 
 #define P9_23  49 
-#define P9_24  15 
+// #define P9_24  15  // UART1 used for MIDI
 // #define P9_25  117 // mcasp0
-#define P9_26  14 
+// #define P9_26  14  // UART1 used for MIDI
 #define P9_27  115 // mux_control
 // #define P9_28  113 // mcasp0
 // #define P9_29  111 // mcasp0
