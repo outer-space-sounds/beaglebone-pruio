@@ -54,9 +54,9 @@
 // #define P8_24 33 // emmc2
 // #define P8_25 32 // emmc2
 #define P8_26 61 
-#define P8_27 86 // hdmi
-#define P8_28 88 // hdmi
-#define P8_29 87 // hdmi
+#define P8_27 86 // hdmi, mux_control
+#define P8_28 88 // hdmi, mux_control
+#define P8_29 87 // hdmi, mux_control
 #define P8_30 89 // hdmi
 #define P8_31 10 // hdmi
 #define P8_32 11 // hdmi
@@ -91,14 +91,14 @@
 #define P9_24  15 
 // #define P9_25  117 // mcasp0
 #define P9_26  14 
-#define P9_27  115 // mux_control
+#define P9_27  115 // previous mux_control
 // #define P9_28  113 // mcasp0
 // #define P9_29  111 // mcasp0
-#define P9_30  112 // mux_control
+#define P9_30  112 // previous mux_control
 // #define P9_31  110 // mcasp0
 #define P9_41A 20 
 // #define P9_41B 116 // low levels on output, ok input
-#define P9_42A 7   // mux_control
+#define P9_42A 7   // previous mux_control
 // #define P9_42B 114 // mcasp0
 
 static inline int beaglebone_pruio_get_gpio_number(char* pin_name){

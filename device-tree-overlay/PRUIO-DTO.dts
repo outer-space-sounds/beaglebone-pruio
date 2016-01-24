@@ -42,9 +42,9 @@
       "P8_18", 
       "P8_19", 
       "P8_26", 
-      "P8_27", // hdmi
-      "P8_28", // hdmi
-      "P8_29", // hdmi
+      "P8_27", // hdmi, mux_control
+      "P8_28", // hdmi, mux_control
+      "P8_29", // hdmi, mux_control
       "P8_30", // hdmi
       "P8_31", // hdmi
       "P8_32", // hdmi
