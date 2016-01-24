@@ -20,4 +20,5 @@
 ###
 
 ./set_beagle_clock.sh
+sudo mkdir -p /media/beagle
 sshfs -o reconnect root@192.168.7.2:/ /media/beagle
