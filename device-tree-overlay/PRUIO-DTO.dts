@@ -63,9 +63,9 @@
       "P8_45", // hdmi
       "P8_46", // hdmi
 
-      "P9.11",
+      /* "P9.11", */  // UART 1
       "P9.12",
-      "P9.13",
+      /* "P9.13", */ // UART 1
       "P9.14",
       "P9.15",
       "P9.16",
@@ -74,8 +74,8 @@
       "P9.21",
       "P9.22",
       "P9.23",
-      /* "P9.24", */
-      /* "P9.26", */
+      "P9.24",
+      "P9.26",
       "P9.27",
       "P9.30",
       "P9.41",
@@ -202,14 +202,14 @@
          P8_46_o: P8_46_out{pinctrl-single,pins = <0x0A4 0x0F>;};
 
 
-         P9_11_i: P9_11_in{pinctrl-single,pins = <0x070 0x37>;};
-         P9_11_o: P9_11_out{pinctrl-single,pins = <0x070 0x0F>;};
+         /* P9_11_i: P9_11_in{pinctrl-single,pins = <0x070 0x37>;}; */
+         /* P9_11_o: P9_11_out{pinctrl-single,pins = <0x070 0x0F>;}; */
 
          P9_12_i: P9_12_in{pinctrl-single,pins = <0x078 0x37>;};
          P9_12_o: P9_12_out{pinctrl-single,pins = <0x078 0x0F>;};
 
-         P9_13_i: P9_13_in{pinctrl-single,pins = <0x074 0x37>;};
-         P9_13_o: P9_13_out{pinctrl-single,pins = <0x074 0x0F>;};
+         /* P9_13_i: P9_13_in{pinctrl-single,pins = <0x074 0x37>;}; */
+         /* P9_13_o: P9_13_out{pinctrl-single,pins = <0x074 0x0F>;}; */
 
          P9_14_i: P9_14_in{pinctrl-single,pins = <0x048 0x37>;};
          P9_14_o: P9_14_out{pinctrl-single,pins = <0x048 0x0F>;};
@@ -235,11 +235,11 @@
          P9_23_i: P9_23_in{pinctrl-single,pins = <0x044 0x37>;};
          P9_23_o: P9_23_out{pinctrl-single,pins = <0x044 0x0F>;};
 
-         /* P9_24_i: P9_24_in{pinctrl-single,pins = <0x184 0x37>;}; */
-         /* P9_24_o: P9_24_out{pinctrl-single,pins = <0x184 0x0F>;}; */
+         P9_24_i: P9_24_in{pinctrl-single,pins = <0x184 0x37>;};
+         P9_24_o: P9_24_out{pinctrl-single,pins = <0x184 0x0F>;};
 
-         /* P9_26_i: P9_26_in{pinctrl-single,pins = <0x180 0x37>;}; */
-         /* P9_26_o: P9_26_out{pinctrl-single,pins = <0x180 0x0F>;}; */
+         P9_26_i: P9_26_in{pinctrl-single,pins = <0x180 0x37>;};
+         P9_26_o: P9_26_out{pinctrl-single,pins = <0x180 0x0F>;};
 
          P9_27_i: P9_27_in{pinctrl-single,pins = <0x1A4 0x37>;};
          P9_27_o: P9_27_out{pinctrl-single,pins = <0x1A4 0x0F>;};
@@ -541,13 +541,13 @@
          };
 
 
-         P9_11_mux {
-            compatible = "bone-pinmux-helper";
-            status = "okay";
-            pinctrl-names = "input", "output";
-            pinctrl-0 = <&P9_11_i>;
-            pinctrl-1 = <&P9_11_o>;
-         };
+         /* P9_11_mux { */
+         /*    compatible = "bone-pinmux-helper"; */
+         /*    status = "okay"; */
+         /*    pinctrl-names = "input", "output"; */
+         /*    pinctrl-0 = <&P9_11_i>; */
+         /*    pinctrl-1 = <&P9_11_o>; */
+         /* }; */
 
          P9_12_mux {
             compatible = "bone-pinmux-helper";
@@ -557,13 +557,13 @@
             pinctrl-1 = <&P9_12_o>;
          };
 
-         P9_13_mux {
-            compatible = "bone-pinmux-helper";
-            status = "okay";
-            pinctrl-names = "input", "output";
-            pinctrl-0 = <&P9_13_i>;
-            pinctrl-1 = <&P9_13_o>;
-         };
+         /* P9_13_mux { */
+         /*    compatible = "bone-pinmux-helper"; */
+         /*    status = "okay"; */
+         /*    pinctrl-names = "input", "output"; */
+         /*    pinctrl-0 = <&P9_13_i>; */
+         /*    pinctrl-1 = <&P9_13_o>; */
+         /* }; */
 
          P9_14_mux {
             compatible = "bone-pinmux-helper";
@@ -629,21 +629,21 @@
             pinctrl-1 = <&P9_23_o>;
          };
 
-         /* P9_24_mux { */
-         /*    compatible = "bone-pinmux-helper"; */
-         /*    status = "okay"; */
-         /*    pinctrl-names = "input", "output"; */
-         /*    pinctrl-0 = <&P9_24_i>; */
-         /*    pinctrl-1 = <&P9_24_o>; */
-         /* }; */
-         /*  */
-         /* P9_26_mux { */
-         /*    compatible = "bone-pinmux-helper"; */
-         /*    status = "okay"; */
-         /*    pinctrl-names = "input", "output"; */
-         /*    pinctrl-0 = <&P9_26_i>; */
-         /*    pinctrl-1 = <&P9_26_o>; */
-         /* }; */
+         P9_24_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_24_i>;
+            pinctrl-1 = <&P9_24_o>;
+         };
+
+         P9_26_mux {
+            compatible = "bone-pinmux-helper";
+            status = "okay";
+            pinctrl-names = "input", "output";
+            pinctrl-0 = <&P9_26_i>;
+            pinctrl-1 = <&P9_26_o>;
+         };
 
          P9_27_mux {
             compatible = "bone-pinmux-helper";

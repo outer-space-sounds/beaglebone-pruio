@@ -75,9 +75,9 @@
 #define P8_45 70 // hdmi
 #define P8_46 71 // hdmi
 
-#define P9_11  30 
+// #define P9_11  30  // uart 4
 #define P9_12  60 
-#define P9_13  31 
+// #define P9_13  31  // uart 4
 #define P9_14  50 
 #define P9_15  48 
 #define P9_16  51 
@@ -88,9 +88,9 @@
 #define P9_21  3 
 #define P9_22  2 
 #define P9_23  49 
-#define P9_24  15 
+#define P9_24  15
 // #define P9_25  117 // mcasp0
-#define P9_26  14 
+#define P9_26  14
 #define P9_27  115 // mux_control
 // #define P9_28  113 // mcasp0
 // #define P9_29  111 // mcasp0
@@ -205,15 +205,15 @@ static inline int beaglebone_pruio_get_gpio_number(char* pin_name){
       return P8_46;
    }
 
-   else if(strcmp(pin_name, "P9_11") == 0){
-      return P9_11;
-   }
+   // else if(strcmp(pin_name, "P9_11") == 0){
+   //    return P9_11;
+   // }
    else if(strcmp(pin_name, "P9_12") == 0){
       return P9_12;
    }
-   else if(strcmp(pin_name, "P9_13") == 0){
-      return P9_13;
-   }
+   // else if(strcmp(pin_name, "P9_13") == 0){
+   //    return P9_13;
+   // }
    else if(strcmp(pin_name, "P9_14") == 0){
       return P9_14;
    }

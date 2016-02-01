@@ -41,7 +41,7 @@
 
 // Privates
 #define BEAGLEBONE_MIDI_BUFFER_SIZE 128
-#define BEAGLEBONE_MIDI_UART_NUMBER 1
+#define BEAGLEBONE_MIDI_UART_NUMBER 4
 int uart;
 uint8_t uart_buffer[BEAGLEBONE_MIDI_BUFFER_SIZE];
 
@@ -250,15 +250,15 @@ static void* monitor_inputs(void* param){
          beaglebone_pruio_read_message(&message);
 
          // Message from gpio
-         if(message.is_gpio && message.gpio_number==P9_11){
+         /* if(message.is_gpio && message.gpio_number==P9_11){ */
             /* printf("P9_11: %i\n", message.value); */
-         }
-         else if(message.is_gpio && message.gpio_number==P9_13){
+         /* } */
+         /* else if(message.is_gpio && message.gpio_number==P9_13){ */
             /* printf("P9_13: %i\n", message.value); */
-         }
+         /* } */
 
          // Messages from adc
-         else if(!message.is_gpio && message.adc_channel==0){
+         if(!message.is_gpio && message.adc_channel==0){
             /* printf("ADC 0: %i\n", message.value); */
          }
          else if(!message.is_gpio && message.adc_channel==6){
@@ -334,12 +334,12 @@ int main(int argc, const char *argv[]){
    }
 
    // Init 2 pins as inputs
-   if(beaglebone_pruio_init_gpio_pin(P9_13, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT)){
-      fprintf(stderr, "%s\n", "Could not initialize pin P9_13");
-   }
-   if(beaglebone_pruio_init_gpio_pin(P9_11, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT)){
-      fprintf(stderr, "%s\n", "Could not initialize pin P9_11");
-   }
+   /* if(beaglebone_pruio_init_gpio_pin(P9_13, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT)){ */
+   /*    fprintf(stderr, "%s\n", "Could not initialize pin P9_13"); */
+   /* } */
+   /* if(beaglebone_pruio_init_gpio_pin(P9_11, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT)){ */
+   /*    fprintf(stderr, "%s\n", "Could not initialize pin P9_11"); */
+   /* } */
 
    // Init 2 analog inputs
    if(beaglebone_pruio_init_adc_pin_with_ranges(0, 12)){
