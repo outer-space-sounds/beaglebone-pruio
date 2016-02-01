@@ -238,12 +238,12 @@ static int get_gpio_pin_name(int gpio_number, char* pin_name){
       case P9_16: 
          strcpy(pin_name, "P9_16");
          break;
-      case P9_17: 
-         strcpy(pin_name, "P9_17");
-         break;
-      case P9_18: 
-         strcpy(pin_name, "P9_18");
-         break;
+      /* case P9_17:  */
+      /*    strcpy(pin_name, "P9_17"); */
+      /*    break; */
+      /* case P9_18:  */
+      /*    strcpy(pin_name, "P9_18"); */
+      /*    break; */
       case P9_21: 
          strcpy(pin_name, "P9_21");
          break;

@@ -33,6 +33,7 @@ void gpio_input_setup(void);
 void gpio_output_setup(void);
 void adc_input_setup(void);
 void adc_input_tilde_setup(void);
+void display_7_led_setup(void);
 
 void beaglebone_setup(void){
    #ifdef IS_BEAGLEBONE
@@ -42,6 +43,7 @@ void beaglebone_setup(void){
    gpio_output_setup();
    adc_input_setup();
    adc_input_tilde_setup();
+   display_7_led_setup();
 }
 
 //////////////////////////////////////////////////////////////////////

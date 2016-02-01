@@ -69,8 +69,8 @@
       "P9.14",
       "P9.15",
       "P9.16",
-      "P9.17",
-      "P9.18",
+      // "P9.17", // i2c1
+      // "P9.18", // i2c1
       "P9.21",
       "P9.22",
       "P9.23",
@@ -220,11 +220,11 @@
          P9_16_i: P9_16_in{pinctrl-single,pins = <0x04C 0x37>;};
          P9_16_o: P9_16_out{pinctrl-single,pins = <0x04C 0x0F>;};
 
-         P9_17_i: P9_17_in{pinctrl-single,pins = <0x15C 0x37>;};
-         P9_17_o: P9_17_out{pinctrl-single,pins = <0x15C 0x0F>;};
+         // P9_17_i: P9_17_in{pinctrl-single,pins = <0x15C 0x37>;};
+         // P9_17_o: P9_17_out{pinctrl-single,pins = <0x15C 0x0F>;};
 
-         P9_18_i: P9_18_in{pinctrl-single,pins = <0x158 0x37>;};
-         P9_18_o: P9_18_out{pinctrl-single,pins = <0x158 0x0F>;};
+         // P9_18_i: P9_18_in{pinctrl-single,pins = <0x158 0x37>;};
+         // P9_18_o: P9_18_out{pinctrl-single,pins = <0x158 0x0F>;};
 
          P9_21_i: P9_21_in{pinctrl-single,pins = <0x154 0x37>;};
          P9_21_o: P9_21_out{pinctrl-single,pins = <0x154 0x0F>;};
@@ -589,21 +589,21 @@
             pinctrl-1 = <&P9_16_o>;
          };
 
-         P9_17_mux {
-            compatible = "bone-pinmux-helper";
-            status = "okay";
-            pinctrl-names = "input", "output";
-            pinctrl-0 = <&P9_17_i>;
-            pinctrl-1 = <&P9_17_o>;
-         };
-
-         P9_18_mux {
-            compatible = "bone-pinmux-helper";
-            status = "okay";
-            pinctrl-names = "input", "output";
-            pinctrl-0 = <&P9_18_i>;
-            pinctrl-1 = <&P9_18_o>;
-         };
+         // P9_17_mux {
+         //    compatible = "bone-pinmux-helper";
+         //    status = "okay";
+         //    pinctrl-names = "input", "output";
+         //    pinctrl-0 = <&P9_17_i>;
+         //    pinctrl-1 = <&P9_17_o>;
+         // };
+         //
+         // P9_18_mux {
+         //    compatible = "bone-pinmux-helper";
+         //    status = "okay";
+         //    pinctrl-names = "input", "output";
+         //    pinctrl-0 = <&P9_18_i>;
+         //    pinctrl-1 = <&P9_18_o>;
+         // };
 
          P9_21_mux {
             compatible = "bone-pinmux-helper";

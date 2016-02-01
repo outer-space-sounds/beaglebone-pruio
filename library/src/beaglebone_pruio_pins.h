@@ -81,8 +81,8 @@
 #define P9_14  50 
 #define P9_15  48 
 #define P9_16  51 
-#define P9_17  5 
-#define P9_18  4 
+// #define P9_17  5  // i2c1
+// #define P9_18  4  // i2c1
 // #define P9_19  13 // i2c2
 // #define P9_20  12 // i2c2
 #define P9_21  3 
@@ -223,12 +223,12 @@ static inline int beaglebone_pruio_get_gpio_number(char* pin_name){
    else if(strcmp(pin_name, "P9_16") == 0){
       return P9_16;
    }
-   else if(strcmp(pin_name, "P9_17") == 0){
-      return P9_17;
-   }
-   else if(strcmp(pin_name, "P9_18") == 0){
-      return P9_18;
-   }
+   // else if(strcmp(pin_name, "P9_17") == 0){
+   //    return P9_17;
+   // }
+   // else if(strcmp(pin_name, "P9_18") == 0){
+   //    return P9_18;
+   // }
    else if(strcmp(pin_name, "P9_21") == 0){
       return P9_21;
    }
