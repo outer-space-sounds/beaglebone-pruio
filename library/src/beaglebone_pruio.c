@@ -104,9 +104,9 @@ static int init_gpio(){
    // clocks, debounce, etc. is set on the PRU side.
 
    // Pins used to control analog mux:
-   int e1 = beaglebone_pruio_init_gpio_pin(P9_27, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT);
-   int e2 = beaglebone_pruio_init_gpio_pin(P9_30, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT);
-   int e3 = beaglebone_pruio_init_gpio_pin(P9_42A, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT); 
+   int e1 = beaglebone_pruio_init_gpio_pin(P8_27, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT);
+   int e2 = beaglebone_pruio_init_gpio_pin(P8_28, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT);
+   int e3 = beaglebone_pruio_init_gpio_pin(P8_29, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT); 
 
    if(e1 || e2 || e3){
       return 1;
@@ -238,12 +238,12 @@ static int get_gpio_pin_name(int gpio_number, char* pin_name){
       case P9_16: 
          strcpy(pin_name, "P9_16");
          break;
-      case P9_17: 
-         strcpy(pin_name, "P9_17");
-         break;
-      case P9_18: 
-         strcpy(pin_name, "P9_18");
-         break;
+      /* case P9_17:  */
+      /*    strcpy(pin_name, "P9_17"); */
+      /*    break; */
+      /* case P9_18:  */
+      /*    strcpy(pin_name, "P9_18"); */
+      /*    break; */
       case P9_21: 
          strcpy(pin_name, "P9_21");
          break;

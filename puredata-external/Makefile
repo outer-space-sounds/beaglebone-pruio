@@ -4,7 +4,7 @@ LIBRARY_NAME = beaglebone
 
 # add your .c source files, one object per file, to the SOURCES
 # variable, help files will be included automatically
-SOURCES = adc_input.c adc_input~.c gpio_input.c gpio_output.c
+SOURCES = display_7_led.c adc_input.c adc_input~.c gpio_input.c gpio_output.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
