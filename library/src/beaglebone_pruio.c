@@ -384,7 +384,7 @@ static int init_adc_channel(unsigned char channel_number, beaglebone_pruio_adc_m
 // PRU Initialization
 //
 
-static int load_device_tree_overlay(char* dto){
+int beaglebone_pruio_load_device_tree_overlay(char* dto){
    // Check if the device tree overlay is loaded, load if needed.
    int device_tree_overlay_loaded = 0; 
    FILE* f;
@@ -413,7 +413,7 @@ static int load_device_tree_overlay(char* dto){
 }
 
 static int load_device_tree_overlays(){
-   if(load_device_tree_overlay("PRUIO-DTO")){
+   if(beaglebone_pruio_load_device_tree_overlay("PRUIO-DTO")){
       return 1;
    }
    usleep(100000);

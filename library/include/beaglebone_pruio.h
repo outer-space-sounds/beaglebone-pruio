@@ -20,6 +20,7 @@
 #define BEAGLEBONE_PRUIO_H
 
 #include <string.h>
+#include <stdint.h>
 
 /**
  * A structure for easy reading of incoming messages.
@@ -84,6 +85,51 @@ static inline int beaglebone_pruio_messages_are_available();
  */
 static inline void beaglebone_pruio_read_message(beaglebone_pruio_message *message);
 
+/**
+ * Loads a DTO
+ */
+int beaglebone_pruio_load_device_tree_overlay(char* dto);
+
+/**
+ * Init MIDI port
+ */
+int beaglebone_midi_start();
+
+/**
+ * Close MIDI port
+ */
+void beaglebone_midi_stop();
+
+/**
+ * A structure for easy reading of MIDI messages
+ */
+
+typedef enum{  
+   BEAGLEBONE_MIDI_NOTE_OFF = 0x8,
+   BEAGLEBONE_MIDI_NOTE_ON = 0x9,
+   BEAGLEBONE_MIDI_CONTROL_CHANGE = 0xB,
+   BEAGLEBONE_MIDI_PROGRAM_CHANGE = 0xC,
+   BEAGLEBONE_MIDI_PITCH_BEND = 0xE,
+} beaglebone_midi_message_type;
+
+#define BEAGLEBONE_MIDI_MAX_MESSAGE_SIZE 3
+
+typedef struct { 
+   beaglebone_midi_message_type type;
+   int channel;
+   int size;
+   uint8_t data[BEAGLEBONE_MIDI_MAX_MESSAGE_SIZE];
+} beaglebone_midi_message;
+
+/**
+ * Get MIDI messages
+ */
+void beaglebone_midi_receive_messages(beaglebone_midi_message* messages, int* count);
+
+/**
+ * Send MIDI messages
+ */
+void beaglebone_midi_send_messages(beaglebone_midi_message* messages, int count);
 
 ///////////////////////////////////////////////////////////////////////////////
 // !!!

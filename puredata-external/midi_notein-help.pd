@@ -1,0 +1,11 @@
+#N canvas 464 75 439 288 10;
+#X declare -lib beaglebone;
+#X obj 13 167 license;
+#X obj 14 9 declare -lib beaglebone;
+#X obj 16 88 pack f f f;
+#X obj 17 118 print notein;
+#X obj 15 44 midi_notein;
+#X connect 2 0 3 0;
+#X connect 4 0 2 0;
+#X connect 4 1 2 1;
+#X connect 4 2 2 2;

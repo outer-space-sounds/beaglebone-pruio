@@ -40,8 +40,8 @@ library:
 
 .PHONY:run
 run:
-	# LD_LIBRARY_PATH=../library/lib ./example 
-	./example
+	LD_LIBRARY_PATH=../library/lib ./example 
+	# ./example
 
 .PHONY:debugger
 debugger:

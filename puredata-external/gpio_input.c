@@ -70,7 +70,7 @@ static void *gpio_input_new(t_symbol *s) {
    x->outlet_left = outlet_new(&x->x_obj, &s_float);
    x->gpio_number = gpio_number;
 
-   if(beaglebone_register_callback(1, gpio_number, x, gpio_input_callback)){
+   if(beaglebone_register_callback(BB_GPIO_DIGITAL, gpio_number, x, gpio_input_callback)){
       error("beaglebone/gpio_input: Could not init pin %s (%i), is it already in use?", s->s_name, gpio_number); 
       return NULL;
    }
@@ -79,7 +79,7 @@ static void *gpio_input_new(t_symbol *s) {
 }
 
 static void gpio_input_free(t_gpio_input *x) { 
-   beaglebone_unregister_callback(1, x->gpio_number);
+   beaglebone_unregister_callback(BB_GPIO_DIGITAL, x->gpio_number);
 }
 
 /////////////////////////////////////////////////////////////////////////

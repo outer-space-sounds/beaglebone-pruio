@@ -26,6 +26,7 @@
 
 #include "beaglebone.h"
 
+
 /////////////////////////////////////////////////////////////////////////
 // PD library bootstrapping.
 //
@@ -34,16 +35,23 @@ void gpio_output_setup(void);
 void adc_input_setup(void);
 void adc_input_tilde_setup(void);
 void display_7_led_setup(void);
+int init_midi(void);
+int close_midi(void);
+void midi_notein_setup(void);
 
 void beaglebone_setup(void){
    #ifdef IS_BEAGLEBONE
-      beaglebone_pruio_start();
+     beaglebone_pruio_start();
+     if(beaglebone_midi_start()){
+       error("beaglebone: Could not init midi port (UART)");
+     }
    #endif 
    gpio_input_setup();
    gpio_output_setup();
    adc_input_setup();
    adc_input_tilde_setup();
    display_7_led_setup();
+   midi_notein_setup();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -65,14 +73,20 @@ void beaglebone_setup(void){
 
 typedef struct callback{
    void(*callback_function)(void*, t_float);
+   void(*midi_callback_function)(void*, beaglebone_midi_message*);
    void* instance;
 } callback;
 
 callback digital_callbacks[BEAGLEBONE_PRUIO_MAX_GPIO_CHANNELS];
 callback analog_callbacks[BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS];
+callback midi_notein_callbacks[1];
+
+beaglebone_midi_message midi_messages[16];
+int n_midi_messages = 0;
 
 static int beaglebone_number_of_instances = 0;
 static t_clock* beaglebone_clock = NULL;
+
 
 void beaglebone_clock_tick(void* x){
    (void)x; // Do not use x, means nothing here, 
@@ -112,6 +126,20 @@ void beaglebone_clock_tick(void* x){
             /* } */
          }
       }
+
+      beaglebone_midi_receive_messages(midi_messages, &n_midi_messages);
+      int i;
+      for(i=0; i<n_midi_messages; ++i){
+        if(midi_messages[i].type == BEAGLEBONE_MIDI_NOTE_ON){
+          cbk = &midi_notein_callbacks[0];
+          cbk->midi_callback_function(cbk->instance, &(midi_messages[i]));
+        }
+        else if(midi_messages[i].type == BEAGLEBONE_MIDI_NOTE_OFF){
+          midi_messages[i].data[2] = 0;
+          cbk = &midi_notein_callbacks[0];
+          cbk->midi_callback_function(cbk->instance, &(midi_messages[i]));
+        }
+      }
    #else
       int i;
       for(i=0; i<BEAGLEBONE_PRUIO_MAX_GPIO_CHANNELS; ++i){
@@ -132,75 +160,128 @@ void beaglebone_clock_tick(void* x){
    clock_delay(beaglebone_clock, CLOCK_PERIOD);
 }
 
+static void check_if_first_time(){
+  // First time here. Init arrays.
+  if(beaglebone_number_of_instances==0){
+    int i;
+    for(i=0; i<BEAGLEBONE_PRUIO_MAX_GPIO_CHANNELS; ++i){
+      callback new_callback;
+      new_callback.callback_function = NULL;
+      new_callback.midi_callback_function = NULL;
+      new_callback.instance = NULL;
+      digital_callbacks[i] = new_callback;
+    }
+
+    for(i=0; i<BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS; ++i){
+      callback new_callback;
+      new_callback.callback_function = NULL;
+      new_callback.midi_callback_function = NULL;
+      new_callback.instance = NULL;
+      analog_callbacks[i] = new_callback;
+    }
+
+    for(i=0; i<1; ++i){
+      callback new_callback;
+      new_callback.callback_function = NULL;
+      new_callback.midi_callback_function = NULL;
+      new_callback.instance = NULL;
+      midi_notein_callbacks[i] = new_callback;
+    }
+  }
+}
+
+static void start_the_clock(){
+  // First time here. Start the clock.
+  if(beaglebone_number_of_instances==0){
+    beaglebone_clock = clock_new(NULL,  (t_method)beaglebone_clock_tick); 
+    clock_delay(beaglebone_clock, CLOCK_PERIOD);
+  }
+}
+
+
 int beaglebone_register_callback(
-      int is_digital, 
+      beaglebone_callback_type type, 
       int channel, 
       void* instance, 
       void (*callback_function)(void*, t_float) 
 ){
-   
-   // First time here. Init arrays.
-   if(beaglebone_number_of_instances==0){
-      int i;
-      for(i=0; i<BEAGLEBONE_PRUIO_MAX_GPIO_CHANNELS; ++i){
-         callback new_callback;
-         new_callback.callback_function = NULL;
-         new_callback.instance = NULL;
-         digital_callbacks[i] = new_callback;
-      }
-
-      for(i=0; i<BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS; ++i){
-         callback new_callback;
-         new_callback.callback_function = NULL;
-         new_callback.instance = NULL;
-         analog_callbacks[i] = new_callback;
-      }
-   }
+   check_if_first_time(); 
    
    // If there's already a callback for this channel, bail out.
-   if(is_digital){
+   if(type == BB_GPIO_DIGITAL){
       if(digital_callbacks[channel].instance!=NULL){
          return 1;    
       }
    }
-   else{
+   else if(type == BB_GPIO_ANALOG){
       if(analog_callbacks[channel].instance!=NULL){
          return 1;    
       }
    }
 
    // All good, register the callback
-   callback new_callback;
-   new_callback.callback_function = callback_function;
-   new_callback.instance = instance;
-   if(is_digital==1){
-      digital_callbacks[channel] = new_callback;
+   callback* new_callback = NULL;
+   if(type == BB_GPIO_DIGITAL){
+      new_callback = &(digital_callbacks[channel]);
    }
-   else{
-      analog_callbacks[channel] = new_callback;
+   else if(type == BB_GPIO_ANALOG){
+      new_callback = &(analog_callbacks[channel]);
    }
-
-   // First time here. Start the clock.
-   if(beaglebone_number_of_instances==0){
-      beaglebone_clock = clock_new(NULL,  (t_method)beaglebone_clock_tick); 
-      clock_delay(beaglebone_clock, CLOCK_PERIOD);
-   }
+   new_callback->callback_function = callback_function;
+   new_callback->instance = instance;
 
    beaglebone_number_of_instances++;
 
    return 0;
 }
 
-void beaglebone_unregister_callback(int is_digital, int channel){
-   // TODO uninit pin?
+int beaglebone_register_midi_callback(
+    beaglebone_callback_type type, 
+    int channel, 
+    void* instance, 
+    void (*callback_function)(void*, beaglebone_midi_message*)
+){
+  check_if_first_time();
+
+  if(type == BB_MIDI_NOTE){
+    if(midi_notein_callbacks[channel].instance!=NULL){
+      return 1;    
+    }
+  }
+
+  callback* new_callback = NULL;
+  if(type == BB_MIDI_NOTE){
+    new_callback = &(midi_notein_callbacks[channel]);
+  }
+
+  new_callback->midi_callback_function = callback_function;
+  new_callback->instance = instance;
+
+  start_the_clock();
+
+  beaglebone_number_of_instances++;
+
+  return 0;
+}
+
+void beaglebone_unregister_callback(beaglebone_callback_type type, int channel){
+   // TODO uninit gpio or analog pin?
    
-   callback *cbk;
-   if(is_digital==1){
+   callback *cbk = NULL;
+   if(type == BB_GPIO_DIGITAL){
       cbk = &(digital_callbacks[channel]);
    }
-   else{
+   else if(type == BB_GPIO_ANALOG){
       cbk = &(analog_callbacks[channel]);
    }
+   else if(type == BB_MIDI_NOTE){
+      cbk = &(midi_notein_callbacks[channel]);
+      // TODO
+   }
+   else{ // BB_MIDI_CONTROL
+      //TODO
+   }
+
    cbk->callback_function = NULL;
    cbk->instance = NULL;
 
@@ -210,6 +291,7 @@ void beaglebone_unregister_callback(int is_digital, int channel){
       beaglebone_clock = NULL;
       #ifdef IS_BEAGLEBONE
          beaglebone_pruio_stop();
+         beaglebone_midi_stop();
       #endif
    }
 }

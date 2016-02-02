@@ -80,13 +80,17 @@ src/beaglebone_pruio.o: src/beaglebone_pruio.c src/pru0.elf lib/libbeaglebone_pr
 		&& gcc $(HOST_C_FLAGS) -DBEAGLEBONE_PRUIO_PREFIX=\"$(PREFIX)\" \
 		-DBEAGLEBONE_PRUIO_START_ADDR_0=`echo $$START_ADDR_0` \
 		-c -o src/beaglebone_pruio.o src/beaglebone_pruio.c
+	
+# 4.1 Compile beaglebone_midi.c into beaglebone_midi.o
+src/beaglebone_midi.o: src/beaglebone_midi.c
+	gcc $(HOST_C_FLAGS) -c -o src/beaglebone_midi.o src/beaglebone_midi.c
 
 # 5. Link library
-lib/libbeaglebone_pruio.a: src/beaglebone_pruio.o ../device-tree-overlay/PRUIO-DTO-00A0.dtbo
-	ar rcs lib/libbeaglebone_pruio.a src/beaglebone_pruio.o
+lib/libbeaglebone_pruio.a: src/beaglebone_pruio.o src/beaglebone_midi.o ../device-tree-overlay/PRUIO-DTO-00A0.dtbo
+	ar rcs lib/libbeaglebone_pruio.a src/beaglebone_pruio.o src/beaglebone_midi.o
 	cp src/beaglebone_pruio.h include/
 	cp src/beaglebone_pruio_pins.h include/
-	gcc $(HOST_LD_FLAGS) -o lib/libbeaglebone_pruio.so src/beaglebone_pruio.o $(HOST_LIBS)
+	gcc $(HOST_LD_FLAGS) -o lib/libbeaglebone_pruio.so src/beaglebone_pruio.o src/beaglebone_midi.o $(HOST_LIBS)
 
 
 
