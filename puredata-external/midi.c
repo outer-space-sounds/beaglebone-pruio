@@ -40,9 +40,10 @@
 #include "beaglebone.h"
 
 /////////////////////////////////////////////////////////////////////////
-// Data
+// NOTEIN
 //
 
+// Data structure
 typedef struct midi_notein {
    t_object x_obj;
    t_outlet *outlet_left;
@@ -54,10 +55,7 @@ typedef struct midi_notein {
 // A pointer to the class object.
 t_class *midi_notein_class;
 
-/////////////////////////////////////////////////////////////////////////
 // Callback from lib beaglebone_pruio
-//
-
 void midi_notein_callback(void* x, beaglebone_midi_message* message){
    (void)(x);
    t_midi_notein* this = (t_midi_notein*)x;
@@ -66,10 +64,7 @@ void midi_notein_callback(void* x, beaglebone_midi_message* message){
    outlet_float(this->outlet_left, (float)message->data[1]);
 }
 
-/////////////////////////////////////////////////////////////////////////
-// Constructor, destructor
-//
-
+// Constructor
 static void *midi_notein_new() {
    t_midi_notein *x = (t_midi_notein *)pd_new(midi_notein_class);
    x->outlet_left = outlet_new(&x->x_obj, &s_float);
@@ -84,15 +79,13 @@ static void *midi_notein_new() {
    return (void *)x;
 }
 
+// Destructor
 static void midi_notein_free(t_midi_notein* x) { 
   (void)x;
   beaglebone_unregister_callback(BB_MIDI_NOTE, 0);
 }
 
-/////////////////////////////////////////////////////////////////////////
 // Class definition
-// 
-
 void midi_notein_setup(void){
    midi_notein_class = class_new(
       gensym("midi_notein"), 

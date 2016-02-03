@@ -35,17 +35,21 @@ void gpio_output_setup(void);
 void adc_input_setup(void);
 void adc_input_tilde_setup(void);
 void display_7_led_setup(void);
-int init_midi(void);
-int close_midi(void);
 void midi_notein_setup(void);
 
 void beaglebone_setup(void){
+   // Initialize hardware.
+   // TODO: only initialize when an object actually needs the hardware
    #ifdef IS_BEAGLEBONE
-     beaglebone_pruio_start();
+     if(beaglebone_pruio_start()){
+       error("beaglebone: Could not init pruio system");
+     }
      if(beaglebone_midi_start()){
        error("beaglebone: Could not init midi port (UART)");
      }
    #endif 
+
+   // Setup pd objects
    gpio_input_setup();
    gpio_output_setup();
    adc_input_setup();
@@ -59,10 +63,11 @@ void beaglebone_setup(void){
 //
 
 // The main idea here is that instances of pd objects register themselves
-// to receive callbacks for their input of interest (analog or digital)
-// using the beaglebone_clock_new function. This adds a new entry to the
-// callbacks array. The callbacks array will be checked when a new 
-// message from the PRU arrives and the callback will be triggered.
+// to receive callbacks for their input of interest (analog, digital 
+// or midi) using the beaglebone_register_callback function. 
+// This adds new entries to the callbacks arrays. The callbacks arrays
+// will be checked when a new message from the PRU or Midi port arrives
+// and the callback will be triggered.
 
 #ifdef IS_BEAGLEBONE
 #define CLOCK_PERIOD 0.6666 // milliseconds
