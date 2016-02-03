@@ -44,19 +44,13 @@ static void* monitor_inputs(void* param){
          beaglebone_pruio_read_message(&message);
 
          // Message from gpio
-         /* if(message.is_gpio && message.gpio_number==P9_11){ */
-            /* printf("P9_11: %i\n", message.value); */
-         /* } */
-         /* else if(message.is_gpio && message.gpio_number==P9_13){ */
-            /* printf("P9_13: %i\n", message.value); */
-         /* } */
+         if(message.is_gpio){
+            printf("GPIO %i: %i\n", message.gpio_number, message.value);
+         }
 
          // Messages from adc
-         if(!message.is_gpio && message.adc_channel==0){
-            /* printf("ADC 0: %i\n", message.value); */
-         }
-         else if(!message.is_gpio && message.adc_channel==6){
-            /* printf("ADC 6: %i\n", message.value); */
+         if(!message.is_gpio){
+            printf("ADC %i: %i\n", message.adc_channel, message.value);
          }
       }
       
@@ -76,7 +70,7 @@ static void* monitor_inputs(void* param){
         printf("Data 2: %i \n\n", midi_messages[i].data[2]);
       } 
 
-      usleep(10000);
+      usleep(1000);
    }
 
    return NULL;
@@ -119,52 +113,76 @@ int main(int argc, const char *argv[]){
      return 1;
    }
 
-   // Initialize 2 pins as outputs
-   /* if(beaglebone_pruio_init_gpio_pin(P9_16, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT)){ */
-   /*    fprintf(stderr, "%s\n", "Could not initialize pin P9_12"); */
-   /* } */
-   /* if(beaglebone_pruio_init_gpio_pin(P9_18, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT)){ */
-   /*    fprintf(stderr, "%s\n", "Could not initialize pin P9_14"); */
-   /* } */
+   // Initialize pins as outputs
+   beaglebone_pruio_init_gpio_pin(P9_12, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT);
+   beaglebone_pruio_init_gpio_pin(P9_14, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT);
+   beaglebone_pruio_init_gpio_pin(P9_15, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT);
+   beaglebone_pruio_init_gpio_pin(P9_21, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT);
+   beaglebone_pruio_init_gpio_pin(P9_24, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT);
+   beaglebone_pruio_init_gpio_pin(P9_22, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT);
+   beaglebone_pruio_init_gpio_pin(P9_23, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT);
 
-   // Init 2 pins as inputs
-   /* if(beaglebone_pruio_init_gpio_pin(P9_13, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT)){ */
-   /*    fprintf(stderr, "%s\n", "Could not initialize pin P9_13"); */
-   /* } */
-   /* if(beaglebone_pruio_init_gpio_pin(P9_11, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT)){ */
-   /*    fprintf(stderr, "%s\n", "Could not initialize pin P9_11"); */
-   /* } */
+   // Init pins as inputs
+   beaglebone_pruio_init_gpio_pin(P8_07, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_07, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_08, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_09, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P9_16, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P9_27, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_45, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_30, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_32, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P9_26, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P9_41A, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_44, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_41, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_42, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_39, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_40, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_37, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_38, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_35, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_36, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_33, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_34, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_31, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_18, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_43, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
+   beaglebone_pruio_init_gpio_pin(P8_46, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT);
 
-   // Init 2 analog inputs
-   /* if(beaglebone_pruio_init_adc_pin_with_ranges(0, 12)){ */
-      /* fprintf(stderr, "%s\n", "Could not initialize adc pin 0"); */
-   /* } */
-   /* if(beaglebone_pruio_init_adc_pin(6, 7)){ */
-   /*    fprintf(stderr, "%s\n", "Could not initialize adc pin 6"); */
-   /* } */
+   // Init analog pins
+   beaglebone_pruio_init_adc_pin(1, 8);
+   beaglebone_pruio_init_adc_pin(2, 8);
+   beaglebone_pruio_init_adc_pin(3, 8);
+   beaglebone_pruio_init_adc_pin(4, 8);
+   beaglebone_pruio_init_adc_pin(0, 8);
+   beaglebone_pruio_init_adc_pin(10, 8);
+   beaglebone_pruio_init_adc_pin(8, 8);
+   beaglebone_pruio_init_adc_pin(11, 8);
+   beaglebone_pruio_init_adc_pin(9, 8);
+   beaglebone_pruio_init_adc_pin(7, 8);
+   beaglebone_pruio_init_adc_pin(6, 8);
 
-   // Check if library is returning adequately when trying to 
-   // re-initialize a pin.
-   /* if(!beaglebone_pruio_init_gpio_pin(P9_16, BEAGLEBONE_PRUIO_GPIO_MODE_INPUT)){ */
-   /*    fprintf(stderr, "%s\n", "P9_16 was already initialized, should have returned error"); */
-   /*    exit(1); */
-   /* } */
-   /* if(beaglebone_pruio_init_gpio_pin(P9_18, BEAGLEBONE_PRUIO_GPIO_MODE_OUTPUT)){ */
-   /*    fprintf(stderr, "%s\n", "P9_18 was already initialized as output, should have not returned error"); */
-   /*    exit(1); */
-   /* } */
 
    // Blink 2 outputs
    /* uint8_t messages[3] = {0x90, 0x06, 0x08}; */
    while(!finished){
-      /* beaglebone_pruio_set_pin_value(P9_16, 0); */
-      /* beaglebone_pruio_set_pin_value(P9_18, 1); */
-      /* beaglebone_midi_write(messages, 3); */
-      /* sleep(3); */
-      /* beaglebone_pruio_set_pin_value(P9_16, 1); */
-      /* beaglebone_pruio_set_pin_value(P9_18, 0); */
-      /* beaglebone_midi_write(messages, 3); */
-      sleep(3);
+     beaglebone_pruio_set_pin_value(P9_12, 0);
+     beaglebone_pruio_set_pin_value(P9_14, 0);
+     beaglebone_pruio_set_pin_value(P9_15, 0);
+     beaglebone_pruio_set_pin_value(P9_21, 0);
+     beaglebone_pruio_set_pin_value(P9_24, 0);
+     beaglebone_pruio_set_pin_value(P9_22, 0);
+     beaglebone_pruio_set_pin_value(P9_23, 0);
+     sleep(1);
+     beaglebone_pruio_set_pin_value(P9_12, 1);
+     beaglebone_pruio_set_pin_value(P9_14, 1);
+     beaglebone_pruio_set_pin_value(P9_15, 1);
+     beaglebone_pruio_set_pin_value(P9_21, 1);
+     beaglebone_pruio_set_pin_value(P9_24, 1);
+     beaglebone_pruio_set_pin_value(P9_22, 1);
+     beaglebone_pruio_set_pin_value(P9_23, 1);
+     sleep(1);
    }
 
    beaglebone_pruio_stop();

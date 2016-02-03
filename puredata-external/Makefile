@@ -29,7 +29,7 @@ EXTRA_DIST = beaglebone.c beaglebone.h test.pd
 #------------------------------------------------------------------------------#
 
 # -I"$(PD_INCLUDE)/pd" supports the header location for 0.43
-CFLAGS = -I"$(PD_INCLUDE)/pd" -I../library/include -Wall -W -g
+CFLAGS = -I"$(PD_INCLUDE)/pd" -I../library/include -Wall -W -g -O0
 LDFLAGS =
 LIBS =
 
@@ -119,7 +119,8 @@ ifeq ($(UNAME),Linux)
   EXTENSION = pd_linux
   OS = linux
   PD_PATH = /usr
-  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  # OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  OPT_CFLAGS = -funroll-loops -fomit-frame-pointer
   CFLAGS += -fPIC
   LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
   LIBS += -lc

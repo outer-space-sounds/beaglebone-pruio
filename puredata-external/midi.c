@@ -32,6 +32,11 @@
 #include <sys/signal.h>
 #include <asm/termios.h>
 
+#include <execinfo.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 /* #include <beaglebone_pruio_pins.h> */
 #ifdef IS_BEAGLEBONE
    #include <beaglebone_pruio.h>
@@ -65,13 +70,29 @@ void midi_notein_callback(void* x, beaglebone_midi_message* message){
 }
 
 // Constructor
+//
+/* void handler(int sig) { */
+/*   void *array[10]; */
+/*   size_t size; */
+/*  */
+/*   // get void*'s for all entries on the stack */
+/*   size = backtrace(array, 10); */
+/*  */
+/*   // print out all the frames to stderr */
+/*   fprintf(stderr, "Error: signal %d:\n", sig); */
+/*   backtrace_symbols_fd(array, size, STDERR_FILENO); */
+/*   exit(1); */
+/* } */
+
 static void *midi_notein_new() {
+  /* signal(SIGSEGV, handler);  */
    t_midi_notein *x = (t_midi_notein *)pd_new(midi_notein_class);
    x->outlet_left = outlet_new(&x->x_obj, &s_float);
    x->outlet_middle = outlet_new(&x->x_obj, &s_float);
    x->outlet_right = outlet_new(&x->x_obj, &s_float);
 
-   if(beaglebone_register_midi_callback(BB_MIDI_NOTE, 0, x, midi_notein_callback)){
+   printf("new\n");
+   if(beaglebone_register_midi_callback(BB_MIDI_NOTE, 0, x, &midi_notein_callback)){
      error("beaglebone/midi_notein: Could not register for receiving midi note events."); 
      return NULL;
    }

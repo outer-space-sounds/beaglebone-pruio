@@ -21,9 +21,8 @@
 #include <beaglebone_pruio_pins.h>
 
 #ifdef IS_BEAGLEBONE
-#include <beaglebone_pruio.h>
+  #include <beaglebone_pruio.h> 
 #endif 
-
 #include "beaglebone.h"
 
 
@@ -72,8 +71,8 @@ void beaglebone_setup(void){
 #ifdef IS_BEAGLEBONE
 #define CLOCK_PERIOD 0.6666 // milliseconds
 #else
-#define CLOCK_PERIOD 1000 // milliseconds
-/* #define CLOCK_PERIOD 0.6666 // milliseconds */
+/* #define CLOCK_PERIOD 1000 // milliseconds */
+#define CLOCK_PERIOD 0.6666 // milliseconds
 #endif
 
 typedef struct callback{
@@ -82,16 +81,16 @@ typedef struct callback{
    void* instance;
 } callback;
 
-callback digital_callbacks[BEAGLEBONE_PRUIO_MAX_GPIO_CHANNELS];
-callback analog_callbacks[BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS];
-callback midi_notein_callbacks[1];
+static callback digital_callbacks[BEAGLEBONE_PRUIO_MAX_GPIO_CHANNELS];
+static callback analog_callbacks[BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS];
+static callback midi_notein_callbacks[1];
 
-beaglebone_midi_message midi_messages[16];
-int n_midi_messages = 0;
+static beaglebone_midi_message midi_messages[16];
+static int n_midi_messages = 0;
 
-static int beaglebone_number_of_instances = 0;
-static t_clock* beaglebone_clock = NULL;
-
+static int beaglebone_number_of_pruio_instances = 0;
+static int beaglebone_number_of_midi_instances = 0;
+t_clock* beaglebone_clock = NULL;
 
 void beaglebone_clock_tick(void* x){
    (void)x; // Do not use x, means nothing here, 
@@ -105,30 +104,12 @@ void beaglebone_clock_tick(void* x){
 
          // Message from gpio
          if(message.is_gpio){
-            cbk = &digital_callbacks[message.gpio_number];
-
-            // Debug
-            /* if(message.gpio_number >= BEAGLEBONE_PRUIO_MAX_GPIO_CHANNELS || cbk->instance == NULL || cbk->callback_function==NULL){ */
-            /*    printf("A! i:%p cbk:%p val:%i gpio_num:%i \n", cbk->instance, cbk->callback_function, message.value, message.gpio_number); */
-            /*    continue; //while */
-            /* } */
-
-            /* if(message.gpio_number<BEAGLEBONE_PRUIO_MAX_GPIO_CHANNELS && cbk->instance!=NULL && cbk->callback_function!=NULL){ */
-               cbk->callback_function(cbk->instance, message.value);
-            /* } */
+           cbk = &digital_callbacks[message.gpio_number];
+           if(cbk->callback_function) cbk->callback_function(cbk->instance, message.value);
          }
          else{ // adc
-            cbk = &analog_callbacks[message.adc_channel];
-
-            // Debug
-            /* if(message.adc_channel >= BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS || cbk->instance == NULL || cbk->callback_function==NULL){ */
-            /*    printf("A! i:%p cbk:%p val:%i chan:%i \n", cbk->instance, cbk->callback_function, message.value, message.adc_channel); */
-            /*    continue; //while */
-            /* } */
-
-            /* if(message.adc_channel<BEAGLEBONE_PRUIO_MAX_ADC_CHANNELS && cbk->instance!=NULL && cbk->callback_function!=NULL){ */
-               cbk->callback_function(cbk->instance, (t_float)message.value);
-            /* } */
+           cbk = &analog_callbacks[message.adc_channel];
+           if(cbk->callback_function) cbk->callback_function(cbk->instance, (t_float)message.value);
          }
       }
 
@@ -136,14 +117,22 @@ void beaglebone_clock_tick(void* x){
       int i;
       for(i=0; i<n_midi_messages; ++i){
         if(midi_messages[i].type == BEAGLEBONE_MIDI_NOTE_ON){
-          cbk = &midi_notein_callbacks[0];
-          cbk->midi_callback_function(cbk->instance, &(midi_messages[i]));
+          cbk = &(midi_notein_callbacks[0]);
+          if(cbk->midi_callback_function){
+            printf("A %i %i %p %p %p\n", n_midi_messages, i, cbk, cbk->midi_callback_function, cbk->instance);
+            cbk->midi_callback_function(cbk->instance, &(midi_messages[i]));
+            printf("WW\n");
+          }
         }
-        else if(midi_messages[i].type == BEAGLEBONE_MIDI_NOTE_OFF){
-          midi_messages[i].data[2] = 0;
-          cbk = &midi_notein_callbacks[0];
-          cbk->midi_callback_function(cbk->instance, &(midi_messages[i]));
-        }
+        /* else if(midi_messages[i].type == BEAGLEBONE_MIDI_NOTE_OFF){ */
+        /*   midi_messages[i].data[2] = 0; */
+        /*   cbk = &(midi_notein_callbacks[0]); */
+        /*   if(cbk->midi_callback_function){ */
+        /*     printf("B %i %i %p\n", n_midi_messages, i, cbk->midi_callback_function); */
+        /*     cbk->midi_callback_function(cbk->instance, &(midi_messages[i])); */
+        /*     printf("WW\n"); */
+        /*   } */
+        /* } */
       }
    #else
       int i;
@@ -167,7 +156,7 @@ void beaglebone_clock_tick(void* x){
 
 static void check_if_first_time(){
   // First time here. Init arrays.
-  if(beaglebone_number_of_instances==0){
+  if(beaglebone_number_of_pruio_instances==0 && beaglebone_number_of_midi_instances==0){
     int i;
     for(i=0; i<BEAGLEBONE_PRUIO_MAX_GPIO_CHANNELS; ++i){
       callback new_callback;
@@ -197,7 +186,7 @@ static void check_if_first_time(){
 
 static void start_the_clock(){
   // First time here. Start the clock.
-  if(beaglebone_number_of_instances==0){
+  if(beaglebone_number_of_midi_instances==0 && beaglebone_number_of_pruio_instances==0){
     beaglebone_clock = clock_new(NULL,  (t_method)beaglebone_clock_tick); 
     clock_delay(beaglebone_clock, CLOCK_PERIOD);
   }
@@ -235,7 +224,7 @@ int beaglebone_register_callback(
    new_callback->callback_function = callback_function;
    new_callback->instance = instance;
 
-   beaglebone_number_of_instances++;
+   beaglebone_number_of_pruio_instances++;
 
    return 0;
 }
@@ -249,24 +238,26 @@ int beaglebone_register_midi_callback(
   check_if_first_time();
 
   if(type == BB_MIDI_NOTE){
-    if(midi_notein_callbacks[channel].instance!=NULL){
+    if(midi_notein_callbacks[0].instance!=NULL){
       return 1;    
     }
+
+    callback* new_callback = &(midi_notein_callbacks[0]);
+    printf("yep\n");
+
+    printf("cbk %p %p\n", new_callback, callback_function);
+    new_callback->midi_callback_function = callback_function;
+    printf("cbk %p\n", midi_notein_callbacks[0].midi_callback_function);
+    new_callback->instance = instance;
+
+    start_the_clock();
+
+    beaglebone_number_of_midi_instances++;
   }
-
-  callback* new_callback = NULL;
-  if(type == BB_MIDI_NOTE){
-    new_callback = &(midi_notein_callbacks[channel]);
-  }
-
-  new_callback->midi_callback_function = callback_function;
-  new_callback->instance = instance;
-
-  start_the_clock();
-
-  beaglebone_number_of_instances++;
 
   return 0;
+
+  (void)channel;
 }
 
 void beaglebone_unregister_callback(beaglebone_callback_type type, int channel){
@@ -275,13 +266,15 @@ void beaglebone_unregister_callback(beaglebone_callback_type type, int channel){
    callback *cbk = NULL;
    if(type == BB_GPIO_DIGITAL){
       cbk = &(digital_callbacks[channel]);
+      beaglebone_number_of_pruio_instances--;
    }
    else if(type == BB_GPIO_ANALOG){
       cbk = &(analog_callbacks[channel]);
+      beaglebone_number_of_pruio_instances--;
    }
    else if(type == BB_MIDI_NOTE){
-      cbk = &(midi_notein_callbacks[channel]);
-      // TODO
+      cbk = &(midi_notein_callbacks[0]);
+      beaglebone_number_of_midi_instances--;
    }
    else{ // BB_MIDI_CONTROL
       //TODO
@@ -290,8 +283,7 @@ void beaglebone_unregister_callback(beaglebone_callback_type type, int channel){
    cbk->callback_function = NULL;
    cbk->instance = NULL;
 
-   beaglebone_number_of_instances--;
-   if(beaglebone_number_of_instances==0){
+   if(beaglebone_number_of_pruio_instances==0 && beaglebone_number_of_midi_instances==0){
       clock_free(beaglebone_clock);
       beaglebone_clock = NULL;
       #ifdef IS_BEAGLEBONE
