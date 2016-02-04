@@ -29,7 +29,7 @@ EXTRA_DIST = beaglebone.c beaglebone.h test.pd
 #------------------------------------------------------------------------------#
 
 # -I"$(PD_INCLUDE)/pd" supports the header location for 0.43
-CFLAGS = -I"$(PD_INCLUDE)/pd" -I../library/include -Wall -W -g -O0
+CFLAGS = -I"$(PD_INCLUDE)/pd" -I../library/include -Wall -W -g -O6
 LDFLAGS =
 LIBS =
 

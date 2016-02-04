@@ -171,7 +171,7 @@ static void *adc_input_tilde_new(t_symbol *s, int argc, t_atom *argv) {
    x->target_value = 0;
    x->increment = 0;
 
-   if(beaglebone_register_callback(BB_GPIO_ANALOG, (int)f, x, adc_input_tilde_callback)){
+   if(beaglebone_register_callback(0, (int)f, x, adc_input_tilde_callback)){
       error("beaglebone/adc_input: Could not init adc channel %s (%f), is it already in use?", atom_getsymbol(argv)->s_name, f);
       return NULL;
    }
@@ -180,7 +180,7 @@ static void *adc_input_tilde_new(t_symbol *s, int argc, t_atom *argv) {
 }
 
 static void adc_input_tilde_free(t_adc_input_tilde *x) { 
-   beaglebone_unregister_callback(BB_GPIO_ANALOG, x->channel);
+   beaglebone_unregister_callback(0, x->channel);
 }
 
 /////////////////////////////////////////////////////////////////////////

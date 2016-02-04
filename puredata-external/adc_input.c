@@ -158,7 +158,7 @@ static void *adc_input_new(t_symbol *s, int argc, t_atom *argv) {
    x->ranges = ranges;
 
    // 4. Register the callback.
-   if(beaglebone_register_callback(BB_GPIO_ANALOG, (int)f, x, adc_input_callback)){
+   if(beaglebone_register_callback(0, (int)f, x, adc_input_callback)){
       error("beaglebone/adc_input: Could not init adc channel %s (%f), is it already in use?", atom_getsymbol(argv)->s_name, f);
       return NULL;
    }
@@ -167,7 +167,7 @@ static void *adc_input_new(t_symbol *s, int argc, t_atom *argv) {
 }
 
 static void adc_input_free(t_adc_input *x) { 
-   beaglebone_unregister_callback(BB_GPIO_ANALOG, x->channel);
+   beaglebone_unregister_callback(0, x->channel);
 }
 
 /////////////////////////////////////////////////////////////////////////

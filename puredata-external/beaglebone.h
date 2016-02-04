@@ -18,13 +18,6 @@
 
 #include <m_pd.h>
 
-typedef enum beaglebone_callback_type{
-  BB_GPIO_DIGITAL = 0,
-  BB_GPIO_ANALOG,
-  BB_MIDI_NOTE,
-  BB_MIDI_CONTROL
-} beaglebone_callback_type;
-
-int beaglebone_register_callback(beaglebone_callback_type type, int channel, void* instance, void (*callback_function)(void*, t_float));
-int beaglebone_register_midi_callback(beaglebone_callback_type type, int channel, void* instance, void (*callback_function)(void*, beaglebone_midi_message*));
-void beaglebone_unregister_callback(beaglebone_callback_type type, int channel);
+int beaglebone_register_callback(int is_digital, int channel, void* instance, void (*callback_function)(void*, t_float));
+void beaglebone_unregister_callback(int is_digital, int channel);
+void beaglebone_tick(void* x);
