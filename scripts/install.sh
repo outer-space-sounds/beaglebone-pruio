@@ -43,15 +43,11 @@ PREFIX=/usr make install > /dev/null
 echo ""
 echo "3. Installing beaglebone_pruio library."
 cd ../../library
+PREFIX=/usr make uninstall > /dev/null
 PREFIX=/usr make install > /dev/null
 
 echo ""
-echo "4. Installing puredata externals."
-cd ../puredata-external
-make install > /dev/null
-
-echo ""
-echo "5. Disabling HDMI virtual cape."
+echo "4. Disabling HDMI virtual cape."
 mkdir -p /mnt/card
 mount /dev/mmcblk0p1 /mnt/card
 cd /mnt/card
@@ -60,7 +56,7 @@ cd
 umount /mnt/card
 
 echo ""
-echo "6. Assigning index zero to USB sound card in ALSA."
+echo "5. Assigning index zero to USB sound card in ALSA."
 cd /etc/modprobe.d
 sed -i.bak 's/options snd-usb-audio index=-2/options snd-usb-audio index=0/' alsa-base.conf
 
