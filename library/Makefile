@@ -115,6 +115,6 @@ install:
 
 .PHONY: uninstall
 uninstall:
-	-rm $(PREFIX)/lib/libbeaglebone_pruio*
-	-rm $(PREFIX)/include/beaglebone_pruio.h
-	-rm $(PREFIX)/include/beaglebone_pruio_pins.h
+	-rm $(PREFIX)/lib/libbeaglebone_pruio* 2> /dev/null
+	-rm $(PREFIX)/include/beaglebone_pruio.h 2> /dev/null
+	-rm $(PREFIX)/include/beaglebone_pruio_pins.h 2> /dev/null

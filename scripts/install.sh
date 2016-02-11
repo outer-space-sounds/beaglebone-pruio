@@ -26,7 +26,7 @@ git submodule update --init --recursive > /dev/null
 
 echo ""
 echo "2. Installing beaglebone_pruio library."
-cd ../../library
+cd library
 PREFIX=/usr make uninstall > /dev/null
 PREFIX=/usr make install > /dev/null
 
@@ -45,7 +45,8 @@ cd /opt/scripts/tools
 git pull
 apt-get update
 apt-get install linux-headers-4.1.17-bone-rt-r19
-./update-kernel --bone-rt-kernel --lts-4.1
+./update_kernel.sh --bone-rt-kernel --lts-4_1
+
 
 echo ""
 echo ""
