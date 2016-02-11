@@ -19,46 +19,36 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
-
-echo ""
 echo ""
 echo "1. Fetching dependencies"
 cd ..
 git submodule update --init --recursive > /dev/null
 
-
 echo ""
-echo "2. Installing patched version of am335x-pru-package."
-mv /usr/lib/libprussdrvd.so /usr/lib/libprussdrvd.so.bkp &> /dev/null
-mv /usr/lib/libprussdrvd.a /usr/lib/libprussdrvd.a.bkp &> /dev/null
-mv /usr/lib/libprussdrv.so /usr/lib/libprussdrv.so.bkp &> /dev/null
-mv /usr/lib/libprussdrv.a /usr/lib/libprussdrv.a.bkp &> /dev/null
-mv /usr/include/prussdrv.h /usr/include/prussdrv.h.bkp &> /dev/null
-mv /usr/include/pruss_intc_mapping.h /usr/include/pruss_intc_mapping.h.bkp &> /dev/null
-mv /usr/bin/pasm /usr/bin/pasm.bkp &> /dev/null
-
-cd vendors/am335x_pru_package
-PREFIX=/usr make install > /dev/null
-
-echo ""
-echo "3. Installing beaglebone_pruio library."
+echo "2. Installing beaglebone_pruio library."
 cd ../../library
 PREFIX=/usr make uninstall > /dev/null
 PREFIX=/usr make install > /dev/null
 
 echo ""
-echo "4. Disabling HDMI virtual cape."
-mkdir -p /mnt/card
-mount /dev/mmcblk0p1 /mnt/card
-cd /mnt/card
-sed -i.bak '/^##Disable HDMI$/{N; s/^##Disable HDMI\n#/##Disable HDMI\n/}' uEnv.txt
-cd
-umount /mnt/card
+echo '3. Disabling HDMI and "universal" cape.'
+sed -i.bak 's/#dtb=am335x-boneblack-emmc-overlay.dtb/dtb=am335x-boneblack-emmc-overlay.dtb/' /boot/uEnv.txt
+sed -i.bak 's/cape_universal=enable/cape_universal=disable/' /boot/uEnv.txt
 
 echo ""
-echo "5. Assigning index zero to USB sound card in ALSA."
-cd /etc/modprobe.d
-sed -i.bak 's/options snd-usb-audio index=-2/options snd-usb-audio index=0/' alsa-base.conf
+echo "4. Assigning index zero to USB sound card in ALSA."
+echo 'options snd-usb-audio index=0' > /etc/modprobe.d/audio.conf
 
+echo ""
+echo "5. Installing the correct version of the Linux kernel. This will take a few minutes."
+cd /opt/scripts/tools
+git pull
+apt-get update
+apt-get install linux-headers-4.1.17-bone-rt-r19
+./update-kernel --bone-rt-kernel --lts-4.1
+
+echo ""
+echo ""
 echo ""
 echo "Done. Reboot now if there are no error messages above."
+

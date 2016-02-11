@@ -107,7 +107,7 @@ static int display_7_led_load_device_tree_overlay(char* dto){
    // Check if the device tree overlay is loaded, load if needed.
    int device_tree_overlay_loaded = 0; 
    FILE* f;
-   f = fopen("/sys/devices/bone_capemgr.9/slots","rt");
+   f = fopen("/sys/devices/platform/bone_capemgr/slots","rt");
    if(f==NULL){
       return 1;
    }
@@ -120,7 +120,7 @@ static int display_7_led_load_device_tree_overlay(char* dto){
    fclose(f);
 
    if(!device_tree_overlay_loaded){
-      f = fopen("/sys/devices/bone_capemgr.9/slots","w");
+      f = fopen("/sys/devices/platform/bone_capemgr/slots","w");
       if(f==NULL){
          return 1;
       }
@@ -220,7 +220,7 @@ static void *display_7_led_new(){
       usleep(100000);
 
       // Open the file that represents the i2c device
-      char *filename = "/dev/i2c-2";
+      char *filename = "/dev/i2c-1";
       if((display_7_led_i2c_file_descriptor = open(filename, O_RDWR)) < 0){
         error("beaglebone/display_7_led: Failed to open the i2c bus: %s\n", strerror(errno));
         return NULL;

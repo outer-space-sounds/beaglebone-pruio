@@ -284,50 +284,54 @@ static int get_gpio_config_file(int gpio_number, char* path){
       return 1; 
    }
 
-   char tmp[256] = "";
+   char tmp[256] = "/sys/devices/platform/ocp/ocp:";
+   strcat(tmp, pin_name);
+   strcat(tmp, "_mux/state");
+   strcpy(path, tmp);
+   return 0;
 
    // look for a path that looks like ocp.* in /sys/devices/
-   DIR *dir = opendir("/sys/devices/");
-   if(dir==NULL){
-      return 1;
-   }
-   struct dirent* dir_info;
-   while(dir){
-      dir_info = readdir(dir);
-      if(dir_info==NULL){
-         closedir(dir);
-         return 1;
-      }
-      // Substring "ocp."
-      if(strstr(dir_info->d_name, "ocp.")!=NULL){
-         strcat(tmp, "/sys/devices/");
-         strcat(tmp, dir_info->d_name);
-         strcat(tmp, "/");
-
-         DIR *dir2 = opendir(tmp);
-         if(dir2==NULL){
-            return 1;
-         }
-         while(dir2){
-            dir_info = readdir(dir2);
-            if(dir_info==NULL){
-               closedir(dir2);
-               closedir(dir);
-               return 1;
-            }
-            // Substring pin name
-            if(strstr(dir_info->d_name, pin_name)!=NULL){
-               strcat(tmp, dir_info->d_name);
-               strcat(tmp, "/state");
-               break; // while dir2
-            }
-         }
-         closedir(dir2);
-         break; // while dir1
-      }
-   }
-   closedir(dir);
-   strcpy(path, tmp);
+   /* DIR *dir = opendir("/sys/devices/"); */
+   /* if(dir==NULL){ */
+   /*    return 1; */
+   /* } */
+   /* struct dirent* dir_info; */
+   /* while(dir){ */
+   /*    dir_info = readdir(dir); */
+   /*    if(dir_info==NULL){ */
+   /*       closedir(dir); */
+   /*       return 1; */
+   /*    } */
+   /*    // Substring "ocp." */
+   /*    if(strstr(dir_info->d_name, "ocp.")!=NULL){ */
+   /*       strcat(tmp, "/sys/devices/"); */
+   /*       strcat(tmp, dir_info->d_name); */
+   /*       strcat(tmp, "/"); */
+   /*  */
+   /*       DIR *dir2 = opendir(tmp); */
+   /*       if(dir2==NULL){ */
+   /*          return 1; */
+   /*       } */
+   /*       while(dir2){ */
+   /*          dir_info = readdir(dir2); */
+   /*          if(dir_info==NULL){ */
+   /*             closedir(dir2); */
+   /*             closedir(dir); */
+   /*             return 1; */
+   /*          } */
+   /*          // Substring pin name */
+   /*          if(strstr(dir_info->d_name, pin_name)!=NULL){ */
+   /*             strcat(tmp, dir_info->d_name); */
+   /*             strcat(tmp, "/state"); */
+   /*             break; // while dir2 */
+   /*          } */
+   /*       } */
+   /*       closedir(dir2); */
+   /*       break; // while dir1 */
+   /*    } */
+   /* } */
+   /* closedir(dir); */
+   /* strcpy(path, tmp); */
    return 0;
 }
 
@@ -388,7 +392,7 @@ int beaglebone_pruio_load_device_tree_overlay(char* dto){
    // Check if the device tree overlay is loaded, load if needed.
    int device_tree_overlay_loaded = 0; 
    FILE* f;
-   f = fopen("/sys/devices/bone_capemgr.9/slots","rt");
+   f = fopen("/sys/devices/platform/bone_capemgr/slots","rt");
    if(f==NULL){
       return 1;
    }
@@ -401,7 +405,7 @@ int beaglebone_pruio_load_device_tree_overlay(char* dto){
    fclose(f);
 
    if(!device_tree_overlay_loaded){
-      f = fopen("/sys/devices/bone_capemgr.9/slots","w");
+      f = fopen("/sys/devices/platform/bone_capemgr/slots","w");
       if(f==NULL){
          return 1;
       }

@@ -20,6 +20,7 @@
 
 NAME = PRUIO-DTO
 VERSION = 00A0
+CAPE_MGR_PATH = /sys/devices/platform/bone_capemgr/slots
 
 $(NAME)-$(VERSION).dtbo: $(NAME).dts
 	dtc -O dtb -o $(NAME)-$(VERSION).dtbo -b 0 -@ $(NAME).dts 
@@ -38,8 +39,8 @@ uninstall:
 
 .PHONY: load
 load:
-	echo $(NAME) > /sys/devices/bone_capemgr.9/slots
+	echo $(NAME) > $(CAPE_MGR_PATH)
 
 .PHONY: unload
 unload:
-	echo -`cat /sys/devices/bone_capemgr.9/slots | grep $(NAME) | sed 's/:.*//' | sed 's/ //'` > /sys/devices/bone_capemgr.9/slots
+	echo -`cat $(CAPE_MGR_PATH) | grep $(NAME) | sed 's/:.*//' | sed 's/ //'` > $(CAPE_MGR_PATH)
