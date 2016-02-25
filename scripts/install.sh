@@ -44,7 +44,7 @@ echo "5. Installing the correct version of the Linux kernel. This will take a fe
 cd /opt/scripts/tools
 git pull
 apt-get update
-apt-get install linux-headers-4.1.17-bone-rt-r19
+apt-get install linux-headers-4.1.18-bone-rt-r19
 ./update_kernel.sh --bone-rt-kernel --lts-4_1
 
 

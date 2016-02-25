@@ -413,6 +413,8 @@ int beaglebone_pruio_load_device_tree_overlay(char* dto){
       fclose(f);
    }
 
+   usleep(100000);
+
    return 0;
 }
 
@@ -420,7 +422,6 @@ static int load_device_tree_overlays(){
    if(beaglebone_pruio_load_device_tree_overlay("PRUIO-DTO")){
       return 1;
    }
-   usleep(100000);
    return 0;
 }
 
