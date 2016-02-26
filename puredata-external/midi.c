@@ -70,18 +70,22 @@ void midi_in_tick(void* x){
     switch(this->incoming_messages[i].type){
       case BEAGLEBONE_MIDI_NOTE_ON:
         {
-          SETFLOAT(&output[0], this->incoming_messages[i].data[1]);
-          SETFLOAT(&output[1], this->incoming_messages[i].data[2]);
-          SETFLOAT(&output[2], this->incoming_messages[i].channel);
-          outlet_anything(this->outlet, gensym("note"), 3, &output[0]);
+          if(this->incoming_messages[i].channel == 15){
+            SETFLOAT(&output[0], this->incoming_messages[i].data[1]);
+            SETFLOAT(&output[1], this->incoming_messages[i].data[2]);
+            SETFLOAT(&output[2], this->incoming_messages[i].channel);
+            outlet_anything(this->outlet, gensym("note"), 3, &output[0]);
+          }
         }
         break;
       case BEAGLEBONE_MIDI_NOTE_OFF:
         {
-          SETFLOAT(&output[0], this->incoming_messages[i].data[1]);
-          SETFLOAT(&output[1], 0);
-          SETFLOAT(&output[2], this->incoming_messages[i].channel);
-          outlet_anything(this->outlet, gensym("note"), 3, &output[0]);
+          if(this->incoming_messages[i].channel == 15){
+            SETFLOAT(&output[0], this->incoming_messages[i].data[1]);
+            SETFLOAT(&output[1], 0);
+            SETFLOAT(&output[2], this->incoming_messages[i].channel);
+            outlet_anything(this->outlet, gensym("note"), 3, &output[0]);
+          }
         }
         break;
 
