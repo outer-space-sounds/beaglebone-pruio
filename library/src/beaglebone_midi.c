@@ -113,6 +113,10 @@ void beaglebone_midi_receive_messages(beaglebone_midi_message* messages, int* nu
           current_message.type = BEAGLEBONE_MIDI_PITCH_BEND;
           current_message.size = 3;
           break;
+        default:
+          current_message.type = BEAGLEBONE_MIDI_UNKNOWN;
+          current_message.size = BEAGLEBONE_MIDI_MAX_MESSAGE_SIZE+1;
+          break;
       } 
       current_message.data[0] = byte;
       current_message.channel = byte & 0x0F;

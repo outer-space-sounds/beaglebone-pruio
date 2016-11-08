@@ -105,6 +105,7 @@ void beaglebone_midi_stop();
  */
 
 typedef enum{  
+   BEAGLEBONE_MIDI_UNKNOWN = 0x0,
    BEAGLEBONE_MIDI_NOTE_OFF = 0x8,
    BEAGLEBONE_MIDI_NOTE_ON = 0x9,
    BEAGLEBONE_MIDI_CONTROL_CHANGE = 0xB,
